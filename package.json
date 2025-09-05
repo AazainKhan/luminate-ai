@@ -1,0 +1,26 @@
+{
+  "name": "luminate-ai-backend",
+  "version": "1.0.0",
+  "description": "Have an AI for your Centennial Luminate platform",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AazainKhan/luminate-ai-backend.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AazainKhan/luminate-ai-backend/issues"
+  },
+  "homepage": "https://github.com/AazainKhan/luminate-ai-backend#readme",
+  "dependencies": {
+    "dotenv": "^17.2.2",
+    "express": "^5.1.0",
+    "node-fetch": "^3.3.2"
+  }
+}
