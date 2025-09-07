@@ -1,2 +1,2 @@
 # Luminate-AI
-Have an AI for your Centennial Luminate platform
+An AI for your Centennial Luminate platform
