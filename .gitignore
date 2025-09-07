@@ -5,3 +5,6 @@ CLIENT_SECRET=NcoUfECSAZV8DD1fUqg59LCmdJi3Xfr5
 BASE_URL=https://luminate-ai-backend.onrender.com
 
 node_modules
+.env
+
+tokens.json
