@@ -91,7 +91,7 @@ app.get("/auth/start", (req, res) => {
     const state = crypto.randomBytes(16).toString("hex");
     states.add(state);
     const redirectUri = encodeURIComponent(`${BASE_URL}/auth/callback`);
-    const url = `${BB_HOST}/learn/api/public/v1/oauth2/authorize?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&state=${state}`;
+    const url = `${BB_HOST}/learn/api/public/v1/oauth2/authorizationcode?response_type=code&client_id=${CLIENT_ID}&redirect_uri=${redirectUri}&state=${state}`;
     res.redirect(url);
 });
 
