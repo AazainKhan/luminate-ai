@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONTENT id="_800736_1"><TITLE value="Responsive Grid"/><TITLECOLOR value="#000000"/><DESCRIPTION
+   value="Style Guide - Grid&#xa;Grid System&#xa;NOTE: There are 5 responsive columns available, 2 to 6 columns.&#xa;CLASS col-2&#xa;CLASS col-2&#xa;CLASS col-3&#xa;CLASS col-3&#xa;CLASS col-3&#xa;CLASS col-4&#xa;CLASS col-4&#xa;CLASS col-4&#xa;CLASS col-4&#xa;CLASS col-5&#xa;CLASS col-5&#xa;CLASS col-5&#xa;CLASS col-5&#xa;CLASS col-5&#xa;CLASS col-6&#xa;CLASS col-6&#xa;CLASS col-6&#xa;CLASS col-6&#xa;CLASS col-6&#xa;CLASS col-6&#xa;Example: HTML Code for a Two Column Grid&#xa;CLASS col-2&#xa;CLASS col-2"/><BODY><TEXT>&lt;!-- {"bbMLEditorVersion":1} --&gt;&lt;div&gt; 
+ &lt;h4&gt;Grid System&lt;/h4&gt; 
+ &lt;div&gt; 
+  &lt;p&gt;&lt;strong&gt;NOTE:&lt;/strong&gt; There are 5 responsive columns available, 2 to 6 columns.&lt;/p&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-2&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-2&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-3&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-3&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-3&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-4&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-4&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-4&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-4&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-5&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-5&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-5&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-5&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-5&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-6&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-6&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-6&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-6&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-6&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;CLASS col-6&lt;/p&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;h6&gt;Example: HTML Code for a Two Column Grid&lt;/h6&gt; 
+ &lt;pre&gt;&amp;lt;div class="row"&amp;gt;
+  &amp;lt;div class="col-2"&amp;gt;
+    &amp;lt;p&amp;gt;CLASS col-2&amp;lt;/p&amp;gt;
+  &amp;lt;/div&amp;gt;
+  &amp;lt;div class="col-2"&amp;gt;
+    &amp;lt;p&amp;gt;CLASS col-2&amp;lt;/p&amp;gt;
+  &amp;lt;/div&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/pre&gt; 
+  
+&lt;/div&gt;</TEXT><TYPE
+   value="H"/></BODY><DATES><CREATED value="2024-10-04 18:31:50 EDT"/><UPDATED value="2024-10-10 12:30:50 EDT"/><START
+   value=""/><END value=""/></DATES><FLAGS><ISAVAILABLE value="true"/><ISFROMCARTRIDGE value="false"/><ISFOLDER
+   value="false"/><ISDESCRIBED value="false"/><ISTRACKED value="true"/><ISLESSON value="false"/><ISSEQUENTIAL
+   value="false"/><ALLOWGUESTS value="true"/><ALLOWOBSERVERS value="true"/><LAUNCHINNEWWINDOW
+   value="false"/><ISREVIEWABLE value="false"/><ISGROUPCONTENT value="false"/><ISSAMPLECONTENT
+   value="false"/><PARTIALLYVISIBLE value="false"/><HASTHUMBNAIL value="false"/></FLAGS><CONTENTHANDLER
+  value="resource/x-bb-document"/><RENDERTYPE value="REGULAR"/><FOLDERTYPE value=""/><URL value=""/><VIEWMODE
+  value="TEXT_ICON_ONLY"/><OFFLINENAME value=""/><OFFLINEPATH value=""/><LINKREF value=""/><PARENTID
+  value="_800609_1"/><REVIEWABLEREASON value="NONE"/><VERSION value="3"/><THUMBNAILALT value=""/><AISTATE
+  value="No"/><AIACCEPTINGUSER value=""/><EXTENDEDDATA/><FILES/></CONTENT>

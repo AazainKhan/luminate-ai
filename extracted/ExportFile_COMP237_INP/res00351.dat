@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONTENT id="_800717_1"><TITLE value="overview"/><TITLECOLOR value="#000000"/><DESCRIPTION
+   value="Weekly Overview&#xa;Module Title&#xa;Introduction to this week's topic&#xa;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempor rutrum maximus. Donec fringilla risus finibus suscipit luctus. In at augue eget purus fringilla ultrices. Nam tincidunt dui eu lacus feugiat, vitae feugiat quam fermentum. Nam a maximus diam. Pellentesque ac ipsum non lacus hendrerit malesuada et ut sapien. Curabitur id posuere est, at sollicitudin odio. Praesent viverra hendrerit metus, nec mattis mauris scelerisque consectetur. Maecenas odio ante, lacinia at eleifend at, tempor a nisi. Sed vitae velit et ex vehicula rutrum at sit amet velit.&#xa;Learning Outcomes&#xa;At the end of this module, you will be able to:&#xa;CLO 1&#xa;CLO 2&#xa;CLO 3&#xa;CLO 4&#xa;Checklist&#xa;In order to compl..."/><BODY><TEXT>&lt;!-- {"bbMLEditorVersion":1} --&gt;&lt;div&gt; 
+ &lt;h4&gt;Module Title&lt;/h4&gt; 
+ &lt;p style="float: right;"&gt;&lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693287_1" data-bbfile="{&amp;quot;alternativeText&amp;quot;:&amp;quot;Placeholder&amp;quot;,&amp;quot;linkName&amp;quot;:&amp;quot;placeholder.png&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;image/png&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;placeholder.png&lt;/a&gt;&lt;/p&gt; 
+ &lt;h5&gt;Introduction to this week's topic&lt;/h5&gt; 
+ &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed tempor rutrum maximus. Donec fringilla risus finibus suscipit luctus. In at augue eget purus fringilla ultrices. Nam tincidunt dui eu lacus feugiat, vitae feugiat quam fermentum. Nam a maximus diam. Pellentesque ac ipsum non lacus hendrerit malesuada et ut sapien. Curabitur id posuere est, at sollicitudin odio. Praesent viverra hendrerit metus, nec mattis mauris scelerisque consectetur. Maecenas odio ante, lacinia at eleifend at, tempor a nisi. Sed vitae velit et ex vehicula rutrum at sit amet velit.&lt;/p&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;div&gt; 
+    &lt;h6&gt;Learning Outcomes&lt;/h6&gt; 
+    &lt;p&gt;At the end of this module, you will be able to:&lt;/p&gt; 
+    &lt;ol&gt; 
+     &lt;li&gt;CLO 1&lt;/li&gt; 
+     &lt;li&gt;CLO 2&lt;/li&gt; 
+     &lt;li&gt;CLO 3&lt;/li&gt; 
+     &lt;li&gt;CLO 4&lt;/li&gt; 
+    &lt;/ol&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;div&gt; 
+    &lt;h6&gt;Checklist&lt;/h6&gt; 
+    &lt;p&gt;In order to complete the module, you will need to do the following:&lt;/p&gt; 
+    &lt;ol&gt; 
+     &lt;li&gt;Task 1&lt;/li&gt; 
+     &lt;li&gt;Task 2&lt;/li&gt; 
+     &lt;li&gt;Task 3&lt;/li&gt; 
+     &lt;li&gt;Task 4&lt;/li&gt; 
+    &lt;/ol&gt; 
+   &lt;/div&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;h6&gt;Reading List&lt;/h6&gt; 
+  &lt;ul&gt; 
+   &lt;li&gt;Author. (YYYY). Article Title. Book Title, page #&lt;/li&gt; 
+   &lt;li&gt;Author. (YYYY). Article Title. Book Title, page #&lt;/li&gt; 
+   &lt;li&gt;Author. (YYYY). Article Title. Book Title, page #&lt;/li&gt; 
+  &lt;/ul&gt; 
+ &lt;/div&gt; 
+ &lt;p&gt;Program Name or Course Name - School Name&lt;/p&gt; 
+  
+&lt;/div&gt;</TEXT><TYPE
+   value="H"/></BODY><DATES><CREATED value="2024-10-04 18:31:50 EDT"/><UPDATED value="2024-10-10 12:31:00 EDT"/><START
+   value=""/><END value=""/></DATES><FLAGS><ISAVAILABLE value="true"/><ISFROMCARTRIDGE value="false"/><ISFOLDER
+   value="false"/><ISDESCRIBED value="false"/><ISTRACKED value="true"/><ISLESSON value="false"/><ISSEQUENTIAL
+   value="false"/><ALLOWGUESTS value="true"/><ALLOWOBSERVERS value="true"/><LAUNCHINNEWWINDOW
+   value="false"/><ISREVIEWABLE value="false"/><ISGROUPCONTENT value="false"/><ISSAMPLECONTENT
+   value="false"/><PARTIALLYVISIBLE value="false"/><HASTHUMBNAIL value="false"/></FLAGS><CONTENTHANDLER
+  value="resource/x-bb-document"/><RENDERTYPE value="REGULAR"/><FOLDERTYPE value=""/><URL value=""/><VIEWMODE
+  value="TEXT_ICON_ONLY"/><OFFLINENAME value=""/><OFFLINEPATH value=""/><LINKREF value=""/><PARENTID
+  value="_800620_1"/><REVIEWABLEREASON value="NONE"/><VERSION value="3"/><THUMBNAILALT value=""/><AISTATE
+  value="No"/><AIACCEPTINGUSER value=""/><EXTENDEDDATA/><FILES/></CONTENT>

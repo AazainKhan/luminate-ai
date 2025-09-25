@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONTENT id="_800727_1"><TITLE value="wrapup"/><TITLECOLOR value="#000000"/><DESCRIPTION
+   value="Wrap it Up&#xa;Title&#xa;Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore saepe accusantium, unde id quia, error possimus adipisci nisi, ipsum aliquam molestias repellendus iure, expedita. Nemo repellat debitis rem, labore quibusdam, magnam. Ad quae dolor, nobis rerum tempore accusantium fugit, non nulla dolore quas veniam iure modi eius facilis harum porro.&#xa;Checklist/To-Do&#xa;Task 1&#xa;Task 2&#xa;Task 3&#xa;Module Summary&#xa;Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore saepe accusantium, unde id quia, error possimus adipisci nisi, ipsum aliquam molestias repellendus iure, expedita. Nemo repellat debitis rem, labore quibusdam, magnam. Ad quae dolor, nobis rerum tempore accusantium fugit, non nulla dolore quas veniam iure modi ..."/><BODY><TEXT>&lt;!-- {"bbMLEditorVersion":1} --&gt;&lt;div&gt; 
+ &lt;h4&gt;Title&lt;/h4&gt; 
+ &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore saepe accusantium, unde id quia, error possimus adipisci nisi, ipsum aliquam molestias repellendus iure, expedita. Nemo repellat debitis rem, labore quibusdam, magnam. Ad quae dolor, nobis rerum tempore accusantium fugit, non nulla dolore quas veniam iure modi eius facilis harum porro.&lt;/p&gt; 
+ &lt;h5&gt;Checklist/To-Do&lt;/h5&gt; 
+ &lt;ul&gt; 
+  &lt;li&gt;Task 1&lt;/li&gt; 
+  &lt;li&gt;Task 2&lt;/li&gt; 
+  &lt;li&gt;Task 3&lt;/li&gt; 
+ &lt;/ul&gt; 
+ &lt;h5&gt;Module Summary&lt;/h5&gt; 
+ &lt;p&gt;Lorem ipsum dolor sit amet, consectetur adipisicing elit. Labore saepe accusantium, unde id quia, error possimus adipisci nisi, ipsum aliquam molestias repellendus iure, expedita. Nemo repellat debitis rem, labore quibusdam, magnam. Ad quae dolor, nobis rerum tempore accusantium fugit, non nulla dolore quas veniam iure modi eius facilis harum porro.&lt;/p&gt; 
+ &lt;p&gt;Program Name or Course Name - School Name&lt;/p&gt; 
+  
+&lt;/div&gt;</TEXT><TYPE
+   value="H"/></BODY><DATES><CREATED value="2024-10-04 18:31:50 EDT"/><UPDATED value="2024-10-10 12:30:50 EDT"/><START
+   value=""/><END value=""/></DATES><FLAGS><ISAVAILABLE value="true"/><ISFROMCARTRIDGE value="false"/><ISFOLDER
+   value="false"/><ISDESCRIBED value="false"/><ISTRACKED value="true"/><ISLESSON value="false"/><ISSEQUENTIAL
+   value="false"/><ALLOWGUESTS value="true"/><ALLOWOBSERVERS value="true"/><LAUNCHINNEWWINDOW
+   value="false"/><ISREVIEWABLE value="false"/><ISGROUPCONTENT value="false"/><ISSAMPLECONTENT
+   value="false"/><PARTIALLYVISIBLE value="false"/><HASTHUMBNAIL value="false"/></FLAGS><CONTENTHANDLER
+  value="resource/x-bb-document"/><RENDERTYPE value="REGULAR"/><FOLDERTYPE value=""/><URL value=""/><VIEWMODE
+  value="TEXT_ICON_ONLY"/><OFFLINENAME value=""/><OFFLINEPATH value=""/><LINKREF value=""/><PARENTID
+  value="_800619_1"/><REVIEWABLEREASON value="NONE"/><VERSION value="3"/><THUMBNAILALT value=""/><AISTATE
+  value="No"/><AIACCEPTINGUSER value=""/><EXTENDEDDATA/><FILES/></CONTENT>

@@ -1,0 +1,8 @@
+./extracted/
+./venv/
+__pycache__/
+*.pyc
+*.sqlite3
+*.bin
+*.log
+.DS_Store
