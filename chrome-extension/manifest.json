@@ -1,0 +1,29 @@
+{
+  "manifest_version": 3,
+  "name": "Luminate AI - COMP237 Course Assistant",
+  "version": "1.0.0",
+  "description": "Intelligent tutoring system for COMP237 (Artificial Intelligence) at Centennial College. Navigate and learn with AI-powered assistance.",
+  "permissions": [
+    "storage",
+    "activeTab",
+    "sidePanel"
+  ],
+  "host_permissions": [
+    "https://luminate.centennialcollege.ca/*",
+    "http://localhost:8000/*"
+  ],
+  "side_panel": {
+    "default_path": "sidepanel.html"
+  },
+  "action": {
+    "default_title": "Open Luminate AI"
+  },
+  "background": {
+    "service_worker": "background.js"
+  },
+  "icons": {
+    "16": "icon.svg",
+    "48": "icon.svg",
+    "128": "icon.svg"
+  }
+}
