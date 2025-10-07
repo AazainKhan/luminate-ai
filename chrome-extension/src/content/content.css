@@ -1,0 +1,68 @@
+/* Content script styles - injected into Blackboard pages */
+
+/* Prevent Blackboard styles from affecting our components */
+#luminate-ai-root {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Reset specific conflicting styles from Blackboard */
+#luminate-ai-root *,
+#luminate-ai-root *::before,
+#luminate-ai-root *::after {
+  box-sizing: border-box;
+}
+
+#luminate-ai-root button {
+  font-family: inherit;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+  margin: 0;
+}
+
+/* Animation for chat interface */
+.luminate-ai-chat-container {
+  animation: slideIn 0.3s ease-out;
+  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.15);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+/* Spin animation for loading indicator */
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Button pulse animation on first load */
+@keyframes pulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.luminate-ai-button {
+  animation: pulse 2s ease-in-out 3;
+}
+
