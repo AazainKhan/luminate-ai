@@ -20,6 +20,10 @@ import sys
 from pathlib import Path
 import logging
 from contextlib import asynccontextmanager
+import time
+
+# Import enhanced middleware
+from middleware import cache, rate_limiter, metrics, validator
 
 # Add parent directories to path for imports
 project_root = Path(__file__).parent.parent.parent.parent
@@ -189,14 +193,18 @@ async def health_check():
 
 @app.get("/stats")
 async def get_stats():
-    """Get ChromaDB collection statistics"""
+    """Get ChromaDB collection and API performance statistics"""
     if chroma_db is None:
         raise HTTPException(status_code=503, detail="ChromaDB not initialized")
     
     try:
-        stats = chroma_db.get_stats()
+        db_stats = chroma_db.get_stats()
+        api_metrics = metrics.get_stats()
+        
         return {
-            "stats": stats,
+            "database": db_stats,
+            "api_metrics": api_metrics,
+            "cache_size": cache.size(),
             "timestamp": datetime.now().isoformat()
         }
     except Exception as e:
@@ -210,15 +218,45 @@ async def navigate_query(request: NavigateRequest, req: Request):
     Navigate mode: Semantic search for course content
     
     Returns relevant course materials with Blackboard URLs for navigation.
-    Uses ChromaDB for vector similarity search.
+    Uses ChromaDB for vector similarity search with caching and rate limiting.
     """
     start_time = datetime.now()
     client_ip = req.client.host if req.client else "unknown"
     
-    logger.info(f"Navigate query from {client_ip}: '{request.query}' (n={request.n_results})")
+    # Rate limiting
+    if not rate_limiter.is_allowed(client_ip):
+        metrics.record_error("rate_limit_exceeded")
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded. Please wait before making more requests."
+        )
+    
+    # Validate and sanitize input
+    sanitized_query = validator.sanitize_query(request.query)
+    validated_n_results = validator.validate_n_results(request.n_results)
+    validated_min_score = validator.validate_score(request.min_score)
+    
+    logger.info(f"Navigate query from {client_ip}: '{sanitized_query}' (n={validated_n_results})")
+    
+    # Check cache
+    cache_key = {
+        "query": sanitized_query,
+        "n_results": validated_n_results,
+        "min_score": validated_min_score,
+        "module_filter": request.module_filter,
+        "content_type_filter": request.content_type_filter,
+        "include_no_url": request.include_no_url
+    }
+    
+    cached_response = cache.get(cache_key)
+    if cached_response:
+        logger.info(f"Returning cached response for: '{sanitized_query}'")
+        metrics.record_request("/query/navigate", 0, success=True)
+        return NavigateResponse(**cached_response)
     
     if chroma_db is None:
         logger.error("ChromaDB not initialized")
+        metrics.record_error("chromadb_unavailable")
         raise HTTPException(status_code=503, detail="Search service not available")
     
     try:
@@ -231,8 +269,8 @@ async def navigate_query(request: NavigateRequest, req: Request):
         
         # Query ChromaDB
         chroma_results = chroma_db.query(
-            query_text=request.query,
-            n_results=request.n_results * 2,  # Fetch extra for filtering
+            query_text=sanitized_query,
+            n_results=validated_n_results * 2,  # Fetch extra for filtering
             filter_metadata=where_filter if where_filter else None
         )
         
@@ -249,7 +287,7 @@ async def navigate_query(request: NavigateRequest, req: Request):
                 score = dist
                 
                 # Apply score threshold
-                if score > request.min_score and request.min_score > 0:
+                if score > validated_min_score and validated_min_score > 0:
                     continue
                 
                 # Filter out results without URLs (unless explicitly allowed)
@@ -277,30 +315,38 @@ async def navigate_query(request: NavigateRequest, req: Request):
                 results.append(result)
                 
                 # Stop if we have enough results
-                if len(results) >= request.n_results:
+                if len(results) >= validated_n_results:
                     break
         
         # Calculate execution time
         execution_time_ms = (datetime.now() - start_time).total_seconds() * 1000
         
         logger.info(
-            f"Navigate query completed: '{request.query}' → "
+            f"Navigate query completed: '{sanitized_query}' → "
             f"{len(results)} results in {execution_time_ms:.2f}ms"
         )
         
         # Build response
         response = NavigateResponse(
-            query=request.query,
+            query=sanitized_query,
             results=results,
             total_results=len(results),
             execution_time_ms=round(execution_time_ms, 2),
             timestamp=datetime.now().isoformat()
         )
         
+        # Cache the response
+        cache.set(cache_key, response.model_dump())
+        
+        # Record metrics
+        metrics.record_request("/query/navigate", execution_time_ms, success=True)
+        
         return response
     
     except Exception as e:
         logger.error(f"Navigate query failed: {e}", exc_info=True)
+        metrics.record_request("/query/navigate", 0, success=False)
+        metrics.record_error(type(e).__name__)
         raise HTTPException(status_code=500, detail=f"Search failed: {str(e)}")
 
 
@@ -334,7 +380,7 @@ class LangGraphNavigateResponse(BaseModel):
 
 
 @app.post("/langgraph/navigate", response_model=LangGraphNavigateResponse)
-async def langgraph_navigate(request: LangGraphNavigateRequest):
+async def langgraph_navigate(request: LangGraphNavigateRequest, req: Request):
     """
     LangGraph Navigate Mode: Multi-agent workflow for course content search
     
@@ -345,17 +391,38 @@ async def langgraph_navigate(request: LangGraphNavigateRequest):
     4. Formatting - Structures output for Chrome extension
     """
     start_time = datetime.now()
+    client_ip = req.client.host if req.client else "unknown"
     
-    logger.info(f"🤖 LangGraph Navigate query: '{request.query}'")
+    # Rate limiting
+    if not rate_limiter.is_allowed(client_ip):
+        metrics.record_error("rate_limit_exceeded")
+        raise HTTPException(
+            status_code=429,
+            detail="Rate limit exceeded. Please wait before making more requests."
+        )
+    
+    # Validate and sanitize input
+    sanitized_query = validator.sanitize_query(request.query)
+    
+    logger.info(f"🤖 LangGraph Navigate query from {client_ip}: '{sanitized_query}'")
+    
+    # Check cache
+    cache_key = {"query": sanitized_query, "endpoint": "langgraph"}
+    cached_response = cache.get(cache_key)
+    if cached_response:
+        logger.info(f"Returning cached LangGraph response for: '{sanitized_query}'")
+        metrics.record_request("/langgraph/navigate", 0, success=True)
+        return LangGraphNavigateResponse(**cached_response)
     
     if navigate_workflow is None:
         logger.error("LangGraph workflow not initialized")
+        metrics.record_error("langgraph_unavailable")
         raise HTTPException(status_code=503, detail="Navigate workflow not available")
     
     try:
         # Run the workflow with ChromaDB instance
         result = navigate_workflow.invoke({
-            "query": request.query,
+            "query": sanitized_query,
             "chroma_db": chroma_db
         })
         
@@ -382,16 +449,26 @@ async def langgraph_navigate(request: LangGraphNavigateRequest):
             f"{len(top_results)} results, {len(related_topics)} related topics"
         )
         
-        return LangGraphNavigateResponse(
+        response = LangGraphNavigateResponse(
             formatted_response=answer,
             top_results=top_results,
             related_topics=related_topics,
             external_resources=external_resources,  # NEW: Include external resources
             next_steps=[next_steps] if next_steps and isinstance(next_steps, str) else next_steps
         )
+        
+        # Cache the response
+        cache.set(cache_key, response.model_dump())
+        
+        # Record metrics
+        metrics.record_request("/langgraph/navigate", execution_time_ms, success=True)
+        
+        return response
     
     except Exception as e:
         logger.error(f"LangGraph Navigate failed: {e}", exc_info=True)
+        metrics.record_request("/langgraph/navigate", 0, success=False)
+        metrics.record_error(type(e).__name__)
         raise HTTPException(status_code=500, detail=f"Navigate workflow failed: {str(e)}")
 
 
@@ -457,6 +534,8 @@ async def get_external_resources(request: ExternalResourcesRequest):
             f"(YouTube: {len(youtube_results)}, Educational: {len(edu_results)}, OER: {len(oer_results)})"
         )
         
+        metrics.record_request("/external-resources", execution_time_ms, success=True)
+        
         return ExternalResourcesResponse(
             resources=resources,
             count=len(resources)
@@ -464,7 +543,114 @@ async def get_external_resources(request: ExternalResourcesRequest):
     
     except Exception as e:
         logger.error(f"External resources search failed: {e}", exc_info=True)
+        metrics.record_request("/external-resources", 0, success=False)
+        metrics.record_error(type(e).__name__)
         raise HTTPException(status_code=500, detail=f"External resources search failed: {str(e)}")
+
+
+# Conversation History Models
+class ConversationMessage(BaseModel):
+    """Single conversation message"""
+    role: str = Field(..., description="user or assistant")
+    content: str
+    timestamp: str
+    results: Optional[List[Dict[str, Any]]] = None
+    related_topics: Optional[List[Dict[str, Any]]] = None
+
+
+class SaveConversationRequest(BaseModel):
+    """Request to save conversation history"""
+    session_id: str = Field(..., description="Unique session identifier")
+    messages: List[ConversationMessage]
+
+
+class LoadConversationResponse(BaseModel):
+    """Response with conversation history"""
+    session_id: str
+    messages: List[ConversationMessage]
+    last_updated: str
+
+
+# Simple in-memory conversation storage (could be Redis/DB in production)
+conversation_store: Dict[str, Dict] = {}
+
+
+@app.post("/conversation/save")
+async def save_conversation(request: SaveConversationRequest):
+    """
+    Save conversation history for a session
+    
+    In production, this would be stored in Redis or a database.
+    Currently using in-memory storage for simplicity.
+    """
+    try:
+        conversation_store[request.session_id] = {
+            "messages": [msg.model_dump() for msg in request.messages],
+            "last_updated": datetime.now().isoformat()
+        }
+        
+        logger.info(f"Saved conversation for session: {request.session_id} ({len(request.messages)} messages)")
+        
+        return {
+            "success": True,
+            "session_id": request.session_id,
+            "message_count": len(request.messages),
+            "timestamp": datetime.now().isoformat()
+        }
+    
+    except Exception as e:
+        logger.error(f"Failed to save conversation: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to save conversation: {str(e)}")
+
+
+@app.get("/conversation/load/{session_id}", response_model=LoadConversationResponse)
+async def load_conversation(session_id: str):
+    """
+    Load conversation history for a session
+    
+    Returns empty list if session not found.
+    """
+    try:
+        if session_id not in conversation_store:
+            logger.info(f"No conversation found for session: {session_id}")
+            return LoadConversationResponse(
+                session_id=session_id,
+                messages=[],
+                last_updated=datetime.now().isoformat()
+            )
+        
+        data = conversation_store[session_id]
+        messages = [ConversationMessage(**msg) for msg in data["messages"]]
+        
+        logger.info(f"Loaded conversation for session: {session_id} ({len(messages)} messages)")
+        
+        return LoadConversationResponse(
+            session_id=session_id,
+            messages=messages,
+            last_updated=data["last_updated"]
+        )
+    
+    except Exception as e:
+        logger.error(f"Failed to load conversation: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to load conversation: {str(e)}")
+
+
+@app.delete("/conversation/{session_id}")
+async def delete_conversation(session_id: str):
+    """Delete conversation history for a session"""
+    try:
+        if session_id in conversation_store:
+            del conversation_store[session_id]
+            logger.info(f"Deleted conversation for session: {session_id}")
+            return {"success": True, "message": "Conversation deleted"}
+        else:
+            raise HTTPException(status_code=404, detail="Session not found")
+    
+    except HTTPException:
+        raise
+    except Exception as e:
+        logger.error(f"Failed to delete conversation: {e}")
+        raise HTTPException(status_code=500, detail=f"Failed to delete conversation: {str(e)}")
 
 
 if __name__ == "__main__":
