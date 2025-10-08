@@ -7,3 +7,4 @@ tqdm>=4.66.0
 lxml>=4.9.0
 requests>=2.31.0
 nanoid>=2.0.0
+langflow>=1.6.4
