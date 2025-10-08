@@ -3,6 +3,7 @@ Centralized LLM Configuration for Luminate AI
 Supports multiple LLM providers with easy switching via environment variables.
 
 Supported Providers:
+- Groq (llama-3.1-70b-versatile, mixtral-8x7b, gemma2-9b - SUPER FAST!)
 - Google Gemini (gemini-2.0-flash, gemini-1.5-pro, etc.)
 - OpenAI (gpt-4, gpt-3.5-turbo, etc.)
 - Anthropic Claude (claude-3-opus, claude-3-sonnet, etc.)
@@ -17,8 +18,9 @@ Usage:
 
 Configuration:
     Set in .env file:
-    LLM_PROVIDER=gemini          # gemini, openai, anthropic, ollama, azure
-    MODEL_NAME=gemini-2.0-flash   # Provider-specific model name
+    LLM_PROVIDER=groq             # groq, gemini, openai, anthropic, ollama, azure
+    MODEL_NAME=llama-3.1-70b-versatile  # Provider-specific model name
+    GROQ_API_KEY=your_key         # For Groq (RECOMMENDED - Fast & Free!)
     GOOGLE_API_KEY=your_key       # For Gemini
     OPENAI_API_KEY=your_key       # For OpenAI
     ANTHROPIC_API_KEY=your_key    # For Anthropic
@@ -62,18 +64,23 @@ def get_llm(
     # Provider-specific defaults if MODEL_NAME not set
     if not model_name:
         model_defaults = {
+            "groq": "llama-3.1-70b-versatile",
             "gemini": "gemini-2.0-flash",
             "openai": "gpt-4o-mini",
             "anthropic": "claude-3-5-sonnet-20241022",
             "ollama": "llama3.2",
             "azure": "gpt-4"
         }
-        model_name = model_defaults.get(llm_provider, "gemini-2.0-flash")
+        model_name = model_defaults.get(llm_provider, "llama-3.1-70b-versatile")
     
     print(f"🤖 Initializing LLM: {llm_provider} / {model_name} (temp={temperature})")
     
+    # Groq (SUPER FAST!)
+    if llm_provider == "groq":
+        return _get_groq_llm(model_name, temperature, max_tokens, **kwargs)
+    
     # Gemini
-    if llm_provider == "gemini":
+    elif llm_provider == "gemini":
         return _get_gemini_llm(model_name, temperature, max_tokens, **kwargs)
     
     # OpenAI
@@ -95,8 +102,38 @@ def get_llm(
     else:
         raise ValueError(
             f"Unsupported LLM provider: {llm_provider}. "
-            f"Supported: gemini, openai, anthropic, ollama, azure"
+            f"Supported: groq, gemini, openai, anthropic, ollama, azure"
         )
+
+
+def _get_groq_llm(model: str, temperature: float, max_tokens: Optional[int], **kwargs):
+    """Get Groq LLM instance (SUPER FAST!)."""
+    try:
+        from langchain_groq import ChatGroq
+    except ImportError:
+        raise ImportError(
+            "langchain-groq not installed. "
+            "Run: pip install langchain-groq"
+        )
+    
+    api_key = os.getenv("GROQ_API_KEY")
+    if not api_key:
+        raise ValueError(
+            "GROQ_API_KEY not found in environment. "
+            "Get one FREE at: https://console.groq.com/keys"
+        )
+    
+    params = {
+        "model": model,
+        "temperature": temperature,
+        "groq_api_key": api_key,
+        **kwargs
+    }
+    
+    if max_tokens:
+        params["max_tokens"] = max_tokens
+    
+    return ChatGroq(**params)
 
 
 def _get_gemini_llm(model: str, temperature: float, max_tokens: Optional[int], **kwargs):

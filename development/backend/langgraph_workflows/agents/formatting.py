@@ -124,6 +124,9 @@ def formatting_agent(state: Dict) -> Dict:
         response = llm.invoke(prompt)
         response_text = response.content if hasattr(response, 'content') else str(response)
         
+        # DEBUG: Print raw LLM response
+        print(f"🔍 DEBUG - Raw LLM response (first 500 chars):\n{response_text[:500]}")
+        
         # Parse JSON
         if "```json" in response_text:
             response_text = response_text.split("```json")[1].split("```")[0].strip()
@@ -131,6 +134,9 @@ def formatting_agent(state: Dict) -> Dict:
             response_text = response_text.split("```")[1].split("```")[0].strip()
         
         formatted_response = json.loads(response_text)
+        
+        # DEBUG: Print parsed response structure
+        print(f"🔍 DEBUG - Parsed top_results count: {len(formatted_response.get('top_results', []))}")
         
         # Add external resources to the response (only if in scope)
         is_in_scope = formatted_response.get("is_in_scope", True)

@@ -92,7 +92,7 @@ Respond with ONLY valid JSON (no markdown, no backticks):
     try:
         llm = get_llm(
             temperature=0.6,  # Higher creativity for diverse questions
-            model="gemini-1.5-pro"
+            model="gemini-2.0-flash-exp"
         )
         
         import json
@@ -207,7 +207,7 @@ Respond with ONLY valid JSON (no markdown, no backticks):
     try:
         llm = get_llm(
             temperature=0.3,
-            model="gemini-1.5-pro"
+            model="gemini-2.0-flash-exp"
         )
         
         import json
@@ -351,7 +351,7 @@ Respond with ONLY valid JSON (no markdown, no backticks):
     try:
         llm = get_llm(
             temperature=0.4,
-            model="gemini-1.5-pro"
+            model="gemini-2.0-flash-exp"
         )
         
         import json

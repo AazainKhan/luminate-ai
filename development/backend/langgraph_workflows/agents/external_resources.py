@@ -32,7 +32,12 @@ def search_youtube(query: str, max_results: int = 3) -> List[Dict[str, str]]:
             "relevanceLanguage": "en"
         }
         
-        response = requests.get(url, params=params, timeout=5)
+        # Add referer header to pass HTTP referrer restrictions
+        headers = {
+            "Referer": "http://localhost:8000/"
+        }
+        
+        response = requests.get(url, params=params, headers=headers, timeout=5)
         response.raise_for_status()
         data = response.json()
         

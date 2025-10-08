@@ -30,9 +30,13 @@ def retrieval_agent(state: Dict) -> Dict:
     # Use expanded query for better retrieval
     search_query = parsed_query.get("expanded_query", state["query"])
     
+    print(f"🔍 Retrieving documents for: {search_query}")
+    
     try:
-        # Query ChromaDB directly
-        raw_results = chroma_db.query(query_text=search_query, n_results=15)
+        # Query ChromaDB directly (note: query_texts expects a list!)
+        raw_results = chroma_db.query(query_texts=[search_query], n_results=15)
+        
+        print(f"📊 ChromaDB returned {len(raw_results.get('documents', [[]])[0])} results")
         
         # Convert ChromaDB format to expected format
         results = _convert_chromadb_results(raw_results)

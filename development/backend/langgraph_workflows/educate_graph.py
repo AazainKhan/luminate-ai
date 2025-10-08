@@ -178,7 +178,8 @@ def build_educate_graph():
 
 def query_educate_mode(
     query: str,
-    conversation_history: List[Dict] = None
+    conversation_history: List[Dict] = None,
+    chroma_db = None
 ) -> Dict[str, Any]:
     """
     Execute Educate Mode workflow for a student query.
@@ -186,6 +187,7 @@ def query_educate_mode(
     Args:
         query: Student's question or request
         conversation_history: Previous conversation (for context)
+        chroma_db: ChromaDB collection for retrieval (optional)
         
     Returns:
         Dictionary with formatted_response and metadata
@@ -196,7 +198,8 @@ def query_educate_mode(
     # Initialize state
     initial_state = {
         "query": query,
-        "conversation_history": conversation_history or []
+        "conversation_history": conversation_history or [],
+        "chroma_db": chroma_db  # Pass ChromaDB to agents
     }
     
     print(f"\n{'='*60}")

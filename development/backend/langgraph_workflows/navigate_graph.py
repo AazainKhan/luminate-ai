@@ -75,12 +75,13 @@ def build_navigate_graph():
     return graph.compile()
 
 
-def query_navigate_mode(query: str) -> Dict[str, Any]:
+def query_navigate_mode(query: str, chroma_db=None) -> Dict[str, Any]:
     """
     Execute Navigate Mode workflow for a student query.
     
     Args:
         query: Student's search query
+        chroma_db: ChromaDB collection for retrieval
         
     Returns:
         Dictionary with formatted_response and metadata
@@ -89,7 +90,10 @@ def query_navigate_mode(query: str) -> Dict[str, Any]:
     navigate_graph = build_navigate_graph()
     
     # Initialize state
-    initial_state = {"query": query}
+    initial_state = {
+        "query": query,
+        "chroma_db": chroma_db  # Pass ChromaDB to agents
+    }
     
     # Execute workflow
     final_state = navigate_graph.invoke(initial_state)
