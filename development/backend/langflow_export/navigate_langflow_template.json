@@ -1,0 +1,180 @@
+{
+  "name": "navigate_mode_flow",
+  "description": "Information retrieval and resource discovery",
+  "data": {
+    "nodes": [
+      {
+        "id": "node_1",
+        "data": {
+          "type": "CustomComponent",
+          "node": {
+            "template": {
+              "agent_name": {
+                "value": "understand_query"
+              },
+              "description": {
+                "value": "Agent: understand_query"
+              }
+            },
+            "description": "Agent: understand_query",
+            "base_classes": [
+              "Agent"
+            ],
+            "display_name": "Understand Query"
+          }
+        },
+        "position": {
+          "x": 300,
+          "y": 150
+        },
+        "type": "genericNode"
+      },
+      {
+        "id": "node_2",
+        "data": {
+          "type": "CustomComponent",
+          "node": {
+            "template": {
+              "agent_name": {
+                "value": "retrieve"
+              },
+              "description": {
+                "value": "Agent: retrieve"
+              }
+            },
+            "description": "Agent: retrieve",
+            "base_classes": [
+              "Agent"
+            ],
+            "display_name": "Retrieve"
+          }
+        },
+        "position": {
+          "x": 500,
+          "y": 200
+        },
+        "type": "genericNode"
+      },
+      {
+        "id": "node_3",
+        "data": {
+          "type": "CustomComponent",
+          "node": {
+            "template": {
+              "agent_name": {
+                "value": "search_external"
+              },
+              "description": {
+                "value": "Agent: search_external"
+              }
+            },
+            "description": "Agent: search_external",
+            "base_classes": [
+              "Agent"
+            ],
+            "display_name": "Search External"
+          }
+        },
+        "position": {
+          "x": 700,
+          "y": 250
+        },
+        "type": "genericNode"
+      },
+      {
+        "id": "node_4",
+        "data": {
+          "type": "CustomComponent",
+          "node": {
+            "template": {
+              "agent_name": {
+                "value": "add_context"
+              },
+              "description": {
+                "value": "Agent: add_context"
+              }
+            },
+            "description": "Agent: add_context",
+            "base_classes": [
+              "Agent"
+            ],
+            "display_name": "Add Context"
+          }
+        },
+        "position": {
+          "x": 900,
+          "y": 300
+        },
+        "type": "genericNode"
+      },
+      {
+        "id": "node_5",
+        "data": {
+          "type": "CustomComponent",
+          "node": {
+            "template": {
+              "agent_name": {
+                "value": "format_response"
+              },
+              "description": {
+                "value": "Agent: format_response"
+              }
+            },
+            "description": "Agent: format_response",
+            "base_classes": [
+              "Agent"
+            ],
+            "display_name": "Format Response"
+          }
+        },
+        "position": {
+          "x": 1100,
+          "y": 350
+        },
+        "type": "genericNode"
+      }
+    ],
+    "edges": [
+      {
+        "id": "edge_1",
+        "source": "understand_query",
+        "target": "retrieve",
+        "type": "sequential",
+        "condition": null
+      },
+      {
+        "id": "edge_2",
+        "source": "retrieve",
+        "target": "search_external",
+        "type": "sequential",
+        "condition": null
+      },
+      {
+        "id": "edge_3",
+        "source": "search_external",
+        "target": "add_context",
+        "type": "sequential",
+        "condition": null
+      },
+      {
+        "id": "edge_4",
+        "source": "add_context",
+        "target": "format_response",
+        "type": "sequential",
+        "condition": null
+      }
+    ]
+  },
+  "metadata": {
+    "mode": "navigate",
+    "llm_model": "gemini-2.0-flash-exp",
+    "agents": [
+      "query_understanding_agent",
+      "retrieval_agent",
+      "external_resources_agent",
+      "context_agent",
+      "formatting_agent"
+    ],
+    "conditional_routing": null
+  }
+}
