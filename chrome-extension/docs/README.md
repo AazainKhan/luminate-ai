@@ -43,14 +43,15 @@ Backend should be accessible at `http://localhost:8000`
 
 ## Usage
 
-1. **Navigate to a COMP237 Course Page**
-   - Go to: `https://luminate.centennialcollege.ca/ultra/courses/{course_id}/outline`
-   - Example: `https://luminate.centennialcollege.ca/ultra/courses/_11378_1/outline`
+1. **Navigate to Any Luminate Blackboard Page**
+   - Go to any page under: `https://luminate.centennialcollege.ca/ultra/...`
+   - Works on: course pages, calendar, stream, grades, announcements, etc.
+   - Example course page: `https://luminate.centennialcollege.ca/ultra/courses/_11378_1/outline`
 
-2. **Look for the Luminate AI Button**
-   - A blue button with sparkles icon appears at bottom-right
-   - Positioned to the **left** of Blackboard's Help button
-   - Click to open the chat interface
+2. **Open the Side Panel**
+   - Click the Luminate AI extension icon in your Chrome toolbar
+   - Or click the sparkles button (if visible on supported pages)
+   - The chat interface opens in a side panel
 
 3. **Ask Questions**
    - Type your question about course topics

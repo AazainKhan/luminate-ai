@@ -16,66 +16,52 @@ import json
 from typing import Dict, Any, List
 
 
-FORMATTING_PROMPT = """You are a knowledgeable AI navigator for COMP237 (Artificial Intelligence).
+FORMATTING_PROMPT = """You are a fast, precise AI assistant for COMP237 course navigation. Be concise and direct.
 
-Your task: Determine if the student's question is within course scope, then answer appropriately.
+Student Query: "{original_query}"
 
-Student Question: "{original_query}"
-
-Available Course Content:
+Course Content:
 {results_summary}
 
-CRITICAL Instructions:
-1. First, determine if the question is WITHIN the scope of COMP237 (Artificial Intelligence course):
-   - IN SCOPE: Questions about AI concepts, machine learning, neural networks, agents, search algorithms, NLP, computer vision, ethics in AI, course assignments, etc.
-   - OUT OF SCOPE: Questions about other programming languages, web development, databases, networking, personal advice, non-AI topics, etc.
+Task: Synthesize course content into a clear, direct answer.
 
-2. If OUT OF SCOPE:
-   - Set "answer" to: "That topic is outside the scope of COMP237 (Introduction to Artificial Intelligence). However, I found some related course materials you might find helpful."
-   - Only include results if they have SOME connection to the question
-   - If NO related materials exist, return empty top_results array
+Instructions:
+1. Scope Check: Is this COMP237-related (AI, ML, search algorithms, NLP, computer vision, neural networks)?
+   - IN SCOPE → Provide clear answer
+   - OUT OF SCOPE → State briefly, list related materials if any
 
-3. If IN SCOPE:
-   - Provide a CLEAR, DIRECT answer to the question (2-4 sentences)
-   - List the most relevant course materials (1-5 results, only truly relevant ones)
-   - For each material, explain WHY it's relevant
+2. Brief Summary: One concise sentence (15-20 words) that directly answers the query
 
-4. For each result, explain in 1 sentence WHY it's relevant to their specific question
-5. Suggest 2-3 related topics they might want to explore next
-6. Keep tone helpful and conversational, not generic or repetitive
+3. Answer Format (if IN SCOPE):
+   - 3-6 sentences max
+   - Use course content excerpts
+   - Include key formulas/algorithms if relevant
+   - Use markdown for code/math: ```python or $formula$
 
-Respond ONLY with valid JSON in this exact format:
+4. Source Materials: List 1-5 most relevant documents with brief explanation
+
+5. Related Topics: Suggest 2-3 next topics to explore
+
+Output JSON:
 {{
-  "answer": "Direct answer OR out-of-scope message...",
-  "is_in_scope": true or false,
+  "brief_summary": "One concise sentence answering the query (15-20 words)...",
+  "answer": "Clear, direct answer using markdown...",
+  "is_in_scope": true/false,
   "top_results": [
-    {{
-      "title": "Document title",
-      "url": "Blackboard URL or document ID",
-      "module": "Module name (e.g., 'Week 1', 'Week 2')",
-      "relevance_explanation": "Why this specific material answers their question..."
-    }}
+    {{"title": "Doc title", "url": "URL", "module": "Week X", "relevance_explanation": "Why relevant..."}}
   ],
   "related_topics": [
-    {{
-      "title": "Related topic title",
-      "why_explore": "Brief reason to explore this"
-    }}
+    {{"title": "Topic", "why_explore": "Brief reason..."}}
   ]
 }}
 
-Important: 
-- Only include results that are truly relevant to the question
-- If 1-2 results fully answer the question, that's fine - don't pad with irrelevant content
-- Make sure module names are meaningful (like "Week 1", "Week 2", not "root")
-- Your answer should actually address their question, not be a generic encouragement
-
-Do not include any text outside the JSON object."""
+Keep answers concise but complete. Use bullet points for lists. Return only valid JSON."""
 
 
 def formatting_agent(state: Dict) -> Dict:
     """
     Format enriched results for Chrome extension display.
+    Optimized for Gemini 2.0 Flash (fast retrieval mode).
     
     Args:
         state: Contains 'enriched_results' with contextual information
@@ -87,16 +73,29 @@ def formatting_agent(state: Dict) -> Dict:
     external_resources = state.get("external_resources", [])  # NEW: Get external resources
     student_query = state.get("query", "")
     
+    # If a math translation (markdown) was already produced by the MathTranslationAgent,
+    # preserve it and do not overwrite via fallback formatting.
+    existing = state.get("formatted_response")
+    if isinstance(existing, dict) and existing.get("answer_markdown"):
+        # Ensure external resources attached if applicable and return early
+        existing.setdefault('external_resources', external_resources if existing.get('is_in_scope', True) else [])
+        state["formatted_response"] = existing
+        state["is_in_scope"] = existing.get("is_in_scope", True)
+        return state
+    
     if not enriched_results:
         # Check if query is likely in scope
         is_in_scope = _is_likely_in_scope(student_query)
         
         if is_in_scope:
+            brief_summary = "No specific course materials found for this query."
             answer = "I couldn't find specific course materials for that question. Try rephrasing or asking about AI concepts, machine learning algorithms, neural networks, or course assignments."
         else:
+            brief_summary = "This topic is outside COMP237 course scope."
             answer = "That topic appears to be outside the scope of COMP237 (Introduction to Artificial Intelligence). This course focuses on AI concepts, machine learning, neural networks, and intelligent agents. Please ask about topics covered in the course!"
         
         state["formatted_response"] = {
+            "brief_summary": brief_summary,
             "answer": answer,
             "is_in_scope": is_in_scope,
             "top_results": [],
@@ -106,8 +105,8 @@ def formatting_agent(state: Dict) -> Dict:
         state["is_in_scope"] = is_in_scope  # Set scope flag for downstream agents
         return state
     
-    # Get LLM instance from centralized config
-    llm = get_llm(temperature=0.2)
+    # Get LLM instance for Navigate mode (Gemini 2.0 Flash - fast)
+    llm = get_llm(temperature=0.2, mode="navigate")
     
     # Prepare summary for LLM
     results_summary = _prepare_results_summary(enriched_results)
@@ -155,13 +154,14 @@ def _prepare_results_summary(results: List[Dict]) -> str:
         results: List of enriched search results
         
     Returns:
-        Formatted string summary
+        Formatted string summary INCLUDING content excerpts
     """
     summary_lines = []
     
     for i, result in enumerate(results, 1):
         metadata = result.get("metadata", {})
         graph_context = result.get("graph_context", {})
+        content = result.get("content", "")
         
         title = metadata.get("title", "Unknown")
         original_module = metadata.get("module", "Unknown Module")
@@ -175,12 +175,16 @@ def _prepare_results_summary(results: List[Dict]) -> str:
         prereqs = len(graph_context.get("prerequisites", [])) if graph_context else 0
         next_steps = len(graph_context.get("next_steps", [])) if graph_context else 0
         
+        # Truncate content to first 800 characters for LLM context
+        content_excerpt = content[:800] + "..." if len(content) > 800 else content
+        
         summary_lines.append(
             f"{i}. {title}\n"
             f"   Module: {module}\n"
             f"   URL: {url}\n"
             f"   Has Prerequisites: {prereqs > 0}\n"
-            f"   Has Next Steps: {next_steps > 0}"
+            f"   Has Next Steps: {next_steps > 0}\n"
+            f"   Content Excerpt:\n   {content_excerpt}\n"
         )
     
     return "\n\n".join(summary_lines)

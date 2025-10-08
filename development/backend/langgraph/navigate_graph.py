@@ -10,13 +10,14 @@ This creates a StateGraph that orchestrates 4 agents:
 Based on educational AI research (VanLehn 2011, AutoTutor).
 """
 
-from typing import TypedDict, List, Dict, Any
+from typing import TypedDict, List, Dict, Any, Callable, Optional
 from langgraph.graph import StateGraph, END
 from agents.query_understanding import query_understanding_agent
 from agents.retrieval import retrieval_agent
 from agents.context import context_agent
 from agents.formatting import formatting_agent
 from agents.external_resources import external_resources_agent
+from datetime import datetime
 
 
 class NavigateState(TypedDict, total=False):
@@ -41,6 +42,37 @@ class NavigateState(TypedDict, total=False):
     # For external resources agent
     original_query: str
     understood_query: str
+    
+    # Agent trace callback
+    trace_callback: Optional[Callable]
+
+
+def _wrap_agent_with_trace(agent_fn, agent_name: str, action_desc: str):
+    """Wrap agent function to emit trace before execution."""
+    def wrapped(state: NavigateState) -> NavigateState:
+        # Emit trace if callback exists
+        if state.get("trace_callback"):
+            state["trace_callback"]({
+                "agent": agent_name,
+                "action": action_desc,
+                "status": "in_progress",
+                "timestamp": datetime.now().isoformat()
+            })
+        
+        # Execute agent
+        result = agent_fn(state)
+        
+        # Emit completion trace
+        if state.get("trace_callback"):
+            state["trace_callback"]({
+                "agent": agent_name,
+                "action": action_desc,
+                "status": "completed",
+                "timestamp": datetime.now().isoformat()
+            })
+        
+        return result
+    return wrapped
 
 
 def build_navigate_graph():
@@ -53,12 +85,22 @@ def build_navigate_graph():
     # Create graph
     graph = StateGraph(NavigateState)
     
-    # Add nodes (agents)
-    graph.add_node("understand_query", query_understanding_agent)
-    graph.add_node("retrieve", retrieval_agent)
-    graph.add_node("add_context", context_agent)
-    graph.add_node("search_external", external_resources_agent)  # NEW: External resources
-    graph.add_node("format_response", formatting_agent)
+    # Add nodes (agents) with trace wrappers
+    graph.add_node("understand_query", _wrap_agent_with_trace(
+        query_understanding_agent, "query_understanding", "Analyzing query and extracting key terms"
+    ))
+    graph.add_node("retrieve", _wrap_agent_with_trace(
+        retrieval_agent, "retrieval", "Searching ChromaDB for relevant course materials"
+    ))
+    graph.add_node("search_external", _wrap_agent_with_trace(
+        external_resources_agent, "external_resources", "Finding supplementary learning resources"
+    ))
+    graph.add_node("add_context", _wrap_agent_with_trace(
+        context_agent, "context", "Adding course structure and related topics"
+    ))
+    graph.add_node("format_response", _wrap_agent_with_trace(
+        formatting_agent, "formatting", "Generating UI-ready response with Gemini 2.0"
+    ))
     
     # Define edges (workflow)
     graph.set_entry_point("understand_query")

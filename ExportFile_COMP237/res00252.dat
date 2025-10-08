@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONTENT id="_800707_1"><TITLE value="Lab Tutorial Neural Networks"/><TITLECOLOR value="#000000"/><DESCRIPTION
+   value="Content and Activity Page&#xa;Module Title&#xa;Overview&#xa;In this tutorial we will using the neurolab Library, a library of basic neural networks algorithms with flexible network configurations and learning algorithms for Python, to build feed forward neural networks. There are many other libraries for neural networks and deep learning such as Theano ,Tensorflow, Pytorch, Lasagne, ..etc. We will carry out the following exercises:&#xa;1) Build a perceptron using the neurolab methods and classes&#xa;2) Build a single layer neural network&#xa;3) Build a multi layer neural network with two hidden layers&#xa;You will notice that using neural network libraries will cut short the development time and code, but please make sure you understand each method and all its para..."/><BODY><TEXT>&lt;!-- {"bbMLEditorVersion":1} --&gt;&lt;div&gt; 
+ &lt;h4&gt;Module Title&lt;/h4&gt; 
+ &lt;h5&gt;Overview&lt;/h5&gt; 
+ &lt;p&gt;In this tutorial we will using the&lt;strong&gt;&lt;span style="color: #000000;"&gt; neurolab&lt;/span&gt; &lt;/strong&gt;Library,&amp;nbsp;a library of basic neural networks algorithms with flexible network configurations and learning algorithms for Python, to build feed forward neural networks. There are many other libraries for neural networks and deep learning such as Theano&amp;nbsp;,Tensorflow, Pytorch, Lasagne, ..etc. We will carry out the following exercises:&lt;/p&gt; 
+ &lt;p&gt;1) Build a perceptron using the neurolab methods and classes&lt;/p&gt; 
+ &lt;p&gt;2) Build a single layer neural network&lt;/p&gt; 
+ &lt;p&gt;3) Build a multi layer neural network with two hidden layers&lt;/p&gt; 
+ &lt;p&gt;You will notice that using neural network libraries will cut short the development time and code, but please make sure you understand each method and all its parameters including all the default values by referring back to the respective documentation.&lt;/p&gt; 
+ &lt;p&gt;As you may have noticed throughout the topicals of this module perceptrons and neural networks depend largely on numeric data, in order for the feed forward and back propagation to work. Therefore, we will be using &lt;strong&gt;&lt;span style="color: #000000;"&gt;Numpy&lt;/span&gt;&lt;/strong&gt; methods and classes to manage our data into array structures for processing.&lt;/p&gt; 
+ &lt;p&gt;We will use a new method to load the data directly into numpy ndarrays. &lt;img src="https://s.brightspace.com/lib/emoticons/1.0.0/blush-light.svg" alt="blush with light skin tone emoticon"&gt;&lt;/p&gt; 
+ &lt;p&gt;Download the data set and script and follow the video.&lt;/p&gt; 
+ &lt;h5&gt;Data&lt;/h5&gt; 
+ &lt;p&gt;You can download the data file for the Perceptron&amp;nbsp; exercise for this lab tutorial from &lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693167_1" data-bbfile="{&amp;quot;linkName&amp;quot;:&amp;quot;data_perceptron.txt&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;text/plain&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;here&lt;/a&gt;.&lt;/p&gt; 
+ &lt;p&gt;You can download the data for the single layer and multi layer exercise from&lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693168_1" data-bbfile="{&amp;quot;linkName&amp;quot;:&amp;quot;data_simple_nn.txt&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;text/plain&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt; here&lt;/a&gt;.&lt;/p&gt; 
+ &lt;h5&gt;Script(s)&lt;/h5&gt; 
+ &lt;p&gt;You can download the python&amp;nbsp; script for perceptron from &lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693170_1" data-bbfile="{&amp;quot;linkName&amp;quot;:&amp;quot;M9_perceptron_nurolab.py&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;application/octet-stream&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;here&lt;/a&gt;.&lt;/p&gt; 
+ &lt;p&gt;You can download the python&amp;nbsp; script for single layer from &lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693171_1" data-bbfile="{&amp;quot;linkName&amp;quot;:&amp;quot;M9_simple_one layer_neural_network.py&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;application/octet-stream&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;here&lt;/a&gt;.&lt;/p&gt; 
+ &lt;p&gt;You can download the python script for multi layer from &lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693172_1" data-bbfile="{&amp;quot;linkName&amp;quot;:&amp;quot;M9_multi_layer.py&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;application/octet-stream&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;here.&lt;/a&gt;&lt;/p&gt; 
+ &lt;h5&gt;Video(s)&lt;/h5&gt; 
+ &lt;p&gt;Please watch these videos in order:&lt;/p&gt; 
+ &lt;h6&gt;&lt;span style="color: #000000;"&gt;Perceptron:&lt;/span&gt;&lt;/h6&gt; 
+ &lt;p&gt;&lt;span style="color: #000000;"&gt;&lt;a href="https://mediasite.centennialcollege.ca/Mediasite/Play/4f289249d9ff4731ab401c9caa28f41a1d" data-bbtype="video" data-bbfile="{&amp;quot;src&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/4f289249d9ff4731ab401c9caa28f41a1d&amp;quot;,&amp;quot;alt&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/4f289249d9ff4731ab401c9caa28f41a1d&amp;quot;}"&gt;https://mediasite.centennialcollege.ca/Mediasite/Play/4f289249d9ff4731ab401c9caa28f41a1d&lt;/a&gt;&lt;/span&gt;&lt;/p&gt; 
+ &lt;h6&gt;&lt;span style="color: #000000;"&gt;Single layer&lt;/span&gt;&amp;nbsp;&lt;span style="color: #000000;"&gt;Feedforward neural network&lt;/span&gt;&lt;/h6&gt; 
+  
+ &lt;h6&gt;&lt;span style="color: #000000;"&gt;&lt;a href="https://mediasite.centennialcollege.ca/Mediasite/Play/92c66ffd5cdf497bb53c45224ce10abb1d" data-bbtype="video" data-bbfile="{&amp;quot;src&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/92c66ffd5cdf497bb53c45224ce10abb1d&amp;quot;,&amp;quot;alt&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/92c66ffd5cdf497bb53c45224ce10abb1d&amp;quot;}"&gt;https://mediasite.centennialcollege.ca/Mediasite/Play/92c66ffd5cdf497bb53c45224ce10abb1d&lt;/a&gt;&lt;/span&gt;&lt;/h6&gt; 
+ &lt;h6&gt;&lt;span style="color: #000000;"&gt;Multi Layer Feedforward neural network&lt;/span&gt;&lt;/h6&gt; 
+ &lt;p&gt;&lt;span style="color: #000000;"&gt;&lt;a href="https://mediasite.centennialcollege.ca/Mediasite/Play/136978db12ad460f9ee240aabc69858a1d" data-bbtype="video" data-bbfile="{&amp;quot;src&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/136978db12ad460f9ee240aabc69858a1d&amp;quot;,&amp;quot;alt&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/136978db12ad460f9ee240aabc69858a1d&amp;quot;}"&gt;https://mediasite.centennialcollege.ca/Mediasite/Play/136978db12ad460f9ee240aabc69858a1d&lt;/a&gt;&lt;/span&gt;&lt;/p&gt; 
+ &lt;h6&gt;References&lt;/h6&gt; 
+ &lt;ol&gt; 
+  &lt;li&gt;Chapter 19 Artificial Intelligence with Python&amp;nbsp; second edition by Prateek Joshi&amp;nbsp; Alberto Artasanchez&lt;/li&gt; 
+  &lt;li&gt;&lt;a href="https://pythonhosted.org/neurolab/lib.html#neurolab.net.newff" rel="noopener"&gt;https://pythonhosted.org/neurolab/lib.html#neurolab.net.newff&lt;/a&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;a href="https://numpy.org/doc/stable/reference/generated/numpy.linspace.html" rel="noopener"&gt;https://numpy.org/doc/stable/reference/generated/numpy.linspace.html&lt;/a&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;a href="https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html" rel="noopener"&gt;https://numpy.org/doc/stable/reference/generated/numpy.linalg.norm.html&lt;/a&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;a href="https://numpy.org/doc/stable/reference/generated/numpy.loadtxt.html" rel="noopener"&gt;https://numpy.org/doc/stable/reference/generated/numpy.loadtxt.html&lt;/a&gt;&lt;/li&gt; 
+ &lt;/ol&gt; 
+  
+  
+  
+&lt;/div&gt;</TEXT><TYPE
+   value="H"/></BODY><DATES><CREATED value="2024-10-04 18:31:47 EDT"/><UPDATED value="2024-10-10 12:30:58 EDT"/><START
+   value=""/><END value=""/></DATES><FLAGS><ISAVAILABLE value="true"/><ISFROMCARTRIDGE value="false"/><ISFOLDER
+   value="false"/><ISDESCRIBED value="false"/><ISTRACKED value="true"/><ISLESSON value="false"/><ISSEQUENTIAL
+   value="false"/><ALLOWGUESTS value="true"/><ALLOWOBSERVERS value="true"/><LAUNCHINNEWWINDOW
+   value="false"/><ISREVIEWABLE value="false"/><ISGROUPCONTENT value="false"/><ISSAMPLECONTENT
+   value="false"/><PARTIALLYVISIBLE value="false"/><HASTHUMBNAIL value="false"/></FLAGS><CONTENTHANDLER
+  value="resource/x-bb-document"/><RENDERTYPE value="REGULAR"/><FOLDERTYPE value=""/><URL value=""/><VIEWMODE
+  value="TEXT_ICON_ONLY"/><OFFLINENAME value=""/><OFFLINEPATH value=""/><LINKREF value=""/><PARENTID
+  value="_800534_1"/><REVIEWABLEREASON value="NONE"/><VERSION value="3"/><THUMBNAILALT value=""/><AISTATE
+  value="No"/><AIACCEPTINGUSER value=""/><EXTENDEDDATA/><FILES/></CONTENT>

@@ -37,6 +37,7 @@ def get_llm(
     max_tokens: Optional[int] = None,
     provider: Optional[str] = None,
     model: Optional[str] = None,
+    mode: Optional[str] = None,  # 'navigate' or 'educate'
     **kwargs
 ):
     """
@@ -47,6 +48,7 @@ def get_llm(
         max_tokens: Maximum tokens in response
         provider: Override default provider (gemini, openai, anthropic, ollama)
         model: Override default model name
+        mode: Specify mode to auto-select model ('navigate' or 'educate')
         **kwargs: Additional provider-specific parameters
         
     Returns:
@@ -54,10 +56,25 @@ def get_llm(
         
     Raises:
         ValueError: If provider is unsupported or API key is missing
+        
+    Mode-based Model Selection:
+        - mode='navigate': Uses MODEL_NAME_NAVIGATE (gemini-2.0-flash) for fast retrieval
+        - mode='educate': Uses MODEL_NAME_EDUCATE (gemini-2.5-flash) for deep tutoring
+        - No mode: Falls back to MODEL_NAME
     """
     # Get provider and model from env or arguments
     llm_provider = (provider or os.getenv("LLM_PROVIDER", "gemini")).lower()
-    model_name = model or os.getenv("MODEL_NAME")
+    
+    # Mode-based model selection
+    if mode and not model:
+        if mode.lower() == "navigate":
+            model_name = os.getenv("MODEL_NAME_NAVIGATE", "gemini-2.0-flash")
+        elif mode.lower() == "educate":
+            model_name = os.getenv("MODEL_NAME_EDUCATE", "gemini-2.5-flash")
+        else:
+            model_name = model or os.getenv("MODEL_NAME")
+    else:
+        model_name = model or os.getenv("MODEL_NAME")
     
     # Provider-specific defaults if MODEL_NAME not set
     if not model_name:
@@ -70,7 +87,8 @@ def get_llm(
         }
         model_name = model_defaults.get(llm_provider, "gemini-2.0-flash")
     
-    print(f"🤖 Initializing LLM: {llm_provider} / {model_name} (temp={temperature})")
+    mode_indicator = f" [{mode.upper()}]" if mode else ""
+    print(f"🤖 Initializing LLM: {llm_provider} / {model_name}{mode_indicator} (temp={temperature})")
     
     # Gemini
     if llm_provider == "gemini":

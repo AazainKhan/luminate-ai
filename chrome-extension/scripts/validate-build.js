@@ -66,8 +66,8 @@ info('\nTest 2: Checking required files...');
 const requiredFiles = [
   'manifest.json',
   'sidepanel.html',
-  'popup.html',
-  'popup.js',
+  // 'popup.html', // Optional - using sidepanel instead
+  // 'popup.js', // Optional - using sidepanel instead
   'background.js',
   'sidepanel.js', // Side panel bundle
 ];
@@ -193,7 +193,7 @@ if (hasErrors) {
   info(`   2. Enable "Developer mode"`);
   info(`   3. Click "Load unpacked"`);
   info(`   4. Select: ${distPath}`);
-  info(`   5. Navigate to: https://luminate.centennialcollege.ca/ultra/courses/_29430_1/outline`);
+  info(`   5. Navigate to any Luminate page: https://luminate.centennialcollege.ca/ultra/...`);
   info(`   6. Click the extension icon to open side panel`);
   process.exit(0);
 } else {
@@ -205,7 +205,7 @@ if (hasErrors) {
   info(`   2. Enable "Developer mode"`);
   info(`   3. Click "Load unpacked"`);
   info(`   4. Select: ${distPath}`);
-  info(`   5. Navigate to: https://luminate.centennialcollege.ca/ultra/courses/_29430_1/outline`);
-  info(`   6. Click the extension icon to open side panel`);  info(`   5. Navigate to: https://luminate.centennialcollege.ca/ultra/courses/_29430_1/outline`);
+  info(`   5. Navigate to any Luminate page: https://luminate.centennialcollege.ca/ultra/...`);
+  info(`   6. Click the extension icon to open side panel`);
   process.exit(0);
 }
