@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
-import { ChatInterface } from '../components/ChatInterface';
-import { ErrorBoundary } from '../components/ErrorBoundary';
+import { DualModeChat } from '../components/DualModeChat';
+import { ThemeProvider } from '../components/providers/theme-provider';
 import '../index.css';
 
 console.log('🚀 Side panel script loaded');
@@ -9,20 +9,25 @@ console.log('🚀 Side panel script loaded');
 function SidePanel() {
   console.log('✅ SidePanel component rendering');
   return (
-    <div style={{ 
-      width: '100%', 
-      height: '100vh',
-      overflow: 'hidden',
-      margin: 0,
-      padding: 0
-    }}>
-      <ErrorBoundary>
-        <ChatInterface onClose={() => {
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
+      <div style={{ 
+        width: '100%', 
+        height: '100vh',
+        overflow: 'hidden',
+        margin: 0,
+        padding: 0
+      }}>
+        <DualModeChat onClose={() => {
           // Side panel doesn't need a close button - user can close via Chrome UI
           // But we keep the prop for compatibility
         }} />
-      </ErrorBoundary>
-    </div>
+      </div>
+    </ThemeProvider>
   );
 }
 

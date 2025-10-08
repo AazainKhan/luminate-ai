@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<NOTIFICATIONRULES><NOTIFICATIONRULE id="_60882_1"><COURSEMAINPK1 value="_11378_1"/><NAME
+   value="default.riskrule.Grade.label"/><RULETYPE value="Grade"/><RULETYPESPEC value="PE"/><RULEVALUE
+   value="25"/><RULEVALUE2 value=""/><RULECOMPARATORTYPE value="LT"/><ATTEMPTSELECTION
+   value="NOT_APPLICABLE"/><RULEITEMID id="_131885_1"/><FLAGS><ISAVAILABLE value="true"/><IS_CMP_TO_AVG
+    value="true"/></FLAGS><DATES><LASTREFRESHDATE
+  value="2025-09-17 03:04:28 EDT"/></DATES></NOTIFICATIONRULE><NOTIFICATIONRULE id="_60883_1"><COURSEMAINPK1
+   value="_11378_1"/><NAME value="default.riskrule.GradebookItemDueDate.label"/><RULETYPE
+   value="GradebookItemDueDate"/><RULETYPESPEC value="A"/><RULEVALUE value="0"/><RULEVALUE2
+   value="1"/><RULECOMPARATORTYPE value="GT"/><ATTEMPTSELECTION value="NOT_APPLICABLE"/><RULEITEMID
+    id=""/><FLAGS><ISAVAILABLE value="true"/><IS_CMP_TO_AVG value="false"/></FLAGS><DATES><LASTREFRESHDATE
+  value="2025-09-17 03:04:29 EDT"/></DATES></NOTIFICATIONRULE><NOTIFICATIONRULE id="_60880_1"><COURSEMAINPK1
+   value="_11378_1"/><NAME value="default.riskrule.CourseLastAccess.label"/><RULETYPE
+   value="CourseLastAccess"/><RULETYPESPEC value=""/><RULEVALUE value="5"/><RULEVALUE2 value=""/><RULECOMPARATORTYPE
+   value="GT"/><ATTEMPTSELECTION value="NOT_APPLICABLE"/><RULEITEMID id=""/><FLAGS><ISAVAILABLE
+    value="true"/><IS_CMP_TO_AVG value="false"/></FLAGS><DATES><LASTREFRESHDATE
+  value="2025-09-17 03:04:29 EDT"/></DATES></NOTIFICATIONRULE><NOTIFICATIONRULE id="_60881_1"><COURSEMAINPK1
+   value="_11378_1"/><NAME value="default.riskrule.Activity.label"/><RULETYPE value="Activity"/><RULETYPESPEC
+   value="W"/><RULEVALUE value="20"/><RULEVALUE2 value="1"/><RULECOMPARATORTYPE value="LT"/><ATTEMPTSELECTION
+   value="NOT_APPLICABLE"/><RULEITEMID id=""/><FLAGS><ISAVAILABLE value="true"/><IS_CMP_TO_AVG
+    value="false"/></FLAGS><DATES><LASTREFRESHDATE value="2025-09-17 03:04:29 EDT"/></DATES></NOTIFICATIONRULE></NOTIFICATIONRULES>

@@ -1,0 +1,25 @@
+#Bb PackageInfo Property File
+#Wed Sep 17 15:38:53 EDT 2025
+cx.config.learn.site.id=bce9aaa6-bbfb-4376-af20-3ad5dfbf0680
+db.product.version=16.8
+cx.config.full.value=CxConfig{operation\=EXPORT, courseid\=COMP237_INP.DEV, package\=/usr/local/bbcontent/vi/BB662aba851e7a7/courses/1/COMP237_INP.DEV/archive/ExportFile_COMP237_INP.DEV_20250917033641.zip, logger\=CxLogger{logs\=[Log{name\=/usr/local/bbcontent/vi/BB662aba851e7a7/courses/1/COMP237_INP.DEV/archive/ExportFile_COMP237_INP.DEV_20250917033641.txt, verbosity\=default}, Log{name\=/usr/local/bbcontent/vi/BB662aba851e7a7/courses/1/COMP237_INP.DEV/archive/ExportFile_COMP237_INP.DEV_20250917033641_detailed.txt, verbosity\=debug}], logHooks\=[blackboard.apps.cx.CxQueuedOperation@7f167a85]}, resource_type_inclusions\=[resource/x-bb-retention, resource/x-bb-wiki], area_inclusions\=[STAFFINFORMATION, ANNOUNCEMENT, POOL, DISCUSSION, ALIGNMENTS, CALENDAR, GROUP, TASK, JOURNAL, GRADEBOOK, COURSESETTING, AVAILABILITY_RULE, SURVEY, BLOG, GLOSSARY, ASSESSMENT, RUBRIC], area_exclusions\=[], object_inclusions\={COURSESETTING\=[limited], COURSETOC\=[_85288_1, _85289_1, _85290_1]}, object_exclusions\={}, features\={BypassDiskQuotaCheck\=false, CreateOrg\=false, ArchiveForUltraRestore\=false, AlternateAssessmentCsLinks\=false, RevertFromUltraRestore\=false, ImportCourseStructure\=false, Bb5LinkToBrokenImageFix\=true}, strHostName\=luminate.centennialcollege.ca, isCommandLineRequest\=false, isCourseConversion\=false, eventHandlers\=[], primaryNode\=null, nodes\=[], title\=null, packageVersion\=null, archiveCSItems\=true, archiveECSItems\=true, archiveOnlyReferencedPpg\=false, commonCartridge\=false, qti21Package\=false, createChildFolder\=false, csDir\=, excludedCsFolderIds\=null, homeDir\=, includeGradeHistoryInArchive\=false, isExportPackage\=false, logDetailRubricInfo\=false, taskId\=PkId{key\=_1900577_1, dataType\=blackboard.platform.queue.data.QueueTask, container\=blackboard.persist.DatabaseContainer@5f7de8f4}, useDefaultLog\=true}
+cx.config.learn.installation.id=9bcf97ed694744dd90f3247e2237a69d
+java.version=11.0.28
+os.arch=amd64
+cx.config.package.name=/usr/local/bbcontent/vi/BB662aba851e7a7/courses/1/COMP237_INP.DEV/archive/ExportFile_COMP237_INP.DEV_20250917033641.zip
+java.class.path=/usr/local/blackboard/apps/service-wrapper/lib/wrapper.jar\:/usr/lib/jvm/java-11-amazon-corretto/lib/tools.jar\:/usr/local/blackboard/apps/tomcat/lib/bb-tomcat-bootstrap.jar\:/usr/local/blackboard/apps/tomcat/bin/bootstrap.jar\:/usr/local/blackboard/apps/tomcat/bin/tomcat-juli.jar
+app.release.number=3900.125.0-rel.41+db1eeee
+cx.package.info.version=6.0
+java.home=/usr/lib/jvm/java-11-amazon-corretto.x86_64
+os.version=6.1.147-172.266.amzn2023.x86_64
+java.default.locale=en
+db.product.name=PostgreSQL
+cx.config.operation=blackboard.apps.cx.CxConfig$Operation\:EXPORT
+cx.config.logs=[Log{name\=/usr/local/bbcontent/vi/BB662aba851e7a7/courses/1/COMP237_INP.DEV/archive/ExportFile_COMP237_INP.DEV_20250917033641.txt, verbosity\=default}, Log{name\=/usr/local/bbcontent/vi/BB662aba851e7a7/courses/1/COMP237_INP.DEV/archive/ExportFile_COMP237_INP.DEV_20250917033641_detailed.txt, verbosity\=debug}]
+cx.config.course.id=COMP237_INP.DEV
+java.vendor=Amazon.com Inc.
+cx.config.file.references=false
+cx.config.package.identifier=fcd71216be1c42f2831eae0952ed3082
+db.driver.name=PostgreSQL JDBC Driver
+os.name=Linux
+db.driver.version=42.7.3

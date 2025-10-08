@@ -101,7 +101,7 @@ export function Popup() {
               No Course Page Detected
             </h3>
             <p className="text-xs text-muted-foreground mb-4">
-              Navigate to a COMP237 course page on Blackboard to use Luminate AI
+              Navigate to any Luminate Blackboard page to use Luminate AI
             </p>
             <p className="text-xs text-muted-foreground">
               Example: luminate.centennialcollege.ca/ultra/courses/_11378_1/outline

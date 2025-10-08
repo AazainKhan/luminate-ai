@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
 import { Sparkles, X } from 'lucide-react';
-import { ChatInterface } from '../components/ChatInterface';
+import { DualModeChat } from '../components/DualModeChat';
 import './content.css';
 
 // Main component for the injected button and chat
@@ -86,7 +86,7 @@ function LuminateButton() {
             zIndex: 9999,
           }}
         >
-          <ChatInterface onClose={() => setIsChatOpen(false)} />
+          <DualModeChat onClose={() => setIsChatOpen(false)} />
         </div>
       )}
     </>

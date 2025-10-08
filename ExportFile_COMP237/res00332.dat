@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONTENT id="_800722_1"><TITLE value="content"/><TITLECOLOR value="#000000"/><DESCRIPTION
+   value="Content Page&#xa;Title&#xa;Topic&#xa;Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.&#xa;Bullet 1&#xa;Bullet 2&#xa;Bullet 3&#xa;Bullet 4&#xa;Table&#xa;Heading 1&#xa;Heading 2&#xa;Heading 3&#xa;Heading 4&#xa;1.1&#xa;2.1&#xa;3.1&#xa;4.1&#xa;1.2&#xa;2.2&#xa;3.2&#xa;4.2&#xa;1.3&#xa;2.3&#xa;3.3&#xa;4.3&#xa;1.4&#xa;2.4&#xa;3.4&#xa;4.4&#xa;References&#xa;Source&#xa;Source&#xa;Program Name or Course Name - School Name"/><BODY><TEXT>&lt;!-- {"bbMLEditorVersion":1} --&gt;&lt;div&gt; 
+ &lt;h4&gt;Title&lt;/h4&gt; 
+ &lt;h5&gt;Topic&lt;/h5&gt; 
+ &lt;p&gt;Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged.&lt;/p&gt; 
+ &lt;ol&gt; 
+  &lt;li&gt;Bullet 1&lt;/li&gt; 
+  &lt;li&gt;Bullet 2&lt;/li&gt; 
+  &lt;li&gt;Bullet 3&lt;/li&gt; 
+  &lt;li&gt;Bullet 4&lt;/li&gt; 
+ &lt;/ol&gt; 
+ &lt;table&gt;  Table  
+  &lt;tbody&gt; 
+   &lt;tr&gt; 
+    &lt;th&gt;Heading 1&lt;/th&gt; 
+    &lt;th&gt;Heading 2&lt;/th&gt; 
+    &lt;th&gt;Heading 3&lt;/th&gt; 
+    &lt;th&gt;Heading 4&lt;/th&gt; 
+   &lt;/tr&gt; 
+   &lt;tr&gt; 
+    &lt;td&gt;1.1&lt;/td&gt; 
+    &lt;td&gt;2.1&lt;/td&gt; 
+    &lt;td&gt;3.1&lt;/td&gt; 
+    &lt;td&gt;4.1&lt;/td&gt; 
+   &lt;/tr&gt; 
+   &lt;tr&gt; 
+    &lt;td&gt;1.2&lt;/td&gt; 
+    &lt;td&gt;2.2&lt;/td&gt; 
+    &lt;td&gt;3.2&lt;/td&gt; 
+    &lt;td&gt;4.2&lt;/td&gt; 
+   &lt;/tr&gt; 
+   &lt;tr&gt; 
+    &lt;td&gt;1.3&lt;/td&gt; 
+    &lt;td&gt;2.3&lt;/td&gt; 
+    &lt;td&gt;3.3&lt;/td&gt; 
+    &lt;td&gt;4.3&lt;/td&gt; 
+   &lt;/tr&gt; 
+   &lt;tr&gt; 
+    &lt;td&gt;1.4&lt;/td&gt; 
+    &lt;td&gt;2.4&lt;/td&gt; 
+    &lt;td&gt;3.4&lt;/td&gt; 
+    &lt;td&gt;4.4&lt;/td&gt; 
+   &lt;/tr&gt; 
+  &lt;/tbody&gt; 
+ &lt;/table&gt;  
+ &lt;h6&gt;References&lt;/h6&gt; 
+ &lt;ol&gt; 
+  &lt;li&gt;Source&lt;/li&gt; 
+  &lt;li&gt;Source&lt;/li&gt; 
+ &lt;/ol&gt; 
+ &lt;p&gt;Program Name or Course Name - School Name&lt;/p&gt; 
+  
+&lt;/div&gt;</TEXT><TYPE
+   value="H"/></BODY><DATES><CREATED value="2024-10-04 18:31:50 EDT"/><UPDATED value="2024-10-10 12:30:50 EDT"/><START
+   value=""/><END value=""/></DATES><FLAGS><ISAVAILABLE value="true"/><ISFROMCARTRIDGE value="false"/><ISFOLDER
+   value="false"/><ISDESCRIBED value="false"/><ISTRACKED value="true"/><ISLESSON value="false"/><ISSEQUENTIAL
+   value="false"/><ALLOWGUESTS value="true"/><ALLOWOBSERVERS value="true"/><LAUNCHINNEWWINDOW
+   value="false"/><ISREVIEWABLE value="false"/><ISGROUPCONTENT value="false"/><ISSAMPLECONTENT
+   value="false"/><PARTIALLYVISIBLE value="false"/><HASTHUMBNAIL value="false"/></FLAGS><CONTENTHANDLER
+  value="resource/x-bb-document"/><RENDERTYPE value="REGULAR"/><FOLDERTYPE value=""/><URL value=""/><VIEWMODE
+  value="TEXT_ICON_ONLY"/><OFFLINENAME value=""/><OFFLINEPATH value=""/><LINKREF value=""/><PARENTID
+  value="_800622_1"/><REVIEWABLEREASON value="NONE"/><VERSION value="3"/><THUMBNAILALT value=""/><AISTATE
+  value="No"/><AIACCEPTINGUSER value=""/><EXTENDEDDATA/><FILES/></CONTENT>

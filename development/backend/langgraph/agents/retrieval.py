@@ -18,7 +18,12 @@ def retrieval_agent(state: Dict) -> Dict:
     Returns:
         Updated state with 'retrieved_chunks' containing top results
     """
-    parsed_query = state["parsed_query"]
+    # If a previous node (e.g., math translation) already set a formatted_response,
+    # short-circuit to avoid redundant retrieval and concurrent state writes.
+    if state.get('formatted_response'):
+        return state
+
+    parsed_query = state.get("parsed_query", {})
     chroma_db = state.get("chroma_db")
     
     if not chroma_db:
@@ -31,10 +36,10 @@ def retrieval_agent(state: Dict) -> Dict:
     search_query = parsed_query.get("expanded_query", state["query"])
     
     try:
-        # Query ChromaDB directly
-        raw_results = chroma_db.query(query_text=search_query, n_results=15)
+        # Query ChromaDB directly (fetch extra to account for filtering)
+        raw_results = chroma_db.query(query_text=search_query, n_results=25)
         
-        # Convert ChromaDB format to expected format
+        # Convert ChromaDB format to expected format (with csfiles filtering)
         results = _convert_chromadb_results(raw_results)
         
         if not results:
@@ -76,6 +81,11 @@ def _convert_chromadb_results(chroma_results: Dict) -> List[Dict]:
         chroma_results["metadatas"][0],
         chroma_results["distances"][0]
     ):
+        # Filter out system/navigation modules (csfiles, etc.)
+        module = meta.get("module", "")
+        if module.lower() in ["csfiles", "system", "navigation", "__internals"]:
+            continue  # Skip system files
+        
         # Extract tags
         tags_str = meta.get("tags", "")
         tags = tags_str.split(",") if tags_str else []

@@ -1,0 +1,979 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Luminate AI - System Architecture Diagram</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 1600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+
+        header {
+            background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+
+        .legend {
+            background: #f8f9fa;
+            padding: 30px;
+            border-bottom: 3px solid #e9ecef;
+        }
+
+        .legend h2 {
+            margin-bottom: 20px;
+            color: #2a5298;
+            font-size: 1.8em;
+        }
+
+        .legend-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .legend-color {
+            width: 30px;
+            height: 30px;
+            border-radius: 6px;
+            border: 2px solid #333;
+        }
+
+        .diagram {
+            padding: 60px 40px;
+            background: #fafbfc;
+            overflow-x: auto;
+        }
+
+        .architecture-diagram {
+            min-width: 1400px;
+            display: flex;
+            flex-direction: column;
+            gap: 40px;
+        }
+
+        .layer {
+            position: relative;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            border-left: 6px solid;
+        }
+
+        .layer-title {
+            font-size: 1.8em;
+            font-weight: bold;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .layer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .component {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+            cursor: pointer;
+            position: relative;
+        }
+
+        .component:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+        }
+
+        .component-title {
+            font-size: 1.3em;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #1e3c72;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .component-icon {
+            width: 30px;
+            height: 30px;
+            background: #1e3c72;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .component-desc {
+            font-size: 0.95em;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        .component-tech {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-top: 15px;
+        }
+
+        .tech-badge {
+            background: #667eea;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        .flow-arrow {
+            text-align: center;
+            padding: 20px 0;
+            font-size: 2em;
+            color: #667eea;
+            font-weight: bold;
+        }
+
+        /* Layer-specific colors */
+        .frontend-layer { border-left-color: #667eea; }
+        .frontend-layer .layer-title { color: #667eea; }
+        .frontend-layer .component { background: linear-gradient(135deg, #e0e7ff 0%, #c7d2fe 100%); }
+
+        .api-layer { border-left-color: #10b981; }
+        .api-layer .layer-title { color: #10b981; }
+        .api-layer .component { background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%); }
+
+        .orchestrator-layer { border-left-color: #f59e0b; }
+        .orchestrator-layer .layer-title { color: #f59e0b; }
+        .orchestrator-layer .component { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+
+        .agents-layer { border-left-color: #8b5cf6; }
+        .agents-layer .layer-title { color: #8b5cf6; }
+        .agents-layer .component { background: linear-gradient(135deg, #ede9fe 0%, #ddd6fe 100%); }
+
+        .data-layer { border-left-color: #ef4444; }
+        .data-layer .layer-title { color: #ef4444; }
+        .data-layer .component { background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%); }
+
+        .ai-layer { border-left-color: #06b6d4; }
+        .ai-layer .layer-title { color: #06b6d4; }
+        .ai-layer .component { background: linear-gradient(135deg, #cffafe 0%, #a5f3fc 100%); }
+
+        .stats {
+            background: #1e3c72;
+            color: white;
+            padding: 40px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+        }
+
+        .stat-number {
+            font-size: 3em;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #fbbf24;
+        }
+
+        .stat-label {
+            font-size: 1.1em;
+            opacity: 0.9;
+        }
+
+        footer {
+            background: #1f2937;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .data-flow-section {
+            margin: 40px 0;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .flow-path {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .flow-step {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 15px;
+            background: #f9fafb;
+            border-left: 4px solid #667eea;
+            border-radius: 8px;
+        }
+
+        .flow-number {
+            width: 40px;
+            height: 40px;
+            background: #667eea;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2em;
+            flex-shrink: 0;
+        }
+
+        .flow-content {
+            flex: 1;
+        }
+
+        .flow-title {
+            font-weight: bold;
+            color: #1e3c72;
+            margin-bottom: 5px;
+        }
+
+        .flow-desc {
+            color: #666;
+            font-size: 0.95em;
+        }
+
+        @media (max-width: 768px) {
+            header h1 {
+                font-size: 2em;
+            }
+            
+            .layer-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .tooltip {
+            position: absolute;
+            background: #1f2937;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            z-index: 1000;
+            max-width: 300px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .component:hover .tooltip {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎓 Luminate AI System Architecture</h1>
+            <p>Intelligent Educational Assistant for COMP-237 Artificial Intelligence</p>
+            <p style="margin-top: 10px; font-size: 1em; opacity: 0.8;">
+                Multi-Agent LangGraph System • ChromaDB Vector Search • Chrome Extension
+            </p>
+        </header>
+
+        <div class="legend">
+            <h2>Component Legend</h2>
+            <div class="legend-items">
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #667eea;"></div>
+                    <span><strong>Frontend Layer</strong> - Chrome Extension UI</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #10b981;"></div>
+                    <span><strong>API Layer</strong> - FastAPI Backend</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #f59e0b;"></div>
+                    <span><strong>Orchestrator</strong> - Mode Router</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #8b5cf6;"></div>
+                    <span><strong>Agent Layer</strong> - LangGraph Workflows</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #ef4444;"></div>
+                    <span><strong>Data Layer</strong> - ChromaDB & Supabase</span>
+                </div>
+                <div class="legend-item">
+                    <div class="legend-color" style="background: #06b6d4;"></div>
+                    <span><strong>AI Models</strong> - Google Gemini</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="diagram">
+            <div class="architecture-diagram">
+                <!-- Frontend Layer -->
+                <div class="layer frontend-layer">
+                    <div class="layer-title">📱 Frontend Layer - Chrome Extension</div>
+                    <div class="layer-content">
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">UI</div>
+                                DualModeChat
+                            </div>
+                            <div class="component-desc">
+                                Main UI container with tabbed interface. Handles Navigate, Educate, Auto modes, Dashboard, Concept Graph, and Settings.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">React 18</span>
+                                <span class="tech-badge">TypeScript</span>
+                                <span class="tech-badge">Tailwind CSS</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">🔍</div>
+                                Navigate Mode
+                            </div>
+                            <div class="component-desc">
+                                Displays semantic search results with course materials, external resources (YouTube, OER), and direct Blackboard links.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">ReactMarkdown</span>
+                                <span class="tech-badge">shadcn/ui</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">🎓</div>
+                                Educate Mode
+                            </div>
+                            <div class="component-desc">
+                                Renders 4-level math explanations (Intuition, Math, Code, Misconceptions) with LaTeX formulas and syntax-highlighted Python code.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">KaTeX</span>
+                                <span class="tech-badge">Prism.js</span>
+                                <span class="tech-badge">rehype-katex</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">✨</div>
+                                Auto Mode
+                            </div>
+                            <div class="component-desc">
+                                Intelligent routing that automatically selects Navigate or Educate mode based on query intent with confidence scoring.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">framer-motion</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow">⬇️ HTTP POST /api/query</div>
+
+                <!-- API Layer -->
+                <div class="layer api-layer">
+                    <div class="layer-title">🌐 API Layer - FastAPI Backend</div>
+                    <div class="layer-content">
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">⚡</div>
+                                Unified Endpoint
+                            </div>
+                            <div class="component-desc">
+                                POST /api/query handles all student queries. Validates requests with Pydantic, logs interactions, and coordinates orchestrator.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">FastAPI</span>
+                                <span class="tech-badge">Uvicorn</span>
+                                <span class="tech-badge">Pydantic</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">🔒</div>
+                                CORS & Auth
+                            </div>
+                            <div class="component-desc">
+                                Enables Chrome extension communication with localhost:8000. Student identification via browser fingerprinting (no PII).
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">CORSMiddleware</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">📊</div>
+                                Health & Stats
+                            </div>
+                            <div class="component-desc">
+                                GET /health checks ChromaDB status. GET /stats returns collection metadata (917 documents, embedding model info).
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">Python Logging</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow">⬇️ Query Classification</div>
+
+                <!-- Orchestrator Layer -->
+                <div class="layer orchestrator-layer">
+                    <div class="layer-title">🎯 Orchestrator - Intelligent Mode Router</div>
+                    <div class="layer-content">
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">🧠</div>
+                                classify_query_mode()
+                            </div>
+                            <div class="component-desc">
+                                <strong>Navigate Indicators:</strong> find, search, look up, show me, video, tutorial, resources<br>
+                                <strong>Educate Indicators:</strong> explain, understand, learn, teach, why, how, confused, formula, solve<br>
+                                <strong>COMP-237 Topics:</strong> gradient descent, neural networks, DFS, BFS, A*, naive bayes (→ auto-educate)
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">Keyword Matching</span>
+                                <span class="tech-badge">Confidence Scoring</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">📈</div>
+                                Output
+                            </div>
+                            <div class="component-desc">
+                                Returns: { mode: 'navigate'|'educate', confidence: 0.0-1.0, reasoning: 'Why this mode' }
+                                <br><br>
+                                <strong>Examples:</strong><br>
+                                • "find neural networks" → Navigate (0.75)<br>
+                                • "explain gradient descent" → Educate (0.95)
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow">⬇️ Workflow Selection</div>
+
+                <!-- Agent Layer -->
+                <div class="layer agents-layer">
+                    <div class="layer-title">🤖 Agent Layer - LangGraph Multi-Agent Workflows</div>
+                    
+                    <h3 style="margin: 20px 0 15px 0; color: #8b5cf6; font-size: 1.4em;">Navigate Mode Pipeline (5 Agents)</h3>
+                    <div class="layer-content">
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">1</div>
+                                Query Understanding
+                            </div>
+                            <div class="component-desc">
+                                Extracts key terms, detects intent (search/learn), identifies scope (COMP-237 or out-of-scope), suggests module filter.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">NLP Patterns</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">2</div>
+                                Retrieval Agent
+                            </div>
+                            <div class="component-desc">
+                                ChromaDB semantic search: Embeds query → 384-dim vector → Cosine similarity → Top-K results (K=10). Filters by module, content type.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">ChromaDB</span>
+                                <span class="tech-badge">Sentence-BERT</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">3</div>
+                                Context Agent
+                            </div>
+                            <div class="component-desc">
+                                Enriches results with course structure, identifies prerequisites (e.g., "linear algebra before neural networks"), suggests related topics.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">Graph Traversal</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">4</div>
+                                External Resources
+                            </div>
+                            <div class="component-desc">
+                                Fetches YouTube tutorials (3Blue1Brown, StatQuest), OER Commons lessons, Khan Academy videos. Filters by duration, views, relevance.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">YouTube API</span>
+                                <span class="tech-badge">OER Commons</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">5</div>
+                                Formatting Agent
+                            </div>
+                            <div class="component-desc">
+                                Creates UI-ready markdown: Organizes results hierarchically, adds relevance explanations, generates resource cards with thumbnails.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">Markdown</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h3 style="margin: 30px 0 15px 0; color: #8b5cf6; font-size: 1.4em;">Educate Mode Pipeline (8 Agents)</h3>
+                    <div class="layer-content">
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">M</div>
+                                Math Translation
+                            </div>
+                            <div class="component-desc">
+                                <strong>30+ Formulas Supported:</strong> Gradient Descent, Backpropagation, Sigmoid, ReLU, Softmax, Cross-Entropy, Bayes' Theorem, TF-IDF, K-Means, Precision/Recall
+                                <br><br>
+                                <strong>4-Level Output:</strong><br>
+                                1️⃣ Intuition: 5-year-old analogy<br>
+                                2️⃣ Math: LaTeX formula + variable explanations<br>
+                                3️⃣ Code: Working Python implementation<br>
+                                4️⃣ Misconceptions: Common student mistakes
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">Pattern Matching</span>
+                                <span class="tech-badge">LaTeX</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">P</div>
+                                Pedagogical Planner
+                            </div>
+                            <div class="component-desc">
+                                Selects teaching strategy: Socratic (questions), Worked Example (step-by-step), Scaffolding (gradual complexity), Discovery (guided exploration).
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">VanLehn Model</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">S</div>
+                                Student Model
+                            </div>
+                            <div class="component-desc">
+                                Tracks mastery levels (0-100) per topic, identifies knowledge gaps, adapts difficulty. Data stored in Supabase topic_mastery table.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">Bayesian Knowledge Tracing</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">Q</div>
+                                Quiz Generator
+                            </div>
+                            <div class="component-desc">
+                                Creates multiple-choice questions with distractors (plausible wrong answers), provides explanations, tracks attempts in quiz_responses table.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">Distractor Generation</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">📅</div>
+                                Study Planner
+                            </div>
+                            <div class="component-desc">
+                                Generates weekly study schedules: Breaks topics into sessions, allocates time (e.g., 60 min/day), suggests resources, sets success criteria.
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">Spaced Repetition</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow">⬇️ Data Access</div>
+
+                <!-- Data Layer -->
+                <div class="layer data-layer">
+                    <div class="layer-title">💾 Data Layer - Storage & Retrieval</div>
+                    <div class="layer-content">
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">🗄️</div>
+                                ChromaDB
+                            </div>
+                            <div class="component-desc">
+                                <strong>Vector Database</strong><br>
+                                • Collection: comp237_content<br>
+                                • Documents: 917 text chunks<br>
+                                • Embedding Model: all-MiniLM-L6-v2 (384-dim)<br>
+                                • Distance Metric: Cosine similarity<br>
+                                • Query Time: <500ms<br>
+                                • Storage: SQLite + HNSW index
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">ChromaDB 0.5.0</span>
+                                <span class="tech-badge">HNSW Algorithm</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">🐘</div>
+                                Supabase PostgreSQL
+                            </div>
+                            <div class="component-desc">
+                                <strong>Relational Database</strong><br>
+                                • students (browser fingerprints)<br>
+                                • session_history (all interactions)<br>
+                                • topic_mastery (0-100 scores)<br>
+                                • misconceptions (detected errors)<br>
+                                • quiz_responses (attempts + scores)<br>
+                                • spaced_repetition (learning schedules)
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">PostgreSQL 15</span>
+                                <span class="tech-badge">Row-Level Security</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">📁</div>
+                                Course Content (JSON)
+                            </div>
+                            <div class="component-desc">
+                                <strong>Cleaned Blackboard Export</strong><br>
+                                • 593 JSON files<br>
+                                • 300,563 tokens total<br>
+                                • Modules: Root (64%), csfiles (34%)<br>
+                                • Formats: .dat, .pdf, .xml, .docx<br>
+                                • Live Blackboard URLs preserved
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">JSON Schema</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flow-arrow">⬇️ AI Inference</div>
+
+                <!-- AI Layer -->
+                <div class="layer ai-layer">
+                    <div class="layer-title">🧠 AI Models - Google Gemini (Vertex AI)</div>
+                    <div class="layer-content">
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">⚡</div>
+                                Gemini 2.0 Flash
+                            </div>
+                            <div class="component-desc">
+                                <strong>Navigate Mode LLM</strong><br>
+                                • Optimized for: Speed, information retrieval<br>
+                                • Response Time: 1-2 seconds<br>
+                                • Context Window: 32K tokens<br>
+                                • Use Cases: Result ranking, relevance explanations, query reformulation
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">Google Vertex AI</span>
+                                <span class="tech-badge">32K Context</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">🎓</div>
+                                Gemini 2.5 Flash
+                            </div>
+                            <div class="component-desc">
+                                <strong>Educate Mode LLM</strong><br>
+                                • Optimized for: Complex reasoning, math explanations<br>
+                                • Response Time: 2-4 seconds<br>
+                                • Context Window: 128K tokens<br>
+                                • Use Cases: Tutoring responses, quiz generation, study plans
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">128K Context</span>
+                                <span class="tech-badge">Multi-Modal Ready</span>
+                            </div>
+                        </div>
+                        <div class="component">
+                            <div class="component-title">
+                                <div class="component-icon">🔤</div>
+                                Sentence Transformers
+                            </div>
+                            <div class="component-desc">
+                                <strong>Embedding Model</strong><br>
+                                • Model: all-MiniLM-L6-v2<br>
+                                • Dimension: 384<br>
+                                • Speed: 100 sentences/sec<br>
+                                • Use Case: ChromaDB query embeddings<br>
+                                • Performance: 0.7-0.9 cosine similarity for relevant results
+                            </div>
+                            <div class="component-tech">
+                                <span class="tech-badge">HuggingFace</span>
+                                <span class="tech-badge">PyTorch</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Flow Section -->
+            <div class="data-flow-section">
+                <h2 style="color: #1e3c72; margin-bottom: 20px; font-size: 2em;">📊 Complete Query Data Flow</h2>
+                
+                <h3 style="margin: 20px 0; color: #667eea;">Example: "explain gradient descent"</h3>
+                <div class="flow-path">
+                    <div class="flow-step">
+                        <div class="flow-number">1</div>
+                        <div class="flow-content">
+                            <div class="flow-title">Student Input (Chrome Extension)</div>
+                            <div class="flow-desc">User types query in PromptInput component → State update → API call triggered</div>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">2</div>
+                        <div class="flow-content">
+                            <div class="flow-title">HTTP Request</div>
+                            <div class="flow-desc">POST http://localhost:8000/api/query { query: "explain gradient descent" }</div>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">3</div>
+                        <div class="flow-content">
+                            <div class="flow-title">Orchestrator Classification</div>
+                            <div class="flow-desc">Detects "explain" keyword + "gradient descent" COMP-237 topic → mode: 'educate', confidence: 0.95</div>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">4</div>
+                        <div class="flow-content">
+                            <div class="flow-title">Math Translation Agent</div>
+                            <div class="flow-desc">Pattern match "gradient descent" → Retrieves 4-level explanation from formula library (650 lines)</div>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">5</div>
+                        <div class="flow-content">
+                            <div class="flow-title">Generate Markdown</div>
+                            <div class="flow-desc">
+                                Level 1: "Blindfolded hill descent analogy"<br>
+                                Level 2: LaTeX → $$\theta_{new} = \theta_{old} - \alpha \nabla J(\theta)$$<br>
+                                Level 3: Python code (25 lines)<br>
+                                Level 4: 3 common misconceptions
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">6</div>
+                        <div class="flow-content">
+                            <div class="flow-title">JSON Response</div>
+                            <div class="flow-desc">Returns { mode: 'educate', response: { formatted_response: markdown }, timestamp }</div>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">7</div>
+                        <div class="flow-content">
+                            <div class="flow-title">UI Rendering</div>
+                            <div class="flow-desc">EducateMode.tsx → ReactMarkdown + KaTeX → Beautiful math typography + syntax-highlighted code</div>
+                        </div>
+                    </div>
+                    <div class="flow-step">
+                        <div class="flow-number">8</div>
+                        <div class="flow-content">
+                            <div class="flow-title">Analytics Logging (Supabase)</div>
+                            <div class="flow-desc">Insert session_history → Update topic_mastery (gradient_descent +5 points)</div>
+                        </div>
+                    </div>
+                </div>
+
+                <h3 style="margin: 30px 0 20px 0; color: #10b981;">Example: "find neural networks resources"</h3>
+                <div class="flow-path">
+                    <div class="flow-step" style="border-left-color: #10b981;">
+                        <div class="flow-number" style="background: #10b981;">1</div>
+                        <div class="flow-content">
+                            <div class="flow-title">Orchestrator → Navigate Mode (confidence: 0.75)</div>
+                            <div class="flow-desc">Detects "find" + "resources" keywords</div>
+                        </div>
+                    </div>
+                    <div class="flow-step" style="border-left-color: #10b981;">
+                        <div class="flow-number" style="background: #10b981;">2</div>
+                        <div class="flow-content">
+                            <div class="flow-title">ChromaDB Vector Search</div>
+                            <div class="flow-desc">
+                                Embed "neural networks" → [0.023, -0.15, ..., 0.12] (384-dim)<br>
+                                Cosine similarity search → Top 10 results (distances: 0.23-0.58)
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flow-step" style="border-left-color: #10b981;">
+                        <div class="flow-number" style="background: #10b981;">3</div>
+                        <div class="flow-content">
+                            <div class="flow-title">External Resources Agent</div>
+                            <div class="flow-desc">
+                                YouTube API → 3Blue1Brown "Neural Networks Explained"<br>
+                                OER Commons → "Deep Learning Fundamentals"
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flow-step" style="border-left-color: #10b981;">
+                        <div class="flow-number" style="background: #10b981;">4</div>
+                        <div class="flow-content">
+                            <div class="flow-title">NavigateMode Renders</div>
+                            <div class="flow-desc">Resource cards with Blackboard links + YouTube embeds + OER badges</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-item">
+                <div class="stat-number">917</div>
+                <div class="stat-label">ChromaDB Documents</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">30+</div>
+                <div class="stat-label">Math Formulas Explained</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">13</div>
+                <div class="stat-label">LangGraph Agents</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">2-4s</div>
+                <div class="stat-label">Avg Response Time</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">384</div>
+                <div class="stat-label">Embedding Dimensions</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">300K+</div>
+                <div class="stat-label">Total Tokens Indexed</div>
+            </div>
+        </div>
+
+        <footer>
+            <p style="font-size: 1.2em; margin-bottom: 10px;"><strong>Luminate AI</strong> - COMP-237 Intelligent Course Assistant</p>
+            <p style="opacity: 0.8;">Architecture Diagram v1.0 | Last Updated: October 7, 2025</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">
+                Built with: React • FastAPI • LangGraph • ChromaDB • Google Gemini • Supabase
+            </p>
+        </footer>
+    </div>
+
+    <script>
+        // Add interactive tooltips
+        document.querySelectorAll('.component').forEach(comp => {
+            comp.addEventListener('click', function() {
+                const title = this.querySelector('.component-title').textContent.trim();
+                const desc = this.querySelector('.component-desc').textContent.trim();
+                alert(`${title}\n\n${desc}`);
+            });
+        });
+
+        // Smooth scroll animation
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeIn 0.6s ease-in';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.layer, .component').forEach(el => {
+            observer.observe(el);
+        });
+
+        // Add CSS animation
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeIn {
+                from {
+                    opacity: 0;
+                    transform: translateY(20px);
+                }
+                to {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

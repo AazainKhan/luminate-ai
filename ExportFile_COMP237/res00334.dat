@@ -1,0 +1,223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONTENT id="_800724_1"><TITLE value="Typography"/><TITLECOLOR value="#000000"/><DESCRIPTION
+   value="Style Guide&#xa;Typography&#xa;Note: All typography can be set by using the tool bar in the &quot;Edit HTML&quot; page.&#xa;What it looks like:&#xa;What the Source Code looks like:&#xa;Heading 1&#xa;Heading 1&#xa;Heading 2&#xa;Heading 2&#xa;Heading 3&#xa;Heading 3&#xa;Heading 4&#xa;Heading 4&#xa;This is paragraph text. Default font style is 16px, Verdana. The back up fonts is Arial, Helvetica then any sans-serif font loaded on the users computer.&#xa;This is a paragraph. Default font style is 16px, Verdana. The back up fonts is Arial, Helvetica then any sans-serif font loaded on the users computer.&#xa;This is a paragraph that has a word wrapped in strong tags to make the word bold.&#xa;This is a paragraph that has a word wrapped in a strong tag to make the word bold.&#xa;This is a paragraph that has a word wrappe..."/><BODY><TEXT>&lt;!-- {"bbMLEditorVersion":1} --&gt;&lt;div&gt; 
+ &lt;h4&gt;Typography&lt;/h4&gt; 
+ &lt;div&gt; 
+  &lt;p&gt;&lt;strong&gt;Note&lt;/strong&gt;: All typography can be set by using the tool bar in the "Edit HTML" page.&lt;/p&gt; 
+  &lt;p&gt;&lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693281_1" data-bbfile="{&amp;quot;linkName&amp;quot;:&amp;quot;PastedImage_0gaf0rfvsquqec7i3mcnirvd0o252jaq00170484731.png&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;image/png&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;PastedImage_0gaf0rfvsquqec7i3mcnirvd0o252jaq00170484731.png&lt;/a&gt;&lt;/p&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;h5&gt;What it looks like:&lt;/h5&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;h5&gt;What the Source Code looks like:&lt;/h5&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;h4&gt;Heading 1&lt;/h4&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;h1&amp;gt;Heading 1&amp;lt;/h1&amp;gt;
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;h5&gt;Heading 2&lt;/h5&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;h2&amp;gt;Heading 2&amp;lt;/h2&amp;gt;
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;h6&gt;Heading 3&lt;/h6&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;h3&amp;gt;Heading 3&amp;lt;/h3&amp;gt;
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;h6&gt;Heading 4&lt;/h6&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;h4&amp;gt;Heading 4&amp;lt;/h4&amp;gt;
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;This is paragraph text. Default font style is 16px,&amp;nbsp;Verdana. The back up fonts is Arial, Helvetica then any sans-serif font loaded on the users computer.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;p&amp;gt;This is a paragraph. Default font style is 16px,&amp;nbsp;Verdana. The back up fonts is Arial, Helvetica then any sans-serif font loaded on the users computer.&amp;lt;/p&amp;gt;
+
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;This is a paragraph that has a word wrapped in&amp;nbsp;&lt;strong&gt;strong tags&lt;/strong&gt; to make the word &lt;strong&gt;bold&lt;/strong&gt;.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;p&amp;gt;This is a paragraph that has a word wrapped in a &amp;lt;strong&amp;gt;strong tag&amp;lt;/strong&amp;gt; to make the word bold.&amp;lt;/p&amp;gt;
+
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;This is a paragraph that has a word wrapped in a &lt;em&gt;em tag&lt;/em&gt; (short for Emphasized) to make the word appear italic. Italic text should only be use for book titling.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;p&amp;gt;This is a paragraph that has a word wrapped in a &amp;lt;em&amp;gt;em tag&amp;lt;/em&amp;gt; (short for Emphasized) to make the word appear italic.&amp;lt;/p&amp;gt;
+
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;This is a paragraph that has a word wrapped in a &lt;span style="text-decoration: underline;"&gt;span tag&lt;/span&gt; with an underline style attached to it.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;p&amp;gt;This is a paragraph that has a word wrapped in a &amp;lt;span style="text-decoration: underline;"&amp;gt;span tag&amp;lt;/span&amp;gt; with an underline style attached to it.&amp;lt;/p&amp;gt;
+
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;Insert your URL in the href="..." field. The attribute target="_blank" means the link will open a new browser window.&lt;/p&gt; 
+   &lt;p&gt;&lt;a href="#" rel="noopener"&gt;This is a link!&lt;/a&gt;&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;p&amp;gt;&amp;lt;a href="#" target="_blank"&amp;gt;This is a link!&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;This is a paragraph that has a class of "large-text" attached to it.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;p class="large-text"&amp;gt;This is a paragraph that has a class of "large-text" attached to it.&amp;lt;/p&amp;gt;
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;This is a paragraph that has a class of "small-text" attached to it.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;p class="small-text"&amp;gt;This is a paragraph that has a class of "small-text" attached to it.&amp;lt;/p&amp;gt;
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt;  This is a paragraph tag wrapped in a blockquote.  Someone famous in Source Title   
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;blockquote&amp;gt;
+  &amp;lt;p&amp;gt;This is a paragraph tag wrapped in a blockquote.&amp;lt;/p&amp;gt;
+&lt;strong&gt;&amp;nbsp;&amp;nbsp;&lt;/strong&gt;&amp;lt;footer&amp;gt;Someone famous in &amp;lt;cite title="Source Title"&amp;gt;Source Title&amp;lt;/cite&amp;gt;&amp;lt;/footer&amp;gt;
+&amp;lt;/blockquote&amp;gt;
+&lt;/pre&gt; 
+   &lt;br&gt; 
+   &lt;br&gt; 
+   &lt;br&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;ul&gt; 
+    &lt;li&gt;Unordered (Bullet) List Item #1&lt;/li&gt; 
+    &lt;li&gt;Unordered (Bullet) List Item #2&lt;/li&gt; 
+    &lt;li&gt;Unordered (Bullet) List Item #3&lt;/li&gt; 
+   &lt;/ul&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;ul&amp;gt;
+  &amp;lt;li&amp;gt;Unordered (Bullet) List Item #1&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;Unordered (Bullet) List Item #2&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;Unordered (Bullet) List Item #3&amp;lt;/li&amp;gt;
+&amp;lt;/ul&amp;gt;
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;ol&gt; 
+    &lt;li&gt;Ordered (Numerical) List Item #1&lt;/li&gt; 
+    &lt;li&gt;Ordered (Numerical) List Item #2&lt;/li&gt; 
+    &lt;li&gt;Ordered (Numerical) List Item #3&lt;/li&gt; 
+   &lt;/ol&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;ol&amp;gt;
+  &amp;lt;li&amp;gt;Ordered (Numerical) List Item #1&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;Ordered (Numerical) List Item #2&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;Ordered (Numerical) List Item #3&amp;lt;/li&amp;gt;
+&amp;lt;/ol&amp;gt;
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;ol&gt; 
+    &lt;li&gt;Ordered (Alphabetical) List Item #1&lt;/li&gt; 
+    &lt;li&gt;Ordered (Alphabetical) List Item #2&lt;/li&gt; 
+    &lt;li&gt;Ordered (Alphabetical) List Item #3&lt;/li&gt; 
+   &lt;/ol&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;ol type="1|a|A|i|I"&amp;gt;
+  &amp;lt;li&amp;gt;Ordered (Alphabetical) List Item #1&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;Ordered (Alphabetical) List Item #2&amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;Ordered (Alphabetical) List Item #3&amp;lt;/li&amp;gt;
+&amp;lt;/ol&amp;gt;
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;ol&gt; 
+    &lt;li&gt;Ordered List Item #1&lt;/li&gt; 
+    &lt;li&gt;Ordered List Item #2 
+     &lt;ol&gt; 
+      &lt;li&gt;Ordered List Item #2.1&lt;/li&gt; 
+      &lt;li&gt;Ordered List Item #2.2&lt;/li&gt; 
+      &lt;li&gt;Ordered List Item #2.3&lt;/li&gt; 
+     &lt;/ol&gt; &lt;/li&gt; 
+    &lt;li&gt;Ordered List Item #3&lt;/li&gt; 
+   &lt;/ol&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;ol&amp;gt;
+ &amp;lt;li&amp;gt;Ordered List Item #1&amp;lt;/li&amp;gt;
+ &amp;lt;li&amp;gt;Ordered List Item #2
+    &amp;lt;ol type="1|a|A|i|I"&amp;gt;
+      &amp;lt;li&amp;gt;Ordered List Item #2.1&amp;lt;/li&amp;gt;
+      &amp;lt;li&amp;gt;Ordered List Item #2.2&amp;lt;/li&amp;gt;
+      &amp;lt;li&amp;gt;Ordered List Item #2.3&amp;lt;/li&amp;gt;
+    &amp;lt;/ol&amp;gt;
+  &amp;lt;/li&amp;gt;
+  &amp;lt;li&amp;gt;Ordered List Item #3&amp;lt;/li&amp;gt;
+&amp;lt;/ol&amp;gt;&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+  
+&lt;/div&gt;</TEXT><TYPE
+   value="H"/></BODY><DATES><CREATED value="2024-10-04 18:31:49 EDT"/><UPDATED value="2024-10-10 12:31:00 EDT"/><START
+   value=""/><END value=""/></DATES><FLAGS><ISAVAILABLE value="true"/><ISFROMCARTRIDGE value="false"/><ISFOLDER
+   value="false"/><ISDESCRIBED value="false"/><ISTRACKED value="true"/><ISLESSON value="false"/><ISSEQUENTIAL
+   value="false"/><ALLOWGUESTS value="true"/><ALLOWOBSERVERS value="true"/><LAUNCHINNEWWINDOW
+   value="false"/><ISREVIEWABLE value="false"/><ISGROUPCONTENT value="false"/><ISSAMPLECONTENT
+   value="false"/><PARTIALLYVISIBLE value="false"/><HASTHUMBNAIL value="false"/></FLAGS><CONTENTHANDLER
+  value="resource/x-bb-document"/><RENDERTYPE value="REGULAR"/><FOLDERTYPE value=""/><URL value=""/><VIEWMODE
+  value="TEXT_ICON_ONLY"/><OFFLINENAME value=""/><OFFLINEPATH value=""/><LINKREF value=""/><PARENTID
+  value="_800605_1"/><REVIEWABLEREASON value="NONE"/><VERSION value="3"/><THUMBNAILALT value=""/><AISTATE
+  value="No"/><AIACCEPTINGUSER value=""/><EXTENDEDDATA/><FILES/></CONTENT>

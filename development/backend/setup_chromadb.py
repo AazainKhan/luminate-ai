@@ -22,7 +22,7 @@ from tqdm import tqdm
 
 # Configure paths
 PROJECT_ROOT = Path(__file__).parent.parent.parent
-COMP237_DATA = PROJECT_ROOT / "comp_237_content"
+COMP237_DATA = PROJECT_ROOT / "cleaned"
 CHROMA_DB_PATH = PROJECT_ROOT / "chromadb_data"
 LOGS_DIR = PROJECT_ROOT / "development/backend/logs"
 
@@ -126,29 +126,29 @@ class LuminateChromaDB:
                     chunk_id_counter += 1
                     chunk_id = f"{chunk_id}_{chunk_id_counter}"
                     
-                    # Prepare metadata
+                    # Prepare metadata (ChromaDB requires non-None values)
                     metadata = {
-                        "course_id": course_id,
-                        "course_name": course_name,
-                        "module": module,
-                        "file_name": file_name,
-                        "title": title,
-                        "content_type": content_type,
-                        "chunk_index": chunk.get("chunk_index", 0),
-                        "total_chunks": chunk.get("total_chunks", 1),
-                        "token_count": chunk.get("token_count", 0)
+                        "course_id": str(course_id) if course_id else "unknown",
+                        "course_name": str(course_name) if course_name else "unknown",
+                        "module": str(module) if module else "Root",
+                        "file_name": str(file_name) if file_name else "unknown",
+                        "title": str(title) if title else "Untitled",
+                        "content_type": str(content_type) if content_type else "text",
+                        "chunk_index": int(chunk.get("chunk_index", 0)),
+                        "total_chunks": int(chunk.get("total_chunks", 1)),
+                        "token_count": int(chunk.get("token_count", 0))
                     }
                     
-                    # Add BB doc ID and URL if available
-                    if bb_doc_id:
-                        metadata["bb_doc_id"] = bb_doc_id
-                    if live_url:
-                        metadata["live_lms_url"] = live_url
+                    # Add BB doc ID and URL (convert to string, use "none" if missing)
+                    metadata["bb_doc_id"] = str(bb_doc_id) if bb_doc_id else "none"
+                    metadata["live_lms_url"] = str(live_url) if live_url else "none"
                     
                     # Add tags
                     tags = chunk.get("tags", [])
                     if tags:
-                        metadata["tags"] = ",".join(tags)
+                        metadata["tags"] = ",".join(str(t) for t in tags if t)
+                    else:
+                        metadata["tags"] = "none"
                     
                     ids.append(chunk_id)
                     texts.append(content)

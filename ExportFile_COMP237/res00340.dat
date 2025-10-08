@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONTENT id="_800730_1"><TITLE value="Images and Video"/><TITLECOLOR value="#000000"/><DESCRIPTION
+   value="Style Guide - Media&#xa;.row {border-bottom:1px solid #eee;margin:20px 0;}&#xa;Images and Videos&#xa;NOTE: When inserting Links and Images, please use any of the three &quot;insert&quot; buttons (top-left ) in the &quot;Edit HTML&quot; window. This allows you to save images and files in the correct folders by selecting the &quot;Choose Destination&quot; button (this helps with avoiding broken links). Please make sure you are saving files and images in their corresponding week/module folders.&#xa;When inserting an image it is important to specify an &quot;Alternative Text&quot; when prompted. This is a mandatory step in being AODA compliant. Doing this will automatically insert a alt=&quot;Description Of Your Image, Keywords&quot; and a title=&quot;Description Of Your Image, Keywords&quot; into the image tag (kee..."/><BODY><TEXT>&lt;!-- {"bbMLEditorVersion":1} --&gt;&lt;div&gt; 
+ &lt;h4&gt;Images and Videos&lt;/h4&gt; 
+ &lt;div&gt; 
+  &lt;p&gt;&lt;strong&gt;NOTE:&lt;/strong&gt; When inserting Links and Images, please use any of the three "insert" buttons (top-left&amp;nbsp;&lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693282_1" data-bbfile="{&amp;quot;linkName&amp;quot;:&amp;quot;PastedImage_x3xd63zzfm66b4pwy2x7bb6khagtxdr600170484731.png&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;image/png&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;PastedImage_x3xd63zzfm66b4pwy2x7bb6khagtxdr600170484731.png&lt;/a&gt;) in the "Edit HTML" window. This allows you to save images and files in the correct folders by selecting the "Choose Destination" button (this helps with avoiding broken links). Please make sure you are saving files and images in their corresponding week/module folders.&lt;/p&gt; 
+  &lt;p&gt;&lt;strong&gt;When inserting an image it is important to specify an "Alternative Text" when prompted. This is a mandatory step in being AODA compliant&lt;/strong&gt;. Doing this will automatically insert a alt="Description Of Your Image, Keywords" and a title="Description Of Your Image, Keywords" into the image tag (keep in mind: it's good practice to keep alternative text under 200 characters). To the best of your ability use images that are appropriate to the content and &lt;span style="text-decoration: underline;"&gt;never have large blocks of text as an image!&lt;/span&gt; Try using alternative ways of displaying the content (tables, blockquotes, or contact your multimedia developer to create an alternative).&lt;/p&gt; 
+  &lt;p&gt;&lt;strong&gt;Quick formatting:&lt;/strong&gt; To float (and text wrap) your images to the right or left, simply select "Align Left" or "Align Right" from the "Unordered List" (the bullet point button) dropdown menu in the editor.&lt;/p&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;h5&gt;What it looks like:&lt;/h5&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;h5&gt;Source Code:&lt;/h5&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt;  
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;&lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693284_1" data-bbfile="{&amp;quot;alternativeText&amp;quot;:&amp;quot;This is a test image!&amp;quot;,&amp;quot;linkName&amp;quot;:&amp;quot;test_image.jpg&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;image/jpeg&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;test_image.jpg&lt;/a&gt;This is an image, and it has a style="float: right;" attribute.&lt;/p&gt; 
+   &lt;p&gt;Class right and left can also be applied.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;p&amp;gt;&amp;lt;img src="...URL Path..." alt="This is a test image!" title="This is a test image!" &lt;strong&gt;style="float: right;"&lt;/strong&gt; /&amp;gt;&amp;lt;/p&amp;gt;&lt;/pre&gt; 
+   &lt;pre&gt;&amp;lt;p&amp;gt;&amp;lt;img src="...URL Path..." alt="This is a test image!" title="This is a test image!" &lt;strong&gt;class="right"&lt;/strong&gt; /&amp;gt;&amp;lt;/p&amp;gt;&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;div&gt; 
+    &lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693284_1" data-bbfile="{&amp;quot;alternativeText&amp;quot;:&amp;quot;This is a test image!&amp;quot;,&amp;quot;linkName&amp;quot;:&amp;quot;test_image.jpg&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;image/jpeg&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;test_image.jpg&lt;/a&gt; 
+    &lt;p&gt;This is a caption for the above image.&lt;/p&gt; 
+   &lt;/div&gt; 
+   &lt;p&gt;This image is wrapped within a &amp;lt;div&amp;gt; element with a class called image-caption, right and col-2.&lt;/p&gt; 
+   &lt;p&gt;Only the paragraph text will have the orange bar on the left.&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;div class="&lt;strong&gt;image-caption right col-2&lt;/strong&gt;"&amp;gt;
+  &amp;lt;img src="../images/test_image.jpg" alt="This is a test image!" title="This is a test image!" /&amp;gt;
+  &amp;lt;p&amp;gt;This is a caption for the above image.&amp;lt;/p&amp;gt;
+&amp;lt;/div&amp;gt;
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;div&gt; 
+   &lt;p&gt;This is a standard YouTube Embed code. class="responsive-video" will make the video scale based on browser size.&lt;/p&gt; 
+   &lt;p&gt;It is important to provide a direct link to the video, as well as a transcript, if close captioning is unavailable or is auto-generated (with mistakes).&lt;/p&gt; 
+   &lt;div&gt; 
+    &lt;a href="https://www.youtube.com/embed/qkGex_YQRwA?wmode=opaque" data-bbtype="video" data-bbfile="{&amp;quot;src&amp;quot;:&amp;quot;https://www.youtube.com/embed/qkGex_YQRwA?wmode=opaque&amp;quot;,&amp;quot;alt&amp;quot;:&amp;quot;https://www.youtube.com/embed/qkGex_YQRwA?wmode=opaque&amp;quot;}"&gt;https://www.youtube.com/embed/qkGex_YQRwA?wmode=opaque&lt;/a&gt; 
+   &lt;/div&gt; 
+   &lt;p&gt;YouTube: &lt;a href="https://www.youtube.com/watch?v=qkGex_YQRwA" rel="noopener"&gt;https://www.youtube.com/watch?v=qkGex_YQRwA&lt;/a&gt;&lt;/p&gt; 
+   &lt;p&gt;Transcript: transcriptfile.txt&lt;/p&gt; 
+  &lt;/div&gt; 
+  &lt;div&gt; 
+   &lt;pre&gt;&amp;lt;div &lt;strong&gt;class="responsive-video"&lt;/strong&gt;&amp;gt;
+  &amp;lt;iframe width="560" height="315" src="https://www.youtube.com/embed/qkGex_YQRwA?wmode=opaque" frameborder="0" allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture" allowfullscreen=""&amp;gt;&amp;lt;/iframe&amp;gt;
+&amp;lt;/div&amp;gt;
+    &amp;lt;p class="small-text links-icon"&amp;gt;YouTube: &amp;lt;a href="https://www.youtube.com/watch?v=qkGex_YQRwA" target="_blank" rel="noopener"&amp;gt;https://www.youtube.com/watch?v=qkGex_YQRwA&amp;lt;/a&amp;gt;&amp;lt;/p&amp;gt;
+    &amp;lt;p class="small-text file-icon"&amp;gt;Transcript: transcriptfile.txt&amp;lt;/p&amp;gt;
+&lt;/pre&gt; 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+  
+&lt;/div&gt;</TEXT><TYPE
+   value="H"/></BODY><DATES><CREATED value="2024-10-04 18:31:50 EDT"/><UPDATED value="2024-10-10 12:31:00 EDT"/><START
+   value=""/><END value=""/></DATES><FLAGS><ISAVAILABLE value="true"/><ISFROMCARTRIDGE value="false"/><ISFOLDER
+   value="false"/><ISDESCRIBED value="false"/><ISTRACKED value="true"/><ISLESSON value="false"/><ISSEQUENTIAL
+   value="false"/><ALLOWGUESTS value="true"/><ALLOWOBSERVERS value="true"/><LAUNCHINNEWWINDOW
+   value="false"/><ISREVIEWABLE value="false"/><ISGROUPCONTENT value="false"/><ISSAMPLECONTENT
+   value="false"/><PARTIALLYVISIBLE value="false"/><HASTHUMBNAIL value="false"/></FLAGS><CONTENTHANDLER
+  value="resource/x-bb-document"/><RENDERTYPE value="REGULAR"/><FOLDERTYPE value=""/><URL value=""/><VIEWMODE
+  value="TEXT_ICON_ONLY"/><OFFLINENAME value=""/><OFFLINEPATH value=""/><LINKREF value=""/><PARENTID
+  value="_800606_1"/><REVIEWABLEREASON value="NONE"/><VERSION value="3"/><THUMBNAILALT value=""/><AISTATE
+  value="No"/><AIACCEPTINGUSER value=""/><EXTENDEDDATA/><FILES/></CONTENT>
