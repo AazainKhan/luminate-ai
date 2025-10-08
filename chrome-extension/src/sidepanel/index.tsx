@@ -1,6 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
 import { ChatInterface } from '../components/ChatInterface';
+import { ErrorBoundary } from '../components/ErrorBoundary';
 import '../index.css';
 
 console.log('🚀 Side panel script loaded');
@@ -15,10 +16,12 @@ function SidePanel() {
       margin: 0,
       padding: 0
     }}>
-      <ChatInterface onClose={() => {
-        // Side panel doesn't need a close button - user can close via Chrome UI
-        // But we keep the prop for compatibility
-      }} />
+      <ErrorBoundary>
+        <ChatInterface onClose={() => {
+          // Side panel doesn't need a close button - user can close via Chrome UI
+          // But we keep the prop for compatibility
+        }} />
+      </ErrorBoundary>
     </div>
   );
 }
