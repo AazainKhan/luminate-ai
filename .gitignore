@@ -1,4 +1,0 @@
-# put the venv folder in the gitignore
-venv/
-__pycache__/
-*.pyc
