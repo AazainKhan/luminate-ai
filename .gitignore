@@ -1,6 +1,5 @@
 # Environment variables
 .env
-
 # Python
 __pycache__/
 *.py[cod]
@@ -31,3 +30,4 @@ Thumbs.db
 data/chroma_input.jsonl
 
 data/ExportFile_COMP237_.zip
+
