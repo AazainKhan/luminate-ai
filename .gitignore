@@ -30,3 +30,6 @@ data/chroma_index/
 Thumbs.db
 venv/
 env/
+ 
+# data
+data/ExportFile_COMP237_.zip
