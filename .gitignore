@@ -7,9 +7,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
 venv/
-ENV/
 *.egg-info/
 dist/
 build/
@@ -28,11 +26,8 @@ data/chroma_index/
 # OS
 .DS_Store
 Thumbs.db
-venv/
-env/
  
 # data
 data/chroma_input.jsonl
 
 data/ExportFile_COMP237_.zip
-
