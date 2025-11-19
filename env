@@ -1,0 +1,22 @@
+# Google Gemini API Key
+# GOOGLE_API_KEY=AIzaSyDldXJV7TQ75UYCIAkg2kIkr7rWETAxMDw
+GOOGLE_API_KEY=AIzaSyAs5cjCS_zV2eajKg07bISV8-UyhA-ZJkw
+
+# OpenAI API Key (for embeddings in RAG)
+OPENAI_API_KEY=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
+
+# WOLFARM ALPHA API KEY 
+WOLFRAM_APP_ID = VR3LTRJATX
+
+DATABASE_URL_SQLITE=feedback.sqlite
+
+
+PGHOST=localhost
+PGPORT=5432
+PGUSER=<your_pg_user>
+PGPASSWORD=<your_pg_password>
+PGDATABASE=luminate_ai
+
+
+# .env
+PLANNER_DEBUG=true

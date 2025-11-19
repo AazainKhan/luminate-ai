@@ -1,0 +1,39 @@
+# Core LangChain packages
+langchain
+langgraph
+langchain-openai
+langchain-google-genai
+langchain-community
+langchain-chroma
+
+# Vector database
+chromadb
+
+# AI/LLM integrations
+openai
+google-generativeai
+tiktoken
+
+# Data validation
+pydantic
+
+# Environment variables
+python-dotenv
+
+# HTML parsing (for ingest_core)
+beautifulsoup4
+lxml
+
+
+fastapi
+uvicorn[standard]
+chromadb
+sympy
+requests
+pydantic
+python-dotenv
+langchain
+langchain-google-genai
+
+psycopg2
+psycopg2-binary
