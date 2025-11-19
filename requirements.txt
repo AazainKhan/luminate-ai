@@ -1,7 +1,0 @@
-fastapi
-uvicorn[standard]
-chromadb
-sentence-transformers
-PyPDF2
-python-multipart
-requests
