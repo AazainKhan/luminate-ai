@@ -1,0 +1,205 @@
+# Docker Compose configuration for Luminate AI Course Marshal
+
+services:
+  api_brain:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: api_brain
+    ports:
+      - "8000:8000"
+    env_file:
+      - ./backend/.env
+    environment:
+      - ENVIRONMENT=development
+      - CHROMADB_HOST=memory_store
+      - CHROMADB_PORT=8000
+      - REDIS_HOST=cache_layer
+      - REDIS_PORT=6379
+      - LANGFUSE_HOST=observer
+      - LANGFUSE_PORT=3000
+    volumes:
+      - ./backend:/app
+      - backend_data:/app/data
+    depends_on:
+      - memory_store
+      - cache_layer
+      # Langfuse disabled for MVP (optional observability)
+      # - observer
+      # - langfuse_worker
+    networks:
+      - luminate_network
+    command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
+
+  memory_store:
+    image: chromadb/chroma:latest
+    container_name: memory_store
+    ports:
+      - "8001:8000"
+    volumes:
+      - chromadb_data:/chroma/chroma
+    environment:
+      - IS_PERSISTENT=TRUE
+      - ANONYMIZED_TELEMETRY=FALSE
+    networks:
+      - luminate_network
+
+  cache_layer:
+    image: redis:alpine
+    container_name: cache_layer
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    networks:
+      - luminate_network
+    command: redis-server --appendonly yes
+
+  # Langfuse Observer - Disabled for MVP (optional observability)
+  # Uncomment and configure ClickHouse authentication if needed
+  # observer:
+  #   image: langfuse/langfuse:latest
+  #   container_name: observer
+  #   ports:
+  #     - "3000:3000"
+  #   environment:
+  #     - DATABASE_URL=postgresql://langfuse:langfuse@postgres:5432/langfuse
+  #     - NEXTAUTH_SECRET=langfuse-secret-key-change-in-production-dev-only
+  #     - NEXTAUTH_URL=http://localhost:3000
+  #     - SALT=langfuse-salt-change-in-production-dev-only
+  #     - ENCRYPTION_KEY=langfuse-encryption-key-dev-only-32-chars-long
+  #     - CLICKHOUSE_URL=http://clickhouse:8123
+  #     - CLICKHOUSE_USER=default
+  #     - CLICKHOUSE_PASSWORD=''
+  #     - CLICKHOUSE_DB=default
+  #     - CLICKHOUSE_MIGRATION_URL=clickhouse://default@clickhouse:9000
+  #     - CLICKHOUSE_MIGRATION_SSL=false
+  #     - REDIS_CONNECTION_STRING=redis://cache_layer:6379
+  #     - LANGFUSE_S3_EVENT_UPLOAD_BUCKET=langfuse-events
+  #     - LANGFUSE_S3_ENDPOINT=http://minio:9000
+  #     - LANGFUSE_S3_ACCESS_KEY_ID=minioadmin
+  #     - LANGFUSE_S3_SECRET_ACCESS_KEY=minioadmin
+  #     - LANGFUSE_S3_BUCKET_REGION=us-east-1
+  #     - LANGFUSE_S3_FORCE_PATH_STYLE=true
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     clickhouse:
+  #       condition: service_healthy
+  #     cache_layer:
+  #       condition: service_started
+  #     minio:
+  #       condition: service_started
+  #   networks:
+  #     - luminate_network
+  #   healthcheck:
+  #     test: ["CMD", "curl", "-f", "http://localhost:3000/api/public/health"]
+  #     interval: 30s
+  #     timeout: 10s
+  #     retries: 3
+
+  # Langfuse Worker - Disabled for MVP (optional observability)
+  # langfuse_worker:
+  #   image: langfuse/langfuse:latest
+  #   container_name: langfuse_worker
+  #   entrypoint: ["node", "dist/worker/index.js"]
+  #   environment:
+  #     - DATABASE_URL=postgresql://langfuse:langfuse@postgres:5432/langfuse
+  #     - NEXTAUTH_SECRET=langfuse-secret-key-change-in-production-dev-only
+  #     - NEXTAUTH_URL=http://localhost:3000
+  #     - SALT=langfuse-salt-change-in-production-dev-only
+  #     - ENCRYPTION_KEY=langfuse-encryption-key-dev-only-32-chars-long
+  #     - CLICKHOUSE_URL=http://clickhouse:8123
+  #     - CLICKHOUSE_USER=default
+  #     - CLICKHOUSE_PASSWORD=''
+  #     - CLICKHOUSE_DB=default
+  #     - CLICKHOUSE_MIGRATION_URL=clickhouse://default@clickhouse:9000
+  #     - CLICKHOUSE_MIGRATION_SSL=false
+  #     - REDIS_CONNECTION_STRING=redis://cache_layer:6379
+  #     - LANGFUSE_S3_EVENT_UPLOAD_BUCKET=langfuse-events
+  #     - LANGFUSE_S3_ENDPOINT=http://minio:9000
+  #     - LANGFUSE_S3_ACCESS_KEY_ID=minioadmin
+  #     - LANGFUSE_S3_SECRET_ACCESS_KEY=minioadmin
+  #     - LANGFUSE_S3_BUCKET_REGION=us-east-1
+  #     - LANGFUSE_S3_FORCE_PATH_STYLE=true
+  #   depends_on:
+  #     postgres:
+  #       condition: service_healthy
+  #     clickhouse:
+  #       condition: service_healthy
+  #     cache_layer:
+  #       condition: service_started
+  #     minio:
+  #       condition: service_started
+  #   networks:
+  #     - luminate_network
+
+  clickhouse:
+    image: clickhouse/clickhouse-server:latest
+    container_name: clickhouse
+    ports:
+      - "8123:8123"  # HTTP interface
+      - "9000:9000"  # Native protocol
+    volumes:
+      - clickhouse_data:/var/lib/clickhouse
+    environment:
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=default
+    networks:
+      - luminate_network
+    healthcheck:
+      test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    ports:
+      - "9001:9001"  # Console
+      - "9002:9000"  # API (changed from 9000 to avoid conflict)
+    volumes:
+      - minio_data:/data
+    environment:
+      - MINIO_ROOT_USER=minioadmin
+      - MINIO_ROOT_PASSWORD=minioadmin
+    command: server /data --console-address ":9001"
+    networks:
+      - luminate_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  postgres:
+    image: postgres:15-alpine
+    container_name: langfuse_postgres
+    environment:
+      - POSTGRES_USER=langfuse
+      - POSTGRES_PASSWORD=langfuse
+      - POSTGRES_DB=langfuse
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - luminate_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U langfuse"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  backend_data:
+  chromadb_data:
+  redis_data:
+  postgres_data:
+  clickhouse_data:
+  minio_data:
+
+networks:
+  luminate_network:
+    driver: bridge
+
