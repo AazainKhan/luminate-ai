@@ -1,6 +1,95 @@
-
-.github/
-# Environment variables (API keys)
+# Environment variables
 .env
 .env.local
 .env.*.local
+
+# Dependencies
+node_modules/
+venv/
+env/
+.venv/
+
+# Build outputs
+build/
+dist/
+.plasmo/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Data
+data/
+*.db
+*.sqlite
+
+# Docker volumes
+chromadb_data/
+redis_data/
+postgres_data/
+backend_data/
+
+venv/
+env/
+.venv/
+
+# Build outputs
+build/
+dist/
+.plasmo/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.cursorrules
+.gemini/
+GEMINI.md
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+
+# Data
+data/
+*.db
+*.sqlite
+
+# Docker volumes
+chromadb_data/
+redis_data/
+postgres_data/
+backend_data/
+
+examples-plasmo/
+shader-gradient-component
+
+raw_data/
+processed_data/

@@ -1,0 +1,2078 @@
+{
+  "resource_to_title": {
+    "res00005": "ROOT",
+    "res00070": "--TOP--",
+    "res00071": "Course Orientation (Start Here)",
+    "res00095": "Welcome to the Course",
+    "res00258": "ultraDocumentBody",
+    "res00134": "Centennial's Land Acknowledgement",
+    "res00259": "ultraDocumentBody",
+    "res00137": "On Whose Territory Are You? (Activity)",
+    "res00260": "ultraDocumentBody",
+    "res00155": "Meet Your Professor",
+    "res00261": "ultraDocumentBody",
+    "res00179": "Introduce Yourself (Activity)",
+    "res00262": "ultraDocumentBody",
+    "res00191": "Student Handbook and FAQ's",
+    "res00249": "Student Handbook and FAQ's",
+    "res00072": "Course Outline, Schedule, and Evaluations",
+    "res00096": "Course Outline",
+    "res00267": "Course Outline",
+    "res00131": "Course outline pdf",
+    "res00208": "COMP_237_course_outline",
+    "res00073": "Module 01 \"Introduction to AI\"",
+    "res00097": "Overview of Module 1",
+    "res00268": "Overview of Module 1",
+    "res00129": "Topic 1.1: The Definition of Artificial Intelligence (AI)",
+    "res00292": "Topic 1.1: The Definition of Artificial Intelligence (AI)",
+    "res00140": "Topic 1.2: The Turing test",
+    "res00305": "Topic 1.2: The Turing test",
+    "res00164": "Topic 1.3: Artificial Intelligence disciplines",
+    "res00230": "Topic 1.3: Artificial Intelligence disciplines",
+    "res00175": "Topic 1.4: The History of AI",
+    "res00242": "Topic 1.4: The History of AI",
+    "res00195": "Topic 1.5: AI applications",
+    "res00248": "Topic 1.5: AI applications",
+    "res00201": "Topic 1.6 AI Risks",
+    "res00255": "Topic 1.6 AI Risks",
+    "res00206": "Lab tutorial Introduction to Python",
+    "res00257": "Lab tutorial Introduction to Python",
+    "res00074": "Module 02 \"Intelligent Agents\"",
+    "res00094": "Overview of Module 2",
+    "res00269": "Overview of Module 2",
+    "res00135": "Topic 2.1: Intelligent Agents",
+    "res00283": "Topic 2.1: Intelligent Agents",
+    "res00153": "Topic 2.2: Environments",
+    "res00302": "Topic 2.2: Environments",
+    "res00165": "Topic 2.3: Types of agents",
+    "res00231": "Topic 2.3: Types of agents",
+    "res00183": "Lab Tutorial - Agents",
+    "res00234": "Lab Tutorial - Agents",
+    "res00075": "Module 03 \"Problem Solving- Uninformed search\"",
+    "res00098": "Overview of Module 3",
+    "res00270": "Overview of Module 3",
+    "res00136": "Topic 3.1: The search problem",
+    "res00287": "Topic 3.1: The search problem",
+    "res00142": "Topic 3.2 Search algorithms",
+    "res00300": "Topic 3.2 Search algorithms",
+    "res00160": "Topic 3.3: Depth first search (DFS)",
+    "res00220": "Topic 3.3: Depth first search (DFS)",
+    "res00186": "Topic 3.4 : Breadth-first search (BDS)",
+    "res00233": "Topic 3.4 : Breadth-first search (BDS)",
+    "res00193": "Topic 3.5: Uniform cost search (UCS)",
+    "res00247": "Topic 3.5: Uniform cost search (UCS)",
+    "res00204": "Lab Tutorial - uninformed search",
+    "res00253": "Lab Tutorial - uninformed search",
+    "res00076": "Module 04 Problem Solving \"Informed search\"",
+    "res00099": "Overview of Module 4",
+    "res00271": "Overview of Module 4",
+    "res00117": "Topic 4.1 Informed Search strategies",
+    "res00282": "Topic 4.1 Informed Search strategies",
+    "res00143": "Topic 4.2: Greedy search",
+    "res00299": "Topic 4.2: Greedy search",
+    "res00168": "Topic 4.3: A* search",
+    "res00221": "Topic 4.3: A* search",
+    "res00185": "Topic 4.4: Features of a heuristic function",
+    "res00235": "Topic 4.4: Features of a heuristic function",
+    "res00196": "Lab Tutorial Informed Search",
+    "res00245": "Lab Tutorial Informed Search",
+    "res00077": "Module 05 Machine learning overview and Linear regression",
+    "res00100": "Overview of Module 5",
+    "res00272": "Overview of Module 5",
+    "res00118": "Topic 5.1 Machine learning overview",
+    "res00284": "Topic 5.1 Machine learning overview",
+    "res00152": "Topic 5.2 Supervised Learning",
+    "res00301": "Topic 5.2 Supervised Learning",
+    "res00162": "Topic 5.3 Feature Engineering",
+    "res00222": "Topic 5.3 Feature Engineering",
+    "res00187": "Topic 5.4 Statistics review",
+    "res00240": "Topic 5.4 Statistics review",
+    "res00197": "Topic 5.5 Linear Regression",
+    "res00244": "Topic 5.5 Linear Regression",
+    "res00200": "Lab Tutorial linear regression & random sampling",
+    "res00256": "Lab Tutorial linear regression & random sampling",
+    "res00078": "Module 06 \"Logistic regression and data pre-processing\"",
+    "res00101": "Overview of Module 6",
+    "res00273": "Overview of Module 6",
+    "res00119": "Topic 6.1 Logistic regression",
+    "res00295": "Topic 6.1 Logistic regression",
+    "res00144": "Topic 6.2 Logistic regression loss function",
+    "res00304": "Topic 6.2 Logistic regression loss function",
+    "res00167": "Topic 6.3 Classification models evaluation",
+    "res00223": "Topic 6.3 Classification models evaluation",
+    "res00188": "Topic 6.4 Training/ testing split & K-fold",
+    "res00239": "Topic 6.4 Training/ testing split & K-fold",
+    "res00192": "Topic 6.5 Data Pre-processing",
+    "res00250": "Topic 6.5 Data Pre-processing",
+    "res00202": "Topic 6.6 Data visualization",
+    "res00254": "Topic 6.6 Data visualization",
+    "res00205": "Lab Tutorial Logistic regression and data pre-processing",
+    "res00207": "Lab Tutorial Logistic regression and data pre-processing",
+    "res00079": "Module 08 \"Artificial Neural networks Intro.\"",
+    "res00102": "Overview of Module 8",
+    "res00274": "Overview of Module 8",
+    "res00120": "Topic 8.1: Introduction to Artificial Neural Networks",
+    "res00285": "Topic 8.1: Introduction to Artificial Neural Networks",
+    "res00147": "Topic 8.2: Linear classifiers",
+    "res00216": "Topic 8.2: Linear classifiers",
+    "res00158": "Topic 8.3: Perceptrons",
+    "res00219": "Topic 8.3: Perceptrons",
+    "res00174": "Topic 8.4: Gradient Descent",
+    "res00237": "Topic 8.4: Gradient Descent",
+    "res00199": "Lab tutorial Perceptron & stochastic gradient descent",
+    "res00251": "Lab tutorial Perceptron & stochastic gradient descent",
+    "res00080": "Module 09 \"Artificial Neural Networks\"",
+    "res00103": "Overview of Module 9",
+    "res00275": "Overview of Module 9",
+    "res00121": "Topic 9.1: More on ANN",
+    "res00290": "Topic 9.1: More on ANN",
+    "res00154": "Topic 9.2: Activation functions",
+    "res00218": "Topic 9.2: Activation functions",
+    "res00157": "Topic 9.3: Feedforward Networks",
+    "res00224": "Topic 9.3: Feedforward Networks",
+    "res00176": "Topic 9.4: Learning networks and back propagation algorithm",
+    "res00238": "Topic 9.4: Learning networks and back propagation algorithm",
+    "res00189": "Lab Tutorial Neural Networks",
+    "res00252": "Lab Tutorial Neural Networks",
+    "res00081": "Module 10 \"Natural language processing & Bayes rule\"",
+    "res00104": "Overview of Module 10",
+    "res00276": "Overview of Module 10",
+    "res00122": "Topic 10.1: Introduction and NLP applications",
+    "res00291": "Topic 10.1: Introduction and NLP applications",
+    "res00146": "Topic 10.2: Bayes rule",
+    "res00297": "Topic 10.2: Bayes rule",
+    "res00163": "Topic 10.3: Natural language toolkit (nltk)",
+    "res00225": "Topic 10.3: Natural language toolkit (nltk)",
+    "res00173": "Topic 10.4: Language pre-processing",
+    "res00232": "Topic 10.4: Language pre-processing",
+    "res00194": "Lab tutorial : (NLP) basics and Naive Bayes classifiers",
+    "res00246": "Lab tutorial : (NLP) basics and Naive Bayes classifiers",
+    "res00082": "Module 11 \"NLP & Classification\"",
+    "res00105": "Overview of Module 11",
+    "res00277": "Overview of Module 11",
+    "res00123": "Topic 11.1 : Bag of words",
+    "res00286": "Topic 11.1 : Bag of words",
+    "res00139": "Topic 11.2: N-gram word models",
+    "res00298": "Topic 11.2: N-gram word models",
+    "res00166": "Topic 11.3 : Term Frequency - Inverse Document Frequency",
+    "res00226": "Topic 11.3 : Term Frequency - Inverse Document Frequency",
+    "res00178": "Topic 11.4 : Part-of-speech (POS) tagging",
+    "res00241": "Topic 11.4 : Part-of-speech (POS) tagging",
+    "res00198": "Lab tutorial NLP and classification",
+    "res00243": "Lab tutorial NLP and classification",
+    "res00083": "Module 12 \"Computer Vision\"",
+    "res00106": "Overview of Module 12",
+    "res00278": "Overview of Module 12",
+    "res00125": "Topic 12.1: Introduction to Computer Vision",
+    "res00289": "Topic 12.1: Introduction to Computer Vision",
+    "res00145": "Topic 12.2: Image Features",
+    "res00296": "Topic 12.2: Image Features",
+    "res00169": "Topic 12.3: Segmentation of natural images",
+    "res00227": "Topic 12.3: Segmentation of natural images",
+    "res00180": "Lab Tutorial Computer vision",
+    "res00236": "Lab Tutorial Computer vision",
+    "res00084": "Module 13: The ethical aspects of AI",
+    "res00107": "Overview",
+    "res00279": "Overview",
+    "res00126": "The ethics of AI",
+    "res00293": "The ethics of AI",
+    "res00150": "Fairness and Bias",
+    "res00217": "Fairness and Bias",
+    "res00171": "Surveillance, security and privacy",
+    "res00228": "Surveillance, security and privacy",
+    "res00085": "Resources",
+    "res00108": "Anaconda",
+    "res00266": "Anaconda",
+    "res00127": "Text Book website",
+    "res00288": "Text Book website",
+    "res00086": "Graded lab assignments",
+    "res00109": "Assignment Agents",
+    "res00209": "Assignment Agents_ wdemo",
+    "res00128": "Assignment Search",
+    "res00210": "Assignment Search_wdemo",
+    "res00151": "Assignment Linear regression",
+    "res00211": "Assignment Linear_wdemo",
+    "res00308": "Ecom Expense",
+    "res00156": "Assignment Logistic regression",
+    "res00212": "Assignment Logistic_wdemo",
+    "res00310": "titanic",
+    "res00182": "Assignment neural network",
+    "res00213": "Assignment Neural networks_wdemo",
+    "res00087": "Project",
+    "res00110": "Project assignment (NLP)",
+    "res00280": "Project assignment (NLP)",
+    "res00130": "COMP 237 Project Peer Evaluation Form",
+    "res00088": "Professor Resources",
+    "res00111": "Professor Course Preparation Checklist",
+    "res00281": "Professor Course Preparation Checklist",
+    "res00132": "External Tools Login Information",
+    "res00294": "External Tools Login Information",
+    "res00149": "Course Delivery Evaluation (Class Climate)",
+    "res00303": "Course Delivery Evaluation (Class Climate)",
+    "res00159": "Copyright Permissions",
+    "res00229": "Copyright Permissions",
+    "res00089": "Developers Resources",
+    "res00112": "Documentation",
+    "res00214": "Integrator Course Preparation Checklist",
+    "res00348": "Integrator Course Preparation Checklist",
+    "res00306": "Template User Guide v3 - Jan 2019",
+    "res00317": "Web Accessibility",
+    "res00336": "Web Accessibility",
+    "res00133": "Template Style Guide",
+    "res00215": "How to Edit a Content Page using the Tool Bar and Attributes Panel",
+    "res00309": "Colour and Highlight",
+    "res00331": "Colour and Highlight",
+    "res00316": "Typography",
+    "res00334": "Typography",
+    "res00321": "Images and Video",
+    "res00340": "Images and Video",
+    "res00322": "Icons",
+    "res00342": "Icons",
+    "res00326": "Tables",
+    "res00345": "Tables",
+    "res00327": "Responsive Grid",
+    "res00346": "Responsive Grid",
+    "res00328": "Interactive Content Components (jQuery UI)",
+    "res00347": "Interactive Content Components (jQuery UI)",
+    "res00141": "External Pages",
+    "res00263": "Introduction",
+    "res00349": "Introduction",
+    "res00312": "Learning Outcomes",
+    "res00330": "Learning Outcomes",
+    "res00313": "Unit Readings",
+    "res00335": "Unit Readings",
+    "res00319": "Topic Page",
+    "res00339": "Topic Page",
+    "res00324": "Summary",
+    "res00341": "Summary",
+    "res00170": "BOLT Model",
+    "res00264": "gettingstarted",
+    "res00350": "gettingstarted",
+    "res00307": "readwatch",
+    "res00352": "readwatch",
+    "res00314": "participate",
+    "res00333": "participate",
+    "res00320": "wrapup",
+    "res00337": "wrapup",
+    "res00184": "Available Layouts",
+    "res00265": "overview",
+    "res00351": "overview",
+    "res00311": "overview-2",
+    "res00329": "overview-2",
+    "res00315": "content",
+    "res00332": "content",
+    "res00318": "content-blank",
+    "res00338": "content-blank",
+    "res00323": "content-activity",
+    "res00343": "content-activity",
+    "res00325": "full-page",
+    "res00344": "full-page",
+    "res00090": "Remote access",
+    "res00113": "Remote Access for Students (ICET Labs) 09-14-20",
+    "res00091": "Syllabus",
+    "res00092": "Assignments",
+    "res00114": "Agents",
+    "res00116": "Search",
+    "res00138": "Linear regression",
+    "res00161": "Logistic regression",
+    "res00177": "Neural networks",
+    "res00190": "Project peer evaluations",
+    "res00203": "NLP project",
+    "res00093": "Assessments",
+    "res00115": "quiz_01",
+    "res00124": "Mid_term test",
+    "res00148": "quiz_02",
+    "res00172": "Final test",
+    "res00181": "Sample_Mid_term",
+    "res00006": "INTERACTIVE",
+    "res00353": "--TOP--",
+    "res00354": "General Discussion Forum",
+    "res00356": "Introductions",
+    "res00358": "Comments and Questions",
+    "res00359": "\"The moral machine\"",
+    "res00360": "\"Search\"",
+    "res00355": "The global Natural Language Processing (NLP) market size",
+    "res00357": "The global Natural Language Processing (NLP) market size",
+    "res00007": "INDIRECT",
+    "res00361": "--TOP--"
+  },
+  "content_to_module": {
+    "res00005": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "ROOT",
+      "title": "ROOT"
+    },
+    "res00070": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "--TOP--",
+      "title": "--TOP--"
+    },
+    "res00071": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Course Orientation (Start Here)",
+      "title": "Course Orientation (Start Here)"
+    },
+    "res00095": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Welcome to the Course",
+      "title": "Welcome to the Course"
+    },
+    "res00258": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "ultraDocumentBody",
+      "title": "ultraDocumentBody"
+    },
+    "res00134": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Centennial's Land Acknowledgement",
+      "title": "Centennial's Land Acknowledgement"
+    },
+    "res00259": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "ultraDocumentBody",
+      "title": "ultraDocumentBody"
+    },
+    "res00137": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "On Whose Territory Are You? (Activity)",
+      "title": "On Whose Territory Are You? (Activity)"
+    },
+    "res00260": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "ultraDocumentBody",
+      "title": "ultraDocumentBody"
+    },
+    "res00155": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Meet Your Professor",
+      "title": "Meet Your Professor"
+    },
+    "res00261": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "ultraDocumentBody",
+      "title": "ultraDocumentBody"
+    },
+    "res00179": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Introduce Yourself (Activity)",
+      "title": "Introduce Yourself (Activity)"
+    },
+    "res00262": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "ultraDocumentBody",
+      "title": "ultraDocumentBody"
+    },
+    "res00191": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Student Handbook and FAQ's",
+      "title": "Student Handbook and FAQ's"
+    },
+    "res00249": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Student Handbook and FAQ's",
+      "title": "Student Handbook and FAQ's"
+    },
+    "res00072": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Course Outline, Schedule, and Evaluations",
+      "title": "Course Outline, Schedule, and Evaluations"
+    },
+    "res00096": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Course Outline",
+      "title": "Course Outline"
+    },
+    "res00267": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Course Outline",
+      "title": "Course Outline"
+    },
+    "res00131": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Course outline pdf",
+      "title": "Course outline pdf"
+    },
+    "res00208": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "COMP_237_course_outline",
+      "title": "COMP_237_course_outline"
+    },
+    "res00073": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Module 01 \"Introduction to AI\"",
+      "title": "Module 01 \"Introduction to AI\""
+    },
+    "res00097": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Overview of Module 1",
+      "title": "Overview of Module 1"
+    },
+    "res00268": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Overview of Module 1",
+      "title": "Overview of Module 1"
+    },
+    "res00129": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.1: The Definition of Artificial Intelligence (AI)",
+      "title": "Topic 1.1: The Definition of Artificial Intelligence (AI)"
+    },
+    "res00292": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.1: The Definition of Artificial Intelligence (AI)",
+      "title": "Topic 1.1: The Definition of Artificial Intelligence (AI)"
+    },
+    "res00140": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.2: The Turing test",
+      "title": "Topic 1.2: The Turing test"
+    },
+    "res00305": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.2: The Turing test",
+      "title": "Topic 1.2: The Turing test"
+    },
+    "res00164": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.3: Artificial Intelligence disciplines",
+      "title": "Topic 1.3: Artificial Intelligence disciplines"
+    },
+    "res00230": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.3: Artificial Intelligence disciplines",
+      "title": "Topic 1.3: Artificial Intelligence disciplines"
+    },
+    "res00175": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.4: The History of AI",
+      "title": "Topic 1.4: The History of AI"
+    },
+    "res00242": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.4: The History of AI",
+      "title": "Topic 1.4: The History of AI"
+    },
+    "res00195": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.5: AI applications",
+      "title": "Topic 1.5: AI applications"
+    },
+    "res00248": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.5: AI applications",
+      "title": "Topic 1.5: AI applications"
+    },
+    "res00201": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.6 AI Risks",
+      "title": "Topic 1.6 AI Risks"
+    },
+    "res00255": {
+      "module": "Module 1",
+      "week": 1,
+      "parent_title": "Topic 1.6 AI Risks",
+      "title": "Topic 1.6 AI Risks"
+    },
+    "res00206": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab tutorial Introduction to Python",
+      "title": "Lab tutorial Introduction to Python"
+    },
+    "res00257": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab tutorial Introduction to Python",
+      "title": "Lab tutorial Introduction to Python"
+    },
+    "res00074": {
+      "module": "Module 2",
+      "week": 2,
+      "parent_title": "Module 02 \"Intelligent Agents\"",
+      "title": "Module 02 \"Intelligent Agents\""
+    },
+    "res00094": {
+      "module": "Module 2",
+      "week": 2,
+      "parent_title": "Overview of Module 2",
+      "title": "Overview of Module 2"
+    },
+    "res00269": {
+      "module": "Module 2",
+      "week": 2,
+      "parent_title": "Overview of Module 2",
+      "title": "Overview of Module 2"
+    },
+    "res00135": {
+      "module": "Module 2",
+      "week": 2,
+      "parent_title": "Topic 2.1: Intelligent Agents",
+      "title": "Topic 2.1: Intelligent Agents"
+    },
+    "res00283": {
+      "module": "Module 2",
+      "week": 2,
+      "parent_title": "Topic 2.1: Intelligent Agents",
+      "title": "Topic 2.1: Intelligent Agents"
+    },
+    "res00153": {
+      "module": "Module 2",
+      "week": 2,
+      "parent_title": "Topic 2.2: Environments",
+      "title": "Topic 2.2: Environments"
+    },
+    "res00302": {
+      "module": "Module 2",
+      "week": 2,
+      "parent_title": "Topic 2.2: Environments",
+      "title": "Topic 2.2: Environments"
+    },
+    "res00165": {
+      "module": "Module 2",
+      "week": 2,
+      "parent_title": "Topic 2.3: Types of agents",
+      "title": "Topic 2.3: Types of agents"
+    },
+    "res00231": {
+      "module": "Module 2",
+      "week": 2,
+      "parent_title": "Topic 2.3: Types of agents",
+      "title": "Topic 2.3: Types of agents"
+    },
+    "res00183": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial - Agents",
+      "title": "Lab Tutorial - Agents"
+    },
+    "res00234": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial - Agents",
+      "title": "Lab Tutorial - Agents"
+    },
+    "res00075": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Module 03 \"Problem Solving- Uninformed search\"",
+      "title": "Module 03 \"Problem Solving- Uninformed search\""
+    },
+    "res00098": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Overview of Module 3",
+      "title": "Overview of Module 3"
+    },
+    "res00270": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Overview of Module 3",
+      "title": "Overview of Module 3"
+    },
+    "res00136": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Topic 3.1: The search problem",
+      "title": "Topic 3.1: The search problem"
+    },
+    "res00287": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Topic 3.1: The search problem",
+      "title": "Topic 3.1: The search problem"
+    },
+    "res00142": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Topic 3.2 Search algorithms",
+      "title": "Topic 3.2 Search algorithms"
+    },
+    "res00300": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Topic 3.2 Search algorithms",
+      "title": "Topic 3.2 Search algorithms"
+    },
+    "res00160": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Topic 3.3: Depth first search (DFS)",
+      "title": "Topic 3.3: Depth first search (DFS)"
+    },
+    "res00220": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Topic 3.3: Depth first search (DFS)",
+      "title": "Topic 3.3: Depth first search (DFS)"
+    },
+    "res00186": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Topic 3.4 : Breadth-first search (BDS)",
+      "title": "Topic 3.4 : Breadth-first search (BDS)"
+    },
+    "res00233": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Topic 3.4 : Breadth-first search (BDS)",
+      "title": "Topic 3.4 : Breadth-first search (BDS)"
+    },
+    "res00193": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Topic 3.5: Uniform cost search (UCS)",
+      "title": "Topic 3.5: Uniform cost search (UCS)"
+    },
+    "res00247": {
+      "module": "Module 3",
+      "week": 3,
+      "parent_title": "Topic 3.5: Uniform cost search (UCS)",
+      "title": "Topic 3.5: Uniform cost search (UCS)"
+    },
+    "res00204": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial - uninformed search",
+      "title": "Lab Tutorial - uninformed search"
+    },
+    "res00253": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial - uninformed search",
+      "title": "Lab Tutorial - uninformed search"
+    },
+    "res00076": {
+      "module": "Module 4",
+      "week": 4,
+      "parent_title": "Module 04 Problem Solving \"Informed search\"",
+      "title": "Module 04 Problem Solving \"Informed search\""
+    },
+    "res00099": {
+      "module": "Module 4",
+      "week": 4,
+      "parent_title": "Overview of Module 4",
+      "title": "Overview of Module 4"
+    },
+    "res00271": {
+      "module": "Module 4",
+      "week": 4,
+      "parent_title": "Overview of Module 4",
+      "title": "Overview of Module 4"
+    },
+    "res00117": {
+      "module": "Module 4",
+      "week": 4,
+      "parent_title": "Topic 4.1 Informed Search strategies",
+      "title": "Topic 4.1 Informed Search strategies"
+    },
+    "res00282": {
+      "module": "Module 4",
+      "week": 4,
+      "parent_title": "Topic 4.1 Informed Search strategies",
+      "title": "Topic 4.1 Informed Search strategies"
+    },
+    "res00143": {
+      "module": "Module 4",
+      "week": 4,
+      "parent_title": "Topic 4.2: Greedy search",
+      "title": "Topic 4.2: Greedy search"
+    },
+    "res00299": {
+      "module": "Module 4",
+      "week": 4,
+      "parent_title": "Topic 4.2: Greedy search",
+      "title": "Topic 4.2: Greedy search"
+    },
+    "res00168": {
+      "module": "Module 4",
+      "week": 4,
+      "parent_title": "Topic 4.3: A* search",
+      "title": "Topic 4.3: A* search"
+    },
+    "res00221": {
+      "module": "Module 4",
+      "week": 4,
+      "parent_title": "Topic 4.3: A* search",
+      "title": "Topic 4.3: A* search"
+    },
+    "res00185": {
+      "module": "Module 4",
+      "week": 4,
+      "parent_title": "Topic 4.4: Features of a heuristic function",
+      "title": "Topic 4.4: Features of a heuristic function"
+    },
+    "res00235": {
+      "module": "Module 4",
+      "week": 4,
+      "parent_title": "Topic 4.4: Features of a heuristic function",
+      "title": "Topic 4.4: Features of a heuristic function"
+    },
+    "res00196": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial Informed Search",
+      "title": "Lab Tutorial Informed Search"
+    },
+    "res00245": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial Informed Search",
+      "title": "Lab Tutorial Informed Search"
+    },
+    "res00077": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Module 05 Machine learning overview and Linear regression",
+      "title": "Module 05 Machine learning overview and Linear regression"
+    },
+    "res00100": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Overview of Module 5",
+      "title": "Overview of Module 5"
+    },
+    "res00272": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Overview of Module 5",
+      "title": "Overview of Module 5"
+    },
+    "res00118": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Topic 5.1 Machine learning overview",
+      "title": "Topic 5.1 Machine learning overview"
+    },
+    "res00284": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Topic 5.1 Machine learning overview",
+      "title": "Topic 5.1 Machine learning overview"
+    },
+    "res00152": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Topic 5.2 Supervised Learning",
+      "title": "Topic 5.2 Supervised Learning"
+    },
+    "res00301": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Topic 5.2 Supervised Learning",
+      "title": "Topic 5.2 Supervised Learning"
+    },
+    "res00162": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Topic 5.3 Feature Engineering",
+      "title": "Topic 5.3 Feature Engineering"
+    },
+    "res00222": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Topic 5.3 Feature Engineering",
+      "title": "Topic 5.3 Feature Engineering"
+    },
+    "res00187": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Topic 5.4 Statistics review",
+      "title": "Topic 5.4 Statistics review"
+    },
+    "res00240": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Topic 5.4 Statistics review",
+      "title": "Topic 5.4 Statistics review"
+    },
+    "res00197": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Topic 5.5 Linear Regression",
+      "title": "Topic 5.5 Linear Regression"
+    },
+    "res00244": {
+      "module": "Module 5",
+      "week": 5,
+      "parent_title": "Topic 5.5 Linear Regression",
+      "title": "Topic 5.5 Linear Regression"
+    },
+    "res00200": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial linear regression & random sampling",
+      "title": "Lab Tutorial linear regression & random sampling"
+    },
+    "res00256": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial linear regression & random sampling",
+      "title": "Lab Tutorial linear regression & random sampling"
+    },
+    "res00078": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Module 06 \"Logistic regression and data pre-processing\"",
+      "title": "Module 06 \"Logistic regression and data pre-processing\""
+    },
+    "res00101": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Overview of Module 6",
+      "title": "Overview of Module 6"
+    },
+    "res00273": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Overview of Module 6",
+      "title": "Overview of Module 6"
+    },
+    "res00119": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.1 Logistic regression",
+      "title": "Topic 6.1 Logistic regression"
+    },
+    "res00295": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.1 Logistic regression",
+      "title": "Topic 6.1 Logistic regression"
+    },
+    "res00144": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.2 Logistic regression loss function",
+      "title": "Topic 6.2 Logistic regression loss function"
+    },
+    "res00304": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.2 Logistic regression loss function",
+      "title": "Topic 6.2 Logistic regression loss function"
+    },
+    "res00167": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.3 Classification models evaluation",
+      "title": "Topic 6.3 Classification models evaluation"
+    },
+    "res00223": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.3 Classification models evaluation",
+      "title": "Topic 6.3 Classification models evaluation"
+    },
+    "res00188": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.4 Training/ testing split & K-fold",
+      "title": "Topic 6.4 Training/ testing split & K-fold"
+    },
+    "res00239": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.4 Training/ testing split & K-fold",
+      "title": "Topic 6.4 Training/ testing split & K-fold"
+    },
+    "res00192": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.5 Data Pre-processing",
+      "title": "Topic 6.5 Data Pre-processing"
+    },
+    "res00250": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.5 Data Pre-processing",
+      "title": "Topic 6.5 Data Pre-processing"
+    },
+    "res00202": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.6 Data visualization",
+      "title": "Topic 6.6 Data visualization"
+    },
+    "res00254": {
+      "module": "Module 6",
+      "week": 6,
+      "parent_title": "Topic 6.6 Data visualization",
+      "title": "Topic 6.6 Data visualization"
+    },
+    "res00205": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial Logistic regression and data pre-processing",
+      "title": "Lab Tutorial Logistic regression and data pre-processing"
+    },
+    "res00207": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial Logistic regression and data pre-processing",
+      "title": "Lab Tutorial Logistic regression and data pre-processing"
+    },
+    "res00079": {
+      "module": "Module 8",
+      "week": 8,
+      "parent_title": "Module 08 \"Artificial Neural networks Intro.\"",
+      "title": "Module 08 \"Artificial Neural networks Intro.\""
+    },
+    "res00102": {
+      "module": "Module 8",
+      "week": 8,
+      "parent_title": "Overview of Module 8",
+      "title": "Overview of Module 8"
+    },
+    "res00274": {
+      "module": "Module 8",
+      "week": 8,
+      "parent_title": "Overview of Module 8",
+      "title": "Overview of Module 8"
+    },
+    "res00120": {
+      "module": "Module 8",
+      "week": 8,
+      "parent_title": "Topic 8.1: Introduction to Artificial Neural Networks",
+      "title": "Topic 8.1: Introduction to Artificial Neural Networks"
+    },
+    "res00285": {
+      "module": "Module 8",
+      "week": 8,
+      "parent_title": "Topic 8.1: Introduction to Artificial Neural Networks",
+      "title": "Topic 8.1: Introduction to Artificial Neural Networks"
+    },
+    "res00147": {
+      "module": "Module 8",
+      "week": 8,
+      "parent_title": "Topic 8.2: Linear classifiers",
+      "title": "Topic 8.2: Linear classifiers"
+    },
+    "res00216": {
+      "module": "Module 8",
+      "week": 8,
+      "parent_title": "Topic 8.2: Linear classifiers",
+      "title": "Topic 8.2: Linear classifiers"
+    },
+    "res00158": {
+      "module": "Module 8",
+      "week": 8,
+      "parent_title": "Topic 8.3: Perceptrons",
+      "title": "Topic 8.3: Perceptrons"
+    },
+    "res00219": {
+      "module": "Module 8",
+      "week": 8,
+      "parent_title": "Topic 8.3: Perceptrons",
+      "title": "Topic 8.3: Perceptrons"
+    },
+    "res00174": {
+      "module": "Module 8",
+      "week": 8,
+      "parent_title": "Topic 8.4: Gradient Descent",
+      "title": "Topic 8.4: Gradient Descent"
+    },
+    "res00237": {
+      "module": "Module 8",
+      "week": 8,
+      "parent_title": "Topic 8.4: Gradient Descent",
+      "title": "Topic 8.4: Gradient Descent"
+    },
+    "res00199": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab tutorial Perceptron & stochastic gradient descent",
+      "title": "Lab tutorial Perceptron & stochastic gradient descent"
+    },
+    "res00251": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab tutorial Perceptron & stochastic gradient descent",
+      "title": "Lab tutorial Perceptron & stochastic gradient descent"
+    },
+    "res00080": {
+      "module": "Module 9",
+      "week": 9,
+      "parent_title": "Module 09 \"Artificial Neural Networks\"",
+      "title": "Module 09 \"Artificial Neural Networks\""
+    },
+    "res00103": {
+      "module": "Module 9",
+      "week": 9,
+      "parent_title": "Overview of Module 9",
+      "title": "Overview of Module 9"
+    },
+    "res00275": {
+      "module": "Module 9",
+      "week": 9,
+      "parent_title": "Overview of Module 9",
+      "title": "Overview of Module 9"
+    },
+    "res00121": {
+      "module": "Module 9",
+      "week": 9,
+      "parent_title": "Topic 9.1: More on ANN",
+      "title": "Topic 9.1: More on ANN"
+    },
+    "res00290": {
+      "module": "Module 9",
+      "week": 9,
+      "parent_title": "Topic 9.1: More on ANN",
+      "title": "Topic 9.1: More on ANN"
+    },
+    "res00154": {
+      "module": "Module 9",
+      "week": 9,
+      "parent_title": "Topic 9.2: Activation functions",
+      "title": "Topic 9.2: Activation functions"
+    },
+    "res00218": {
+      "module": "Module 9",
+      "week": 9,
+      "parent_title": "Topic 9.2: Activation functions",
+      "title": "Topic 9.2: Activation functions"
+    },
+    "res00157": {
+      "module": "Module 9",
+      "week": 9,
+      "parent_title": "Topic 9.3: Feedforward Networks",
+      "title": "Topic 9.3: Feedforward Networks"
+    },
+    "res00224": {
+      "module": "Module 9",
+      "week": 9,
+      "parent_title": "Topic 9.3: Feedforward Networks",
+      "title": "Topic 9.3: Feedforward Networks"
+    },
+    "res00176": {
+      "module": "Module 9",
+      "week": 9,
+      "parent_title": "Topic 9.4: Learning networks and back propagation algorithm",
+      "title": "Topic 9.4: Learning networks and back propagation algorithm"
+    },
+    "res00238": {
+      "module": "Module 9",
+      "week": 9,
+      "parent_title": "Topic 9.4: Learning networks and back propagation algorithm",
+      "title": "Topic 9.4: Learning networks and back propagation algorithm"
+    },
+    "res00189": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial Neural Networks",
+      "title": "Lab Tutorial Neural Networks"
+    },
+    "res00252": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial Neural Networks",
+      "title": "Lab Tutorial Neural Networks"
+    },
+    "res00081": {
+      "module": "Module 10",
+      "week": 10,
+      "parent_title": "Module 10 \"Natural language processing & Bayes rule\"",
+      "title": "Module 10 \"Natural language processing & Bayes rule\""
+    },
+    "res00104": {
+      "module": "Module 10",
+      "week": 10,
+      "parent_title": "Overview of Module 10",
+      "title": "Overview of Module 10"
+    },
+    "res00276": {
+      "module": "Module 10",
+      "week": 10,
+      "parent_title": "Overview of Module 10",
+      "title": "Overview of Module 10"
+    },
+    "res00122": {
+      "module": "Module 10",
+      "week": 10,
+      "parent_title": "Topic 10.1: Introduction and NLP applications",
+      "title": "Topic 10.1: Introduction and NLP applications"
+    },
+    "res00291": {
+      "module": "Module 10",
+      "week": 10,
+      "parent_title": "Topic 10.1: Introduction and NLP applications",
+      "title": "Topic 10.1: Introduction and NLP applications"
+    },
+    "res00146": {
+      "module": "Module 10",
+      "week": 10,
+      "parent_title": "Topic 10.2: Bayes rule",
+      "title": "Topic 10.2: Bayes rule"
+    },
+    "res00297": {
+      "module": "Module 10",
+      "week": 10,
+      "parent_title": "Topic 10.2: Bayes rule",
+      "title": "Topic 10.2: Bayes rule"
+    },
+    "res00163": {
+      "module": "Module 10",
+      "week": 10,
+      "parent_title": "Topic 10.3: Natural language toolkit (nltk)",
+      "title": "Topic 10.3: Natural language toolkit (nltk)"
+    },
+    "res00225": {
+      "module": "Module 10",
+      "week": 10,
+      "parent_title": "Topic 10.3: Natural language toolkit (nltk)",
+      "title": "Topic 10.3: Natural language toolkit (nltk)"
+    },
+    "res00173": {
+      "module": "Module 10",
+      "week": 10,
+      "parent_title": "Topic 10.4: Language pre-processing",
+      "title": "Topic 10.4: Language pre-processing"
+    },
+    "res00232": {
+      "module": "Module 10",
+      "week": 10,
+      "parent_title": "Topic 10.4: Language pre-processing",
+      "title": "Topic 10.4: Language pre-processing"
+    },
+    "res00194": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab tutorial : (NLP) basics and Naive Bayes classifiers",
+      "title": "Lab tutorial : (NLP) basics and Naive Bayes classifiers"
+    },
+    "res00246": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab tutorial : (NLP) basics and Naive Bayes classifiers",
+      "title": "Lab tutorial : (NLP) basics and Naive Bayes classifiers"
+    },
+    "res00082": {
+      "module": "Module 11",
+      "week": 11,
+      "parent_title": "Module 11 \"NLP & Classification\"",
+      "title": "Module 11 \"NLP & Classification\""
+    },
+    "res00105": {
+      "module": "Module 11",
+      "week": 11,
+      "parent_title": "Overview of Module 11",
+      "title": "Overview of Module 11"
+    },
+    "res00277": {
+      "module": "Module 11",
+      "week": 11,
+      "parent_title": "Overview of Module 11",
+      "title": "Overview of Module 11"
+    },
+    "res00123": {
+      "module": "Module 11",
+      "week": 11,
+      "parent_title": "Topic 11.1 : Bag of words",
+      "title": "Topic 11.1 : Bag of words"
+    },
+    "res00286": {
+      "module": "Module 11",
+      "week": 11,
+      "parent_title": "Topic 11.1 : Bag of words",
+      "title": "Topic 11.1 : Bag of words"
+    },
+    "res00139": {
+      "module": "Module 11",
+      "week": 11,
+      "parent_title": "Topic 11.2: N-gram word models",
+      "title": "Topic 11.2: N-gram word models"
+    },
+    "res00298": {
+      "module": "Module 11",
+      "week": 11,
+      "parent_title": "Topic 11.2: N-gram word models",
+      "title": "Topic 11.2: N-gram word models"
+    },
+    "res00166": {
+      "module": "Module 11",
+      "week": 11,
+      "parent_title": "Topic 11.3 : Term Frequency - Inverse Document Frequency",
+      "title": "Topic 11.3 : Term Frequency - Inverse Document Frequency"
+    },
+    "res00226": {
+      "module": "Module 11",
+      "week": 11,
+      "parent_title": "Topic 11.3 : Term Frequency - Inverse Document Frequency",
+      "title": "Topic 11.3 : Term Frequency - Inverse Document Frequency"
+    },
+    "res00178": {
+      "module": "Module 11",
+      "week": 11,
+      "parent_title": "Topic 11.4 : Part-of-speech (POS) tagging",
+      "title": "Topic 11.4 : Part-of-speech (POS) tagging"
+    },
+    "res00241": {
+      "module": "Module 11",
+      "week": 11,
+      "parent_title": "Topic 11.4 : Part-of-speech (POS) tagging",
+      "title": "Topic 11.4 : Part-of-speech (POS) tagging"
+    },
+    "res00198": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab tutorial NLP and classification",
+      "title": "Lab tutorial NLP and classification"
+    },
+    "res00243": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab tutorial NLP and classification",
+      "title": "Lab tutorial NLP and classification"
+    },
+    "res00083": {
+      "module": "Module 12",
+      "week": 12,
+      "parent_title": "Module 12 \"Computer Vision\"",
+      "title": "Module 12 \"Computer Vision\""
+    },
+    "res00106": {
+      "module": "Module 12",
+      "week": 12,
+      "parent_title": "Overview of Module 12",
+      "title": "Overview of Module 12"
+    },
+    "res00278": {
+      "module": "Module 12",
+      "week": 12,
+      "parent_title": "Overview of Module 12",
+      "title": "Overview of Module 12"
+    },
+    "res00125": {
+      "module": "Module 12",
+      "week": 12,
+      "parent_title": "Topic 12.1: Introduction to Computer Vision",
+      "title": "Topic 12.1: Introduction to Computer Vision"
+    },
+    "res00289": {
+      "module": "Module 12",
+      "week": 12,
+      "parent_title": "Topic 12.1: Introduction to Computer Vision",
+      "title": "Topic 12.1: Introduction to Computer Vision"
+    },
+    "res00145": {
+      "module": "Module 12",
+      "week": 12,
+      "parent_title": "Topic 12.2: Image Features",
+      "title": "Topic 12.2: Image Features"
+    },
+    "res00296": {
+      "module": "Module 12",
+      "week": 12,
+      "parent_title": "Topic 12.2: Image Features",
+      "title": "Topic 12.2: Image Features"
+    },
+    "res00169": {
+      "module": "Module 12",
+      "week": 12,
+      "parent_title": "Topic 12.3: Segmentation of natural images",
+      "title": "Topic 12.3: Segmentation of natural images"
+    },
+    "res00227": {
+      "module": "Module 12",
+      "week": 12,
+      "parent_title": "Topic 12.3: Segmentation of natural images",
+      "title": "Topic 12.3: Segmentation of natural images"
+    },
+    "res00180": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial Computer vision",
+      "title": "Lab Tutorial Computer vision"
+    },
+    "res00236": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Lab Tutorial Computer vision",
+      "title": "Lab Tutorial Computer vision"
+    },
+    "res00084": {
+      "module": "Module 13",
+      "week": 13,
+      "parent_title": "Module 13: The ethical aspects of AI",
+      "title": "Module 13: The ethical aspects of AI"
+    },
+    "res00107": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Overview",
+      "title": "Overview"
+    },
+    "res00279": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Overview",
+      "title": "Overview"
+    },
+    "res00126": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "The ethics of AI",
+      "title": "The ethics of AI"
+    },
+    "res00293": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "The ethics of AI",
+      "title": "The ethics of AI"
+    },
+    "res00150": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Fairness and Bias",
+      "title": "Fairness and Bias"
+    },
+    "res00217": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Fairness and Bias",
+      "title": "Fairness and Bias"
+    },
+    "res00171": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Surveillance, security and privacy",
+      "title": "Surveillance, security and privacy"
+    },
+    "res00228": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Surveillance, security and privacy",
+      "title": "Surveillance, security and privacy"
+    },
+    "res00085": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Resources",
+      "title": "Resources"
+    },
+    "res00108": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Anaconda",
+      "title": "Anaconda"
+    },
+    "res00266": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Anaconda",
+      "title": "Anaconda"
+    },
+    "res00127": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Text Book website",
+      "title": "Text Book website"
+    },
+    "res00288": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Text Book website",
+      "title": "Text Book website"
+    },
+    "res00086": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Graded lab assignments",
+      "title": "Graded lab assignments"
+    },
+    "res00109": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assignment Agents",
+      "title": "Assignment Agents"
+    },
+    "res00209": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assignment Agents_ wdemo",
+      "title": "Assignment Agents_ wdemo"
+    },
+    "res00128": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assignment Search",
+      "title": "Assignment Search"
+    },
+    "res00210": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assignment Search_wdemo",
+      "title": "Assignment Search_wdemo"
+    },
+    "res00151": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assignment Linear regression",
+      "title": "Assignment Linear regression"
+    },
+    "res00211": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assignment Linear_wdemo",
+      "title": "Assignment Linear_wdemo"
+    },
+    "res00308": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Ecom Expense",
+      "title": "Ecom Expense"
+    },
+    "res00156": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assignment Logistic regression",
+      "title": "Assignment Logistic regression"
+    },
+    "res00212": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assignment Logistic_wdemo",
+      "title": "Assignment Logistic_wdemo"
+    },
+    "res00310": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "titanic",
+      "title": "titanic"
+    },
+    "res00182": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assignment neural network",
+      "title": "Assignment neural network"
+    },
+    "res00213": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assignment Neural networks_wdemo",
+      "title": "Assignment Neural networks_wdemo"
+    },
+    "res00087": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Project",
+      "title": "Project"
+    },
+    "res00110": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Project assignment (NLP)",
+      "title": "Project assignment (NLP)"
+    },
+    "res00280": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Project assignment (NLP)",
+      "title": "Project assignment (NLP)"
+    },
+    "res00130": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "COMP 237 Project Peer Evaluation Form",
+      "title": "COMP 237 Project Peer Evaluation Form"
+    },
+    "res00088": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Professor Resources",
+      "title": "Professor Resources"
+    },
+    "res00111": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Professor Course Preparation Checklist",
+      "title": "Professor Course Preparation Checklist"
+    },
+    "res00281": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Professor Course Preparation Checklist",
+      "title": "Professor Course Preparation Checklist"
+    },
+    "res00132": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "External Tools Login Information",
+      "title": "External Tools Login Information"
+    },
+    "res00294": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "External Tools Login Information",
+      "title": "External Tools Login Information"
+    },
+    "res00149": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Course Delivery Evaluation (Class Climate)",
+      "title": "Course Delivery Evaluation (Class Climate)"
+    },
+    "res00303": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Course Delivery Evaluation (Class Climate)",
+      "title": "Course Delivery Evaluation (Class Climate)"
+    },
+    "res00159": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Copyright Permissions",
+      "title": "Copyright Permissions"
+    },
+    "res00229": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Copyright Permissions",
+      "title": "Copyright Permissions"
+    },
+    "res00089": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Developers Resources",
+      "title": "Developers Resources"
+    },
+    "res00112": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Documentation",
+      "title": "Documentation"
+    },
+    "res00214": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Integrator Course Preparation Checklist",
+      "title": "Integrator Course Preparation Checklist"
+    },
+    "res00348": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Integrator Course Preparation Checklist",
+      "title": "Integrator Course Preparation Checklist"
+    },
+    "res00306": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Template User Guide v3 - Jan 2019",
+      "title": "Template User Guide v3 - Jan 2019"
+    },
+    "res00317": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Web Accessibility",
+      "title": "Web Accessibility"
+    },
+    "res00336": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Web Accessibility",
+      "title": "Web Accessibility"
+    },
+    "res00133": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Template Style Guide",
+      "title": "Template Style Guide"
+    },
+    "res00215": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "How to Edit a Content Page using the Tool Bar and Attributes Panel",
+      "title": "How to Edit a Content Page using the Tool Bar and Attributes Panel"
+    },
+    "res00309": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Colour and Highlight",
+      "title": "Colour and Highlight"
+    },
+    "res00331": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Colour and Highlight",
+      "title": "Colour and Highlight"
+    },
+    "res00316": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Typography",
+      "title": "Typography"
+    },
+    "res00334": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Typography",
+      "title": "Typography"
+    },
+    "res00321": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Images and Video",
+      "title": "Images and Video"
+    },
+    "res00340": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Images and Video",
+      "title": "Images and Video"
+    },
+    "res00322": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Icons",
+      "title": "Icons"
+    },
+    "res00342": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Icons",
+      "title": "Icons"
+    },
+    "res00326": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Tables",
+      "title": "Tables"
+    },
+    "res00345": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Tables",
+      "title": "Tables"
+    },
+    "res00327": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Responsive Grid",
+      "title": "Responsive Grid"
+    },
+    "res00346": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Responsive Grid",
+      "title": "Responsive Grid"
+    },
+    "res00328": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Interactive Content Components (jQuery UI)",
+      "title": "Interactive Content Components (jQuery UI)"
+    },
+    "res00347": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Interactive Content Components (jQuery UI)",
+      "title": "Interactive Content Components (jQuery UI)"
+    },
+    "res00141": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "External Pages",
+      "title": "External Pages"
+    },
+    "res00263": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Introduction",
+      "title": "Introduction"
+    },
+    "res00349": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Introduction",
+      "title": "Introduction"
+    },
+    "res00312": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Learning Outcomes",
+      "title": "Learning Outcomes"
+    },
+    "res00330": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Learning Outcomes",
+      "title": "Learning Outcomes"
+    },
+    "res00313": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Unit Readings",
+      "title": "Unit Readings"
+    },
+    "res00335": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Unit Readings",
+      "title": "Unit Readings"
+    },
+    "res00319": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Topic Page",
+      "title": "Topic Page"
+    },
+    "res00339": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Topic Page",
+      "title": "Topic Page"
+    },
+    "res00324": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Summary",
+      "title": "Summary"
+    },
+    "res00341": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Summary",
+      "title": "Summary"
+    },
+    "res00170": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "BOLT Model",
+      "title": "BOLT Model"
+    },
+    "res00264": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "gettingstarted",
+      "title": "gettingstarted"
+    },
+    "res00350": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "gettingstarted",
+      "title": "gettingstarted"
+    },
+    "res00307": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "readwatch",
+      "title": "readwatch"
+    },
+    "res00352": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "readwatch",
+      "title": "readwatch"
+    },
+    "res00314": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "participate",
+      "title": "participate"
+    },
+    "res00333": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "participate",
+      "title": "participate"
+    },
+    "res00320": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "wrapup",
+      "title": "wrapup"
+    },
+    "res00337": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "wrapup",
+      "title": "wrapup"
+    },
+    "res00184": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Available Layouts",
+      "title": "Available Layouts"
+    },
+    "res00265": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "overview",
+      "title": "overview"
+    },
+    "res00351": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "overview",
+      "title": "overview"
+    },
+    "res00311": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "overview-2",
+      "title": "overview-2"
+    },
+    "res00329": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "overview-2",
+      "title": "overview-2"
+    },
+    "res00315": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "content",
+      "title": "content"
+    },
+    "res00332": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "content",
+      "title": "content"
+    },
+    "res00318": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "content-blank",
+      "title": "content-blank"
+    },
+    "res00338": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "content-blank",
+      "title": "content-blank"
+    },
+    "res00323": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "content-activity",
+      "title": "content-activity"
+    },
+    "res00343": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "content-activity",
+      "title": "content-activity"
+    },
+    "res00325": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "full-page",
+      "title": "full-page"
+    },
+    "res00344": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "full-page",
+      "title": "full-page"
+    },
+    "res00090": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Remote access",
+      "title": "Remote access"
+    },
+    "res00113": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Remote Access for Students (ICET Labs) 09-14-20",
+      "title": "Remote Access for Students (ICET Labs) 09-14-20"
+    },
+    "res00091": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Syllabus",
+      "title": "Syllabus"
+    },
+    "res00092": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assignments",
+      "title": "Assignments"
+    },
+    "res00114": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Agents",
+      "title": "Agents"
+    },
+    "res00116": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Search",
+      "title": "Search"
+    },
+    "res00138": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Linear regression",
+      "title": "Linear regression"
+    },
+    "res00161": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Logistic regression",
+      "title": "Logistic regression"
+    },
+    "res00177": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Neural networks",
+      "title": "Neural networks"
+    },
+    "res00190": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Project peer evaluations",
+      "title": "Project peer evaluations"
+    },
+    "res00203": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "NLP project",
+      "title": "NLP project"
+    },
+    "res00093": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Assessments",
+      "title": "Assessments"
+    },
+    "res00115": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "quiz_01",
+      "title": "quiz_01"
+    },
+    "res00124": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Mid_term test",
+      "title": "Mid_term test"
+    },
+    "res00148": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "quiz_02",
+      "title": "quiz_02"
+    },
+    "res00172": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Final test",
+      "title": "Final test"
+    },
+    "res00181": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Sample_Mid_term",
+      "title": "Sample_Mid_term"
+    },
+    "res00006": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "INTERACTIVE",
+      "title": "INTERACTIVE"
+    },
+    "res00353": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "--TOP--",
+      "title": "--TOP--"
+    },
+    "res00354": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "General Discussion Forum",
+      "title": "General Discussion Forum"
+    },
+    "res00356": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Introductions",
+      "title": "Introductions"
+    },
+    "res00358": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "Comments and Questions",
+      "title": "Comments and Questions"
+    },
+    "res00359": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "\"The moral machine\"",
+      "title": "\"The moral machine\""
+    },
+    "res00360": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "\"Search\"",
+      "title": "\"Search\""
+    },
+    "res00355": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "The global Natural Language Processing (NLP) market size",
+      "title": "The global Natural Language Processing (NLP) market size"
+    },
+    "res00357": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "The global Natural Language Processing (NLP) market size",
+      "title": "The global Natural Language Processing (NLP) market size"
+    },
+    "res00007": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "INDIRECT",
+      "title": "INDIRECT"
+    },
+    "res00361": {
+      "module": "Unknown",
+      "week": null,
+      "parent_title": "--TOP--",
+      "title": "--TOP--"
+    }
+  },
+  "file_to_context": {},
+  "statistics": {
+    "total_resources": 295,
+    "total_content_items": 295,
+    "total_files_mapped": 0,
+    "total_items_in_hierarchy": 295
+  }
+}

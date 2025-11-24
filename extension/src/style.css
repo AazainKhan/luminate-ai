@@ -1,0 +1,204 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Custom Scrollbar */
+@layer utilities {
+  .scrollbar-thin::-webkit-scrollbar {
+    width: 6px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 3px;
+  }
+  
+  .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
+  
+  /* Animations */
+  @keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  
+  @keyframes slide-in-from-bottom-2 {
+    from { 
+      transform: translateY(0.5rem);
+      opacity: 0;
+    }
+    to { 
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  @keyframes slide-in-from-bottom-4 {
+    from { 
+      transform: translateY(1rem);
+      opacity: 0;
+    }
+    to { 
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+  
+  .animate-in {
+    animation-fill-mode: both;
+  }
+  
+  .fade-in {
+    animation-name: fade-in;
+  }
+  
+  .slide-in-from-bottom-2 {
+    animation-name: slide-in-from-bottom-2;
+  }
+  
+  .slide-in-from-bottom-4 {
+    animation-name: slide-in-from-bottom-4;
+  }
+  
+  .duration-300 {
+    animation-duration: 300ms;
+  }
+  
+  .duration-700 {
+    animation-duration: 700ms;
+  }
+}
+
+@layer base {
+  :root {
+    --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    
+    /* Light Theme (Default) */
+    --background: oklch(0.98 0.01 260);
+    --foreground: oklch(0.12 0.03 260);
+
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.12 0.03 260);
+
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.12 0.03 260);
+
+    --primary: oklch(0.6 0.2 280); /* Purple accent #7c3aed */
+    --primary-foreground: oklch(0.98 0 0);
+
+    --secondary: oklch(0.96 0.01 260);
+    --secondary-foreground: oklch(0.12 0.03 260);
+
+    --muted: oklch(0.96 0.01 260);
+    --muted-foreground: oklch(0.4 0.02 260);
+
+    --accent: oklch(0.96 0.01 260);
+    --accent-foreground: oklch(0.12 0.03 260);
+
+    --destructive: oklch(0.6 0.2 20);
+    --destructive-foreground: oklch(0.98 0 0);
+
+    --border: oklch(0.92 0.01 260);
+    --input: oklch(0.92 0.01 260);
+    --ring: oklch(0.6 0.2 280);
+
+    --radius: 0.75rem;
+  }
+
+  .dark {
+    /* Deep dark theme base from inspo */
+    --background: oklch(0.08 0.02 260); /* Deeper black #0a0a0f */
+    --foreground: oklch(0.98 0.01 260);
+
+    --card: oklch(0.12 0.03 260); /* Slightly lighter */
+    --card-foreground: oklch(0.98 0.01 260);
+
+    --popover: oklch(0.12 0.03 260);
+    --popover-foreground: oklch(0.98 0.01 260);
+
+    --primary: oklch(0.6 0.2 280); /* Purple accent #7c3aed */
+    --primary-foreground: oklch(0.98 0 0);
+
+    --secondary: oklch(0.2 0.04 260);
+    --secondary-foreground: oklch(0.98 0.01 260);
+
+    --muted: oklch(0.2 0.02 260);
+    --muted-foreground: oklch(0.6 0.01 260);
+
+    --accent: oklch(0.25 0.05 260);
+    --accent-foreground: oklch(0.98 0.01 260);
+
+    --destructive: oklch(0.4 0.2 20);
+    --destructive-foreground: oklch(0.98 0 0);
+
+    --border: oklch(0.2 0.04 260);
+    --input: oklch(0.2 0.04 260);
+    --ring: oklch(0.6 0.2 280);
+  }
+}
+
+
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-sans);
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+/* Custom scrollbar from original file */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.15);
+}
+
+/* Prose styles for markdown */
+.prose {
+  @apply text-foreground;
+}
+
+.prose p {
+  @apply leading-relaxed mb-4;
+}
+
+.prose ul, .prose ol {
+  @apply my-4 ml-6;
+}
+
+.prose li {
+  @apply mb-2;
+}
+
+.prose code {
+  @apply px-1 py-0.5 rounded bg-white/10 font-mono text-xs text-pink-300;
+}
+
+.prose pre {
+  @apply p-0 m-0 bg-transparent;
+}
+
+.prose a {
+  @apply text-primary hover:underline;
+}
