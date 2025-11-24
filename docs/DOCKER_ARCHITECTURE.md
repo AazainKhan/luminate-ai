@@ -56,14 +56,15 @@
 ### 5. **langfuse_postgres** (Langfuse Database)
 - **Image**: `postgres:15-alpine`
 - **Port**: 5432 (internal only)
-- **Role**: Primary database for Langfuse
+- **Role**: Dedicated database for Langfuse observability
 - **Responsibilities**:
   - Stores trace metadata
-  - Stores user accounts and API keys
-  - Stores project configurations
+  - Stores Langfuse user accounts and API keys (for Langfuse UI only)
+  - Stores project configurations (Langfuse projects)
   - Stores scores and evaluations
 - **Data**: Persistent storage in `postgres_data` volume
 - **Credentials**: langfuse/langfuse (dev only)
+- **Note**: This is separate from Supabase (used for student/admin auth)
 
 ### 6. **clickhouse** (Analytics Database)
 - **Image**: `clickhouse/clickhouse-server:latest`
@@ -123,12 +124,44 @@
 2. observer (Langfuse)
    ↓ Store trace metadata
 3. langfuse_postgres (PostgreSQL)
-   ↓ Store in database
+   ↓ Store in Langfuse database
 4. clickhouse (Analytics)
    ↓ Store for analytics
 5. minio (S3 Storage)
    ↓ Store large payloads
 ```
+
+### Database Architecture Clarification
+
+**Two Separate Database Systems:**
+
+1. **Supabase** (External Cloud Service)
+   - **Purpose**: User authentication and application data
+   - **Users**: Students and Admins
+   - **Authentication**: Email OTP (magic links)
+   - **Data Stored**:
+     - User profiles
+     - Session tokens
+     - Application-specific data (future: chat history, preferences)
+   - **Access**: Via Supabase client SDK
+   - **Not in Docker**: Hosted by Supabase
+
+2. **langfuse_postgres** (Local Docker Container)
+   - **Purpose**: Langfuse observability data only
+   - **Users**: Langfuse UI users (developers/admins monitoring traces)
+   - **Data Stored**:
+     - AI agent execution traces
+     - LLM call metadata
+     - Token usage and costs
+     - Langfuse project configurations
+   - **Access**: Via Langfuse SDK
+   - **In Docker**: Part of local observability stack
+
+**Why Two Databases?**
+- **Separation of Concerns**: User auth (Supabase) vs. observability (Langfuse)
+- **Scalability**: Each can scale independently
+- **Security**: User data isolated from debug/trace data
+- **Flexibility**: Can swap Supabase for another auth provider without affecting observability
 
 ## Network Architecture
 
