@@ -17,8 +17,8 @@ class Supervisor:
     """
     Router that selects appropriate model and strategy:
     - Fast Mode: Gemini 2.0 Flash (default)
-    - Coder Mode: Groq (Llama 3.1 70B) or Gemini 2.0 Flash
-    - Reasoning Mode: Gemini 2.0 Flash or Groq (Llama 3.1 70B)
+    - Coder Mode: Groq (Llama 3.3 70B) or Gemini 2.0 Flash
+    - Reasoning Mode: Gemini 2.0 Flash or Groq (Llama 3.3 70B)
     """
 
     def __init__(self):
@@ -32,12 +32,12 @@ class Supervisor:
         # Initialize Groq (Performance/Coder)
         if settings.groq_api_key:
             self.groq_coder = ChatGroq(
-                model_name="llama-3.1-70b-versatile",
+                model_name="llama-3.3-70b-versatile",
                 groq_api_key=settings.groq_api_key,
                 temperature=0.5, # Lower temperature for code
             )
             self.groq_fast = ChatGroq(
-                model_name="llama-3.1-8b-instant",
+                model_name="llama-3.3-70b-versatile", # Upgrading fast to 70b as it is very fast on Groq
                 groq_api_key=settings.groq_api_key,
                 temperature=0.7,
             )
