@@ -1,24 +1,73 @@
+"""
+Luminate AI Course Marshal - FastAPI Backend
+Main entry point for the agentic tutoring platform
+"""
+
 from fastapi import FastAPI
-from pydantic import BaseModel
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
-# Create the FastAPI app instance
-app = FastAPI(title="Luminate AI Backend")
+from app.config import settings
+from app.api.middleware import require_auth
+from app.api.routes import chat, admin, execute, mastery
 
-# Define a data model for incoming chat requests
-class ChatRequest(BaseModel):
-    query: str
-    user_id: str = "default_user" # We'll use this later for personalization
+app = FastAPI(
+    title="Luminate AI Course Marshal",
+    description="Agentic AI tutoring platform for COMP 237",
+    version="0.0.1"
+)
+
+# Include routers
+app.include_router(chat.router)
+app.include_router(admin.router)
+app.include_router(execute.router)
+app.include_router(mastery.router)
+
+# CORS middleware for Chrome Extension
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["chrome-extension://*", "http://localhost:*"],  # Will be updated with actual extension ID
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+@app.get("/health")
+async def health_check():
+    """Health check endpoint"""
+    return JSONResponse(
+        content={
+            "status": "healthy",
+            "service": "Luminate AI Course Marshal API",
+            "environment": settings.environment
+        }
+    )
+
 
 @app.get("/")
-def read_root():
-    """A simple endpoint to check if the server is running."""
-    return {"status": "Luminate AI server is alive!"}
+async def root():
+    """Root endpoint"""
+    return JSONResponse(
+        content={
+            "message": "Luminate AI Course Marshal API",
+            "version": "0.0.1"
+        }
+    )
 
-@app.post("/chat")
-def handle_chat(request: ChatRequest):
-    """A placeholder endpoint for the main chat logic."""
-    # For now, this just confirms it received the query.
-    # Later, this is where we will call our delegator agent.
-    return {
-        "response": f"You asked: '{request.query}'. The delegator isn't connected yet."
-    }
+
+@app.get("/api/auth/me")
+async def get_current_user(user_info: dict = require_auth):
+    """Get current authenticated user info"""
+    return JSONResponse(
+        content={
+            "user_id": user_info["user_id"],
+            "email": user_info["email"],
+            "role": user_info["role"],
+        }
+    )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)

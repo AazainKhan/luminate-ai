@@ -1,48 +1,142 @@
-# AI Tutor Project
+# Luminate AI Course Marshal
 
-This project aims to build a full-stack AI Tutor as a Chrome Extension using LangGraph, FastAPI, and various database technologies.
+Agentic AI tutoring platform for Centennial College COMP 237 course, delivered as a Chrome Extension.
 
-## Core Components
+## 🚀 Quick Start
 
-- **Framework**: LangGraph
-- **Backend**: FastAPI
-- **Databases**:
-  - **ChromaDB**: Vector database for the knowledge base.
-  - **PostgreSQL**: For the student model and long-term memory.
-  - **Redis**: Session cache for short-term memory (e.g., authentication tokens, session context).
-- **Frontend**: Chrome Extension
+### Prerequisites
 
-## Architecture
+- Node.js 18+ and npm
+- Python 3.11+
+- Docker and Docker Compose
+- Chrome browser
 
-### The Master Coordinator (Delegator)
+### Setup Steps
 
-The central component of the system. It receives user requests and delegates them to the appropriate worker agent.
+1. **Install Dependencies**
 
-### Worker Agents
+   ```bash
+   # Backend
+   cd backend
+   python -m venv venv
+   source venv/bin/activate  # Windows: venv\Scripts\activate
+   pip install -r requirements.txt
+   
+   # Extension
+   cd ../extension
+   npm install
+   ```
 
-1.  **Navigator**: Navigates through course content to find specific modules.
-2.  **Evaluator**: Assesses student answers, provides constructive feedback, and updates the student's profile in the PostgreSQL database.
-3.  **Educate Agent**: Pulls information from the ChromaDB knowledge base and presents it in a clear, understandable way.
-4.  **Math Agent**: A specialist for solving mathematical problems and explaining math concepts.
-5.  **Study Plan Agent (Knowledge Gap Analysis)**: Acts as an academic advisor. It analyzes a student's progress from the PostgreSQL database to create personalized study schedules and learning paths.
+2. **Environment Variables**
 
-### Memory and Knowledge Base
+   Environment files are already configured:
+   - `backend/.env` - Backend configuration (Supabase, API keys)
+   - `extension/.env.local` - Extension configuration (Supabase, API URL)
 
--   **Student Model (PostgreSQL)**: Long-term memory for student information and conversation history.
--   **Knowledge Base (ChromaDB)**: Contains COMP 237 material for fast, semantic information retrieval.
--   **Session Cache (Redis)**: Short-term memory for managing authentication tokens and session context.
+3. **Start Docker Services**
 
-### Feedback Loops
+   ```bash
+   docker-compose up -d
+   ```
 
-A dynamic process orchestrated by the Master Coordinator.
+   This starts:
+   - FastAPI backend (http://localhost:8000)
+   - ChromaDB (http://localhost:8001)
+   - Redis (port 6379)
+   - Langfuse (http://localhost:3000)
 
-1.  **The Pedagogical Feedback Loop**:
-    *   **Student**: Submits an answer.
-    *   **Delegator**: Routes the answer to the **Evaluator Agent**.
-    *   **Evaluator**: Assesses the response and updates the student's record in PostgreSQL.
-    *   **Adaptation**: The system adapts the learning path based on the student's performance.
+4. **Start Backend** (if not using Docker)
 
-2.  **The Quality Feedback Loop**:
-    *   **Functionality**: Thumbs up/down feature on agent responses.
-    *   **Data Storage**: Feedback is stored in a PostgreSQL table.
-    *   **Purpose**: To analyze agent performance and improve prompts over time.
+   ```bash
+   cd backend
+   source venv/bin/activate
+   uvicorn main:app --reload
+   ```
+
+5. **Build Extension**
+
+   ```bash
+   cd extension
+   npm run dev
+   ```
+
+6. **Load Extension in Chrome**
+
+   - Open Chrome → `chrome://extensions/`
+   - Enable "Developer mode"
+   - Click "Load unpacked"
+   - Select the `extension` directory
+
+## 📁 Project Structure
+
+```
+luminate-ai/
+├── extension/          # Plasmo Chrome Extension
+│   ├── src/
+│   │   ├── sidepanel.tsx          # Student chat interface
+│   │   ├── admin-sidepanel.tsx    # Admin dashboard
+│   │   ├── components/            # React components
+│   │   └── lib/                   # Utilities (Supabase, API)
+│   └── package.json
+├── backend/            # FastAPI + LangGraph backend
+│   ├── app/
+│   │   ├── agents/               # LangGraph agent definitions
+│   │   ├── api/                  # FastAPI routes
+│   │   ├── etl/                  # ETL pipeline
+│   │   ├── rag/                  # RAG & vector store
+│   │   └── tools/                 # Agent tools (E2B, etc.)
+│   ├── main.py
+│   └── requirements.txt
+├── docs/               # Documentation
+├── features/           # Feature documentation (numbered)
+├── raw_data/          # COMP 237 course materials
+└── docker-compose.yml  # Local development stack
+```
+
+## 🔐 Authentication
+
+- **Students**: Email ending with `@my.centennialcollege.ca`
+- **Admins**: Email ending with `@centennialcollege.ca`
+
+Uses Supabase passwordless OTP authentication.
+
+## 🎯 Features
+
+- ✅ Student chat interface with streaming responses
+- ✅ Admin dashboard for course management
+- ✅ LangGraph agentic AI with model routing
+- ✅ RAG with ChromaDB vector store
+- ✅ E2B code execution sandbox
+- ✅ Student mastery tracking
+- ✅ Generative UI (quizzes, code blocks, visualizations)
+- ✅ Blackboard ETL pipeline
+
+## 🛠️ Tech Stack
+
+- **Frontend**: Plasmo, React, TypeScript, Tailwind CSS, Shadcn UI
+- **Backend**: Python 3.11, FastAPI, LangGraph, Pydantic V2
+- **AI**: Gemini 1.5 Pro/Flash, Claude 3.5 Sonnet
+- **Database**: Supabase (Postgres + Auth), ChromaDB (Vector)
+- **Infrastructure**: Docker, Docker Compose
+
+## 📝 Development
+
+See [SETUP.md](./SETUP.md) for detailed development setup and troubleshooting.
+
+## 🔒 Security Notes
+
+- `.env` files are gitignored - never commit API keys
+- Row Level Security (RLS) enabled on Supabase tables
+- JWT token validation on all backend endpoints
+- Role-based access control (student/admin)
+
+## 📚 Documentation
+
+- [PRD](./docs/PRD.md) - Product Requirements Document
+- [Setup Guide](./SETUP.md) - Detailed setup instructions
+- [Project Status](./PROJECT_STATUS.md) - Current project status and implementation details
+- [Feature Docs](./features/) - Numbered feature documentation
+
+## 📄 License
+
+Proprietary - Centennial College Internal Use

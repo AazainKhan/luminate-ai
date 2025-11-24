@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "luminate-ai-backend"
+version = "0.0.1"
+description = "FastAPI backend for Luminate AI Course Marshal"
+authors = ["Luminate AI"]
+
+[tool.black]
+line-length = 100
+target-version = ['py311']
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.11"
+warn_return_any = true
+warn_unused_configs = true
+

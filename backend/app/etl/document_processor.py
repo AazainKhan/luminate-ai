@@ -1,0 +1,282 @@
+"""
+Document Processing Pipeline
+PDF parsing, text extraction, chunking, and embedding generation
+"""
+
+from pathlib import Path
+from typing import List, Dict, Optional
+import logging
+import PyPDF2
+from docx import Document
+import re
+
+logger = logging.getLogger(__name__)
+
+
+class DocumentProcessor:
+    """Processes documents for vectorization"""
+
+    def __init__(self, chunk_size: int = 1000, chunk_overlap: int = 200):
+        """
+        Initialize document processor
+        
+        Args:
+            chunk_size: Size of text chunks in characters
+            chunk_overlap: Overlap between chunks in characters
+        """
+        self.chunk_size = chunk_size
+        self.chunk_overlap = chunk_overlap
+
+    def extract_text_from_pdf(self, pdf_path: Path) -> str:
+        """
+        Extract text from PDF file
+        
+        Args:
+            pdf_path: Path to PDF file
+            
+        Returns:
+            Extracted text content
+        """
+        try:
+            text_content = []
+            with open(pdf_path, 'rb') as file:
+                pdf_reader = PyPDF2.PdfReader(file)
+                for page in pdf_reader.pages:
+                    text = page.extract_text()
+                    if text:
+                        text_content.append(text)
+            
+            full_text = "\n\n".join(text_content)
+            logger.info(f"Extracted {len(full_text)} characters from PDF: {pdf_path.name}")
+            return full_text
+        except Exception as e:
+            logger.error(f"Error extracting text from PDF {pdf_path}: {e}")
+            raise
+
+    def extract_text_from_docx(self, docx_path: Path) -> str:
+        """
+        Extract text from Word document
+        
+        Args:
+            docx_path: Path to .docx file
+            
+        Returns:
+            Extracted text content
+        """
+        try:
+            doc = Document(docx_path)
+            text_content = []
+            for paragraph in doc.paragraphs:
+                if paragraph.text.strip():
+                    text_content.append(paragraph.text)
+            
+            full_text = "\n\n".join(text_content)
+            logger.info(f"Extracted {len(full_text)} characters from DOCX: {docx_path.name}")
+            return full_text
+        except Exception as e:
+            logger.error(f"Error extracting text from DOCX {docx_path}: {e}")
+            raise
+
+    def extract_text_from_txt(self, txt_path: Path) -> str:
+        """
+        Extract text from plain text file
+        
+        Args:
+            txt_path: Path to .txt file
+            
+        Returns:
+            File content
+        """
+        try:
+            with open(txt_path, 'r', encoding='utf-8') as file:
+                content = file.read()
+            logger.info(f"Extracted {len(content)} characters from TXT: {txt_path.name}")
+            return content
+        except Exception as e:
+            logger.error(f"Error reading TXT file {txt_path}: {e}")
+            raise
+
+    def extract_text(self, file_path: Path) -> str:
+        """
+        Extract text from file based on extension
+        
+        Args:
+            file_path: Path to file
+            
+        Returns:
+            Extracted text content
+        """
+        ext = file_path.suffix.lower()
+        
+        if ext == '.pdf':
+            return self.extract_text_from_pdf(file_path)
+        elif ext in ['.docx', '.doc']:
+            return self.extract_text_from_docx(file_path)
+        elif ext == '.txt':
+            return self.extract_text_from_txt(file_path)
+        else:
+            raise ValueError(f"Unsupported file type: {ext}")
+
+    def chunk_text(self, text: str, metadata: Optional[Dict] = None) -> List[Dict[str, any]]:
+        """
+        Split text into chunks
+        
+        Args:
+            text: Text to chunk
+            metadata: Optional metadata to attach to each chunk
+            
+        Returns:
+            List of chunk dictionaries with text and metadata
+        """
+        # Clean text
+        text = re.sub(r'\s+', ' ', text)
+        
+        chunks = []
+        start = 0
+        
+        while start < len(text):
+            end = start + self.chunk_size
+            
+            # Try to break at sentence boundary
+            if end < len(text):
+                # Look for sentence endings
+                sentence_end = max(
+                    text.rfind('.', start, end),
+                    text.rfind('!', start, end),
+                    text.rfind('?', start, end),
+                    text.rfind('\n', start, end)
+                )
+                if sentence_end > start:
+                    end = sentence_end + 1
+            
+            chunk_text = text[start:end].strip()
+            
+            if chunk_text:
+                chunk_metadata = metadata.copy() if metadata else {}
+                chunk_metadata['chunk_index'] = len(chunks)
+                chunk_metadata['chunk_start'] = start
+                chunk_metadata['chunk_end'] = end
+                
+                chunks.append({
+                    'text': chunk_text,
+                    'metadata': chunk_metadata,
+                })
+            
+            # Move start position with overlap
+            start = end - self.chunk_overlap
+        
+        logger.info(f"Created {len(chunks)} chunks from text")
+        return chunks
+
+    def process_file(
+        self,
+        file_path: Path,
+        base_metadata: Dict[str, any]
+    ) -> List[Dict[str, any]]:
+        """
+        Process a single file: extract text and chunk it
+        
+        Args:
+            file_path: Path to file
+            base_metadata: Base metadata for all chunks
+            
+        Returns:
+            List of chunk dictionaries
+        """
+        try:
+            # Extract text
+            text = self.extract_text(file_path)
+            
+            # Prepare metadata
+            metadata = base_metadata.copy()
+            metadata['source_filename'] = file_path.name
+            metadata['source_path'] = str(file_path)
+            
+            # Chunk text
+            chunks = self.chunk_text(text, metadata)
+            
+            return chunks
+        except Exception as e:
+            logger.error(f"Error processing file {file_path}: {e}")
+            return []
+
+
+def process_documents(
+    files: List[Dict[str, any]],
+    course_id: str = "COMP237",
+    processor: Optional[DocumentProcessor] = None
+) -> List[Dict[str, any]]:
+    """
+    Process multiple documents
+    
+    Args:
+        files: List of file info dictionaries
+        course_id: Course identifier
+        processor: Optional DocumentProcessor instance
+        
+    Returns:
+        List of all chunks from all documents
+    """
+    if processor is None:
+        processor = DocumentProcessor()
+    
+    all_chunks = []
+    
+    for file_info in files:
+        file_path = Path(file_info['path'])
+        
+        # Determine content type
+        content_type = _determine_content_type(file_path, file_info)
+        
+        # Determine week number if possible
+        week_number = _extract_week_number(file_path.name)
+        
+        base_metadata = {
+            'course_id': course_id,
+            'content_type': content_type,
+            'week_number': str(week_number) if week_number is not None else 'unknown',
+            'file_type': file_info.get('type', 'unknown'),
+        }
+        
+        chunks = processor.process_file(file_path, base_metadata)
+        all_chunks.extend(chunks)
+    
+    logger.info(f"Processed {len(files)} files into {len(all_chunks)} chunks")
+    return all_chunks
+
+
+def _determine_content_type(file_path: Path, file_info: Dict) -> str:
+    """Determine content type from file name and path"""
+    name_lower = file_path.name.lower()
+    
+    if 'lecture' in name_lower or 'slide' in name_lower:
+        return 'lecture_slide'
+    elif 'assignment' in name_lower or 'lab' in name_lower:
+        return 'assignment_instruction'
+    elif 'outline' in name_lower or 'syllabus' in name_lower:
+        return 'syllabus'
+    elif 'quiz' in name_lower or 'exam' in name_lower:
+        return 'assessment'
+    elif 'textbook' in name_lower or 'reading' in name_lower:
+        return 'textbook'
+    else:
+        return 'concept_definition'
+
+
+def _extract_week_number(filename: str) -> Optional[int]:
+    """Extract week number from filename"""
+    # Look for patterns like "Week 1", "week1", "Module 1", etc.
+    patterns = [
+        r'week\s*(\d+)',
+        r'module\s*(\d+)',
+        r'w(\d+)',
+        r'm(\d+)',
+    ]
+    
+    for pattern in patterns:
+        match = re.search(pattern, filename.lower())
+        if match:
+            return int(match.group(1))
+    
+    return None
+
