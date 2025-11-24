@@ -74,8 +74,13 @@ LANGFUSE_PUBLIC_KEY=pk-lf-your-actual-public-key-here
 LANGFUSE_SECRET_KEY=sk-lf-your-actual-secret-key-here
 
 # Keep these as-is for local development
+# Backend containers must use the internal service name (`observer`)
 LANGFUSE_HOST=http://observer:3000
-LANGFUSE_BASE_URL=http://localhost:3000
+LANGFUSE_BASE_URL=http://observer:3000
+
+# When running locally outside Docker, override with:
+# LANGFUSE_HOST=http://localhost:3000
+# LANGFUSE_BASE_URL=http://localhost:3000
 ```
 
 ### Step 6: Restart Backend

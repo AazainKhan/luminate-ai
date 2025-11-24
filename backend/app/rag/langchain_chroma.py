@@ -54,45 +54,51 @@ class LangChainChromaClient:
         k: int = 5,
         filter: Optional[Dict] = None
     ) -> List[Document]:
-        """
-        Perform similarity search
-        
-        Args:
-            query: Query string
-            k: Number of results to return
-            filter: Optional metadata filter
-            
-        Returns:
-            List of Document objects with page_content and metadata
-        """
-        try:
-            docs = self.vectorstore.similarity_search(
-                query=query,
-                k=k,
-                filter=filter
-            )
-            logger.info(f"✅ Retrieved {len(docs)} documents for query")
-            return docs
-        except Exception as e:
-            logger.error(f"❌ Error in similarity search: {e}")
-            raise
-    
+        """Compatibility wrapper (unused but kept for reference)."""
+        return self.vectorstore.similarity_search(query=query, k=k, filter=filter)
+
     def similarity_search_with_score(
         self,
         query: str,
         k: int = 5,
         filter: Optional[Dict] = None
     ) -> List[Tuple[Document, float]]:
+        """Compatibility wrapper for legacy callers."""
+        return self.vectorstore.similarity_search_with_score(query=query, k=k, filter=filter)
+
+    def _normalize_document(
+        self,
+        doc: Document,
+        score: float
+    ) -> Dict:
         """
-        Perform similarity search with relevance scores
+        Normalize a LangChain document into a structured record
+        """
+        metadata = doc.metadata or {}
+        preview = doc.page_content.replace("\n", " ").strip()
+        if len(preview) > 220:
+            preview = preview[:217] + "..."
         
-        Args:
-            query: Query string
-            k: Number of results to return
-            filter: Optional metadata filter
-            
-        Returns:
-            List of (Document, score) tuples
+        return {
+            "content": doc.page_content,
+            "metadata": metadata,
+            "relevance_score": float(score),
+            "source_filename": metadata.get("source_filename", "Unknown"),
+            "chunk_index": metadata.get("chunk_index", 0),
+            "content_type": metadata.get("content_type", "unknown"),
+            "page": metadata.get("page", metadata.get("page_number", "N/A")),
+            "preview": preview,
+            "public_url": metadata.get("public_url", ""),
+        }
+    
+    def retrieve_with_metadata(
+        self,
+        query: str,
+        k: int = 5,
+        filter: Optional[Dict] = None
+    ) -> List[Dict]:
+        """
+        Perform similarity search and return structured metadata records
         """
         try:
             results = self.vectorstore.similarity_search_with_score(
@@ -100,10 +106,11 @@ class LangChainChromaClient:
                 k=k,
                 filter=filter
             )
-            logger.info(f"✅ Retrieved {len(results)} documents with scores")
-            return results
+            structured = [self._normalize_document(doc, score) for doc, score in results]
+            logger.info(f"✅ Retrieved {len(structured)} structured documents")
+            return structured
         except Exception as e:
-            logger.error(f"❌ Error in similarity search with score: {e}")
+            logger.error(f"❌ Error retrieving structured documents: {e}")
             raise
     
     def get_collection_info(self) -> Dict:
@@ -142,37 +149,30 @@ class LangChainChromaClient:
             logger.error(f"❌ Error adding documents: {e}")
             raise
     
-    def format_results_for_agent(
-        self,
-        results: List[Tuple[Document, float]]
-    ) -> Tuple[List[str], List[Dict]]:
+    def summarize_sources(self, records: List[Dict]) -> List[Dict]:
         """
-        Format search results for agent consumption
-        
-        Args:
-            results: List of (Document, score) tuples
-            
-        Returns:
-            Tuple of (contexts, sources)
+        Summarize retrieval results into unique source cards
         """
-        contexts = []
-        sources = []
+        summaries: List[Dict] = []
+        seen_files = set()
         
-        for doc, score in results:
-            contexts.append(doc.page_content)
+        for record in records:
+            filename = record.get("source_filename", "Unknown")
+            if filename in seen_files:
+                continue
+            seen_files.add(filename)
             
-            # Extract source information from metadata
-            metadata = doc.metadata
-            source_info = {
-                "filename": metadata.get("source_filename", "Unknown"),
-                "page": metadata.get("page", "N/A"),
-                "chunk_index": metadata.get("chunk_index", 0),
-                "relevance_score": float(score),
-                "content_type": metadata.get("content_type", "unknown")
-            }
-            sources.append(source_info)
+            summaries.append({
+                "filename": filename,
+                "chunk_index": record.get("chunk_index", 0),
+                "relevance_score": float(record.get("relevance_score", 0.0)),
+                "content_type": record.get("content_type", "unknown"),
+                "preview": record.get("preview", ""),
+                "public_url": record.get("public_url", ""),
+                "page": record.get("page", "N/A")
+            })
         
-        return contexts, sources
+        return summaries
 
 
 # Global instance

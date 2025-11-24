@@ -26,8 +26,8 @@ class AgentState(TypedDict):
     model_selected: Optional[str]  # "gemini-flash", "claude-sonnet", "gemini-pro"
     
     # RAG context
-    retrieved_context: List[dict]  # Retrieved documents from ChromaDB
-    context_sources: List[str]  # Source filenames
+    retrieved_context: List[dict]  # Retrieved documents with metadata
+    context_sources: List[dict]  # Source summaries with filenames/score
     
     # Policy enforcement
     governor_approved: bool

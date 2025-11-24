@@ -30,19 +30,17 @@ class SyllabusAgent:
             Dictionary with syllabus information
         """
         try:
-            # Query for syllabus-related content
-            results = self.vectorstore.similarity_search_with_score(
+            results = self.vectorstore.retrieve_with_metadata(
                 query=query,
                 k=5,
                 filter={"content_type": "syllabus"}
             )
-            
             if results:
-                contexts, sources = self.vectorstore.format_results_for_agent(results)
+                summaries = self.vectorstore.summarize_sources(results)
                 return {
                     "found": True,
-                    "sources": sources,
-                    "content": contexts,
+                    "sources": summaries,
+                    "content": [record["content"] for record in results],
                 }
             
             return {"found": False}
@@ -60,35 +58,22 @@ class RAGAgent:
     def retrieve_context(self, query: str, course_id: str = "COMP237") -> List[Dict]:
         """
         Retrieve relevant context from ChromaDB using LangChain
-        
-        Args:
-            query: User query
-            course_id: Course identifier
-            
-        Returns:
-            List of retrieved documents with metadata
         """
         try:
-            # Use LangChain's similarity search with scores
-            results = self.vectorstore.similarity_search_with_score(
+            records = self.vectorstore.retrieve_with_metadata(
                 query=query,
                 k=5,
                 filter={"course_id": course_id}
             )
-            
-            retrieved = []
-            for doc, score in results:
-                retrieved.append({
-                    "text": doc.page_content,
-                    "metadata": doc.metadata,
-                    "relevance_score": float(score),
-                })
-            
-            logger.info(f"✅ Retrieved {len(retrieved)} documents for query")
-            return retrieved
+            logger.info(f"✅ Retrieved {len(records)} documents for query")
+            return records
         except Exception as e:
             logger.error(f"❌ Error retrieving context: {e}")
             return []
+    
+    def summarize_sources(self, records: List[Dict]) -> List[Dict]:
+        """Summarize retrieval results into unique sources"""
+        return self.vectorstore.summarize_sources(records)
 
 
 def rag_node(state: AgentState) -> AgentState:
@@ -100,12 +85,10 @@ def rag_node(state: AgentState) -> AgentState:
     query = state.get("query", "")
     
     retrieved = rag_agent.retrieve_context(query)
+    source_summaries = rag_agent.summarize_sources(retrieved)
     
     state["retrieved_context"] = retrieved
-    state["context_sources"] = [
-        doc["metadata"].get("source_filename", "Unknown")
-        for doc in retrieved
-    ]
+    state["context_sources"] = source_summaries
     
     return state
 
@@ -134,14 +117,15 @@ def generate_response_node(state: AgentState) -> AgentState:
     
     query = state.get("query", "")
     retrieved_context = state.get("retrieved_context", [])
+    context_sources = state.get("context_sources", [])
     
     # Build context string
     context_parts = []
     sources = []
     for doc in retrieved_context[:3]:  # Use top 3 results
-        context_parts.append(doc["text"])
-        source = doc["metadata"].get("source_filename", "Unknown")
-        if source not in sources:
+        context_parts.append(doc.get("content") or doc.get("text", ""))
+        source = doc.get("source_filename") or doc.get("metadata", {}).get("source_filename", "Unknown")
+        if source and source not in sources:
             sources.append(source)
     
     context_str = "\n\n---\n\n".join(context_parts)
@@ -175,7 +159,27 @@ Response:"""
             response_text += f"\n\n[Sources: {', '.join(sources)}]"
         
         state["response"] = response_text
-        state["response_sources"] = sources
+        
+        # Build rich source payload for frontend
+        response_sources = []
+        for source in context_sources:
+            filename = source.get("filename", "Unknown")
+            description_parts = [
+                f"Chunk {source.get('chunk_index', 0)}",
+                f"Score {source.get('relevance_score', 0.0):.2f}",
+            ]
+            if source.get("content_type"):
+                description_parts.append(source["content_type"])
+            if source.get("preview"):
+                description_parts.append(source["preview"][:140])
+            
+            response_sources.append({
+                "title": filename,
+                "url": source.get("public_url", ""),
+                "description": " • ".join(description_parts)
+            })
+        
+        state["response_sources"] = response_sources or [{"title": src, "url": "", "description": ""} for src in sources]
         
         logger.info(f"Generated response using {model_name}")
     except Exception as e:

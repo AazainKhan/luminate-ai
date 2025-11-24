@@ -16,8 +16,9 @@ services:
       - CHROMADB_PORT=8000
       - REDIS_HOST=cache_layer
       - REDIS_PORT=6379
-      - LANGFUSE_HOST=observer
+      - LANGFUSE_HOST=http://observer:3000
       - LANGFUSE_PORT=3000
+      - LANGFUSE_BASE_URL=http://observer:3000
     volumes:
       - ./backend:/app
       - backend_data:/app/data
