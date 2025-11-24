@@ -10,6 +10,7 @@ from app.agents.state import AgentState
 from app.agents.governor import governor_node
 from app.agents.supervisor import supervisor_node
 from app.agents.sub_agents import rag_node, syllabus_node, generate_response_node
+from app.observability import create_trace, flush_langfuse
 
 logger = logging.getLogger(__name__)
 
@@ -93,6 +94,16 @@ def run_agent(query: str, user_id: str = None, user_email: str = None) -> Dict:
     """
     agent = get_tutor_agent()
     
+    # Create Langfuse trace for observability (v3 pattern)
+    span = create_trace(
+        name="tutor_agent_query",
+        user_id=user_id,
+        metadata={
+            "query": query,
+            "user_email": user_email,
+        }
+    )
+    
     # Initialize state
     initial_state: AgentState = {
         "messages": [],
@@ -119,6 +130,21 @@ def run_agent(query: str, user_id: str = None, user_email: str = None) -> Dict:
     try:
         final_state = agent.invoke(initial_state)
         
+        # Log trace metadata
+        if span:
+            span.update(
+                output={
+                    "response": final_state.get("response"),
+                    "intent": final_state.get("intent"),
+                    "model_used": final_state.get("model_selected"),
+                    "governor_approved": final_state.get("governor_approved"),
+                }
+            )
+            span.end()
+        
+        # Flush Langfuse events
+        flush_langfuse()
+        
         return {
             "response": final_state.get("response"),
             "sources": final_state.get("response_sources", []),
@@ -128,6 +154,17 @@ def run_agent(query: str, user_id: str = None, user_email: str = None) -> Dict:
         }
     except Exception as e:
         logger.error(f"Error running agent: {e}")
+        
+        # Log error to trace
+        if span:
+            span.update(
+                output={"error": str(e)},
+                level="ERROR"
+            )
+            span.end()
+        
+        flush_langfuse()
+        
         return {
             "response": "I apologize, but I encountered an error processing your query.",
             "sources": [],

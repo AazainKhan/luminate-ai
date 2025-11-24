@@ -7,7 +7,7 @@ from typing import Dict, List
 import logging
 from app.agents.state import AgentState
 from app.agents.supervisor import Supervisor
-from app.rag.chromadb_client import get_chromadb_client
+from app.rag.langchain_chroma import get_langchain_chroma_client
 
 logger = logging.getLogger(__name__)
 
@@ -16,7 +16,7 @@ class SyllabusAgent:
     """Agent for syllabus and course logistics queries"""
     
     def __init__(self):
-        self.chromadb = get_chromadb_client()
+        self.vectorstore = get_langchain_chroma_client()
         self.supervisor = Supervisor()
     
     def check_syllabus(self, query: str) -> Dict[str, any]:
@@ -31,17 +31,18 @@ class SyllabusAgent:
         """
         try:
             # Query for syllabus-related content
-            results = self.chromadb.query(
-                query_texts=[query],
-                n_results=5,
-                where={"content_type": "syllabus"}
+            results = self.vectorstore.similarity_search_with_score(
+                query=query,
+                k=5,
+                filter={"content_type": "syllabus"}
             )
             
-            if results.get("ids") and results["ids"][0]:
+            if results:
+                contexts, sources = self.vectorstore.format_results_for_agent(results)
                 return {
                     "found": True,
-                    "sources": results.get("metadatas", [[]])[0] if results.get("metadatas") else [],
-                    "content": results.get("documents", [[]])[0] if results.get("documents") else [],
+                    "sources": sources,
+                    "content": contexts,
                 }
             
             return {"found": False}
@@ -54,11 +55,11 @@ class RAGAgent:
     """Agent for RAG retrieval and context prioritization"""
     
     def __init__(self):
-        self.chromadb = get_chromadb_client()
+        self.vectorstore = get_langchain_chroma_client()
     
     def retrieve_context(self, query: str, course_id: str = "COMP237") -> List[Dict]:
         """
-        Retrieve relevant context from ChromaDB
+        Retrieve relevant context from ChromaDB using LangChain
         
         Args:
             query: User query
@@ -68,26 +69,25 @@ class RAGAgent:
             List of retrieved documents with metadata
         """
         try:
-            results = self.chromadb.query(
-                query_texts=[query],
-                n_results=5,
-                where={"course_id": course_id}
+            # Use LangChain's similarity search with scores
+            results = self.vectorstore.similarity_search_with_score(
+                query=query,
+                k=5,
+                filter={"course_id": course_id}
             )
             
             retrieved = []
-            if results.get("ids") and results["ids"][0]:
-                for i, doc_id in enumerate(results["ids"][0]):
-                    retrieved.append({
-                        "id": doc_id,
-                        "text": results["documents"][0][i] if results.get("documents") else "",
-                        "metadata": results["metadatas"][0][i] if results.get("metadatas") else {},
-                        "distance": results["distances"][0][i] if results.get("distances") else 0.0,
-                    })
+            for doc, score in results:
+                retrieved.append({
+                    "text": doc.page_content,
+                    "metadata": doc.metadata,
+                    "relevance_score": float(score),
+                })
             
-            logger.info(f"Retrieved {len(retrieved)} documents for query")
+            logger.info(f"✅ Retrieved {len(retrieved)} documents for query")
             return retrieved
         except Exception as e:
-            logger.error(f"Error retrieving context: {e}")
+            logger.error(f"❌ Error retrieving context: {e}")
             return []
 
 

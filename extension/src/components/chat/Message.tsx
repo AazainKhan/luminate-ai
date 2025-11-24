@@ -99,8 +99,8 @@ function MessageContent({ message, copied, handleCopy, isUser }: { message: Mess
           className={cn(
             "relative",
             isUser 
-              ? "bg-violet-600 text-white px-3 py-2 rounded-2xl shadow-sm" 
-              : "bg-slate-900 border border-slate-800 rounded-2xl px-3 py-2 text-slate-100",
+              ? "bg-violet-600 text-white px-4 py-3 rounded-2xl rounded-tr-sm shadow-md" 
+              : "bg-slate-900/50 border border-slate-800/50 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-3 text-slate-100 shadow-sm",
           )}
         >
           {!isUser && message.reasoning && (

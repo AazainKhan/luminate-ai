@@ -9,6 +9,7 @@ from app.agents.state import AgentState
 from langchain_google_genai import ChatGoogleGenerativeAI
 from langchain_groq import ChatGroq
 from app.config import settings
+from app.observability import get_langfuse_handler
 
 logger = logging.getLogger(__name__)
 
@@ -22,11 +23,16 @@ class Supervisor:
     """
 
     def __init__(self):
+        # Get Langfuse callback handler
+        langfuse_handler = get_langfuse_handler()
+        callbacks = [langfuse_handler] if langfuse_handler else []
+        
         # Initialize Gemini (Primary/Fallback)
         self.gemini_flash = ChatGoogleGenerativeAI(
             model="gemini-2.0-flash",
             google_api_key=settings.google_api_key,
             temperature=0.7,
+            callbacks=callbacks,
         )
         
         # Initialize Groq (Performance/Coder)
@@ -35,11 +41,13 @@ class Supervisor:
                 model_name="llama-3.3-70b-versatile",
                 groq_api_key=settings.groq_api_key,
                 temperature=0.5, # Lower temperature for code
+                callbacks=callbacks,
             )
             self.groq_fast = ChatGroq(
                 model_name="llama-3.3-70b-versatile", # Upgrading fast to 70b as it is very fast on Groq
                 groq_api_key=settings.groq_api_key,
                 temperature=0.7,
+                callbacks=callbacks,
             )
         else:
             logger.warning("GROQ_API_KEY not found. Falling back to Gemini for all tasks.")

@@ -6,7 +6,7 @@ Enforces course policies and constraints
 from typing import Dict, List
 import logging
 from app.agents.state import AgentState
-from app.rag.chromadb_client import get_chromadb_client
+from app.rag.langchain_chroma import get_langchain_chroma_client
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +20,7 @@ class Governor:
     """
 
     def __init__(self):
-        self.chromadb = get_chromadb_client()
+        self.vectorstore = get_langchain_chroma_client()
         self.course_id = "COMP237"
 
     def check_policies(self, state: AgentState) -> Dict[str, any]:
@@ -69,38 +69,38 @@ class Governor:
         Returns:
             Dictionary with approval status
         """
-        # Query ChromaDB to see if relevant content exists
+        # Query vector store to see if relevant content exists
         try:
-            results = self.chromadb.query(
-                query_texts=[query],
-                n_results=3,
-                where={"course_id": self.course_id}
+            results = self.vectorstore.similarity_search_with_score(
+                query=query,
+                k=3,
+                filter={"course_id": self.course_id}
             )
             
             # If no relevant results, might be out of scope
-            if not results.get("ids") or not results["ids"][0]:
+            if not results:
                 return {
                     "approved": False,
                     "reason": "This topic is not covered in COMP 237. Please ask about course content.",
                 }
             
-            # Check if results are relevant (low distance = relevant)
-            distances = results.get("distances", [[]])
-            if distances and distances[0]:
-                min_distance = min(distances[0])
-                # If all results are very distant, might be out of scope
-                if min_distance > 1.5:  # Threshold for relevance
-                    return {
-                        "approved": False,
-                        "reason": "This topic is not clearly covered in COMP 237. Please rephrase or ask about specific course content.",
-                    }
+            # Check if results are relevant (lower score = more relevant)
+            min_score = min(score for _, score in results)
             
+            # If all results are very distant, might be out of scope
+            if min_score > 1.5:  # Threshold for relevance
+                return {
+                    "approved": False,
+                    "reason": "This topic is not clearly covered in COMP 237. Please rephrase or ask about specific course content.",
+                }
+            
+            logger.info(f"✅ Scope check passed (min_score: {min_score:.3f})")
             return {
                 "approved": True,
                 "reason": "Topic is within course scope",
             }
         except Exception as e:
-            logger.error(f"Error checking scope: {e}")
+            logger.error(f"❌ Error checking scope: {e}")
             # On error, allow but log
             return {
                 "approved": True,

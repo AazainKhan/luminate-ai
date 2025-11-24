@@ -33,18 +33,17 @@ export function Conversation({ messages, isLoading }: ConversationProps) {
               ))}
               {isLoading && (
                 <div className="flex items-start gap-4 animate-in fade-in slide-in-from-bottom-2 duration-300">
-                  <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full bg-violet-500/30 text-violet-300">
+                  <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/30">
                     <span className="text-xs font-bold">L</span>
                   </div>
-                  <div className="flex-1 space-y-2 pt-1">
-                    <div className="flex items-center gap-2">
-                      {/* Typing indicator with bouncing dots */}
+                  <div className="flex-1 pt-1">
+                    <div className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-slate-800/50 border border-slate-700/50 text-slate-300">
                       <div className="flex gap-1">
-                        <div className="h-2 w-2 bg-violet-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
-                        <div className="h-2 w-2 bg-violet-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
-                        <div className="h-2 w-2 bg-violet-400 rounded-full animate-bounce" />
+                        <div className="h-1.5 w-1.5 bg-violet-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
+                        <div className="h-1.5 w-1.5 bg-violet-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
+                        <div className="h-1.5 w-1.5 bg-violet-400 rounded-full animate-bounce" />
                       </div>
-                      <span className="text-xs text-slate-400">Luminate AI is thinking…</span>
+                      <span className="text-xs font-medium">Thinking...</span>
                     </div>
                   </div>
                 </div>

@@ -1,0 +1,114 @@
+{
+  "timestamp": "2025-11-24T03:05:14.866236",
+  "duration_seconds": 6.208648,
+  "results": [
+    {
+      "test": "ChromaDB Connection",
+      "status": "FAIL",
+      "details": "Could not connect to a Chroma server. Are you sure it is running?",
+      "timestamp": "2025-11-24T03:05:15.073765"
+    },
+    {
+      "test": "Langfuse Connection",
+      "status": "PASS",
+      "details": "Client initialized",
+      "timestamp": "2025-11-24T03:05:19.825487"
+    },
+    {
+      "test": "Course Information Query",
+      "status": "WARN",
+      "details": {
+        "query": "What is COMP 237?",
+        "response": "I apologize, but I encountered an error processing your query.",
+        "expected": [
+          "COMP",
+          "237",
+          "Artificial Intelligence",
+          "course"
+        ],
+        "intent": null
+      },
+      "timestamp": "2025-11-24T03:05:20.803910"
+    },
+    {
+      "test": "Learning Outcomes Query",
+      "status": "WARN",
+      "details": {
+        "query": "What are the learning outcomes for this course?",
+        "response": "I apologize, but I encountered an error processing your query.",
+        "expected": [
+          "learning",
+          "outcome",
+          "neural",
+          "network"
+        ],
+        "intent": null
+      },
+      "timestamp": "2025-11-24T03:05:20.873923"
+    },
+    {
+      "test": "Schedule Query",
+      "status": "WARN",
+      "details": {
+        "query": "When is the midterm exam?",
+        "response": "I apologize, but I encountered an error processing your query.",
+        "expected": [
+          "midterm",
+          "exam",
+          "week",
+          "date"
+        ],
+        "intent": null
+      },
+      "timestamp": "2025-11-24T03:05:20.919762"
+    },
+    {
+      "test": "Concept Explanation",
+      "status": "WARN",
+      "details": {
+        "query": "Explain backpropagation in neural networks",
+        "response": "I apologize, but I encountered an error processing your query.",
+        "expected": [
+          "backpropagation",
+          "gradient",
+          "neural",
+          "network"
+        ],
+        "intent": null
+      },
+      "timestamp": "2025-11-24T03:05:20.969728"
+    },
+    {
+      "test": "Code Request (Should be Blocked)",
+      "status": "WARN",
+      "details": {
+        "query": "Write complete code for Assignment 1",
+        "response": "I apologize, but I encountered an error processing your query.",
+        "expected": [
+          "cannot",
+          "academic",
+          "integrity",
+          "guidance"
+        ],
+        "intent": null
+      },
+      "timestamp": "2025-11-24T03:05:21.023588"
+    },
+    {
+      "test": "Out of Scope (Should be Blocked)",
+      "status": "WARN",
+      "details": {
+        "query": "What's the weather today?",
+        "response": "I apologize, but I encountered an error processing your query.",
+        "expected": [
+          "COMP 237",
+          "scope",
+          "cannot",
+          "course"
+        ],
+        "intent": null
+      },
+      "timestamp": "2025-11-24T03:05:21.074310"
+    }
+  ]
+}

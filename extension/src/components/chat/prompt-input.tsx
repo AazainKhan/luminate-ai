@@ -151,7 +151,7 @@ export function PromptInput({ input, setInput, onSend, isLoading }: PromptInputP
               <div className="h-4 w-px bg-slate-700 mx-1" />
               <Popover>
                 <Tooltip>
-                  <TooltipTrigger>
+                  <TooltipTrigger asChild>
                     <PopoverTrigger asChild>
                       <Button
                         type="button"
@@ -257,7 +257,7 @@ export function PromptInput({ input, setInput, onSend, isLoading }: PromptInputP
           </div>
 
           {/* Footer - Mode chips, helper text, and submit */}
-          <div className="px-3 pb-3 flex items-center justify-between border-t border-slate-800 pt-2">
+          <div className="px-3 pb-3 flex flex-wrap items-center justify-between gap-y-2 border-t border-slate-800 pt-2">
             <div className="flex items-center gap-2">
               <Button
                 type="button"
@@ -291,7 +291,6 @@ export function PromptInput({ input, setInput, onSend, isLoading }: PromptInputP
                 <Brain className="w-3 h-3" />
                 Tutor
               </Button>
-              <span className="text-xs text-slate-500 ml-2">Uses your course materials + web search</span>
             </div>
 
             <div className="flex items-center gap-2.5">

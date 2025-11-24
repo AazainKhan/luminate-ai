@@ -1,0 +1,51 @@
+# Luminate AI Course Marshal - Tech Stack Rules
+
+## Project Context
+We are building "Centennial Course Marshal," a dual-frontend Agentic AI platform.
+
+- **Monorepo Structure:**
+  - `/extension`: Plasmo (Chrome Extension) for Students and Admins.
+  - `/backend`: Python FastAPI + LangGraph.
+
+- **Primary AI:** Gemini 2.5 Flash (via `langchain-google-genai`).
+- **Secondary AI:** Claude 3.5 Sonnet (via `langchain-anthropic`).
+
+## Tech Stack Rules
+
+- **Frontend:** TypeScript, Tailwind CSS, `shadcn/ui`, `lucide-react`.
+- **Streaming:** Vercel AI SDK v5 (`useChat`, `StreamData`) for all chat interactions.
+- **Backend:** Python 3.11, Pydantic V2, Async flows.
+- **DB:** Supabase (Auth/Postgres), ChromaDB (Vector).
+
+## Authentication Rules (CRITICAL)
+
+- Use Supabase Passwordless Login (`signInWithOtp`).
+- **Student Logic:** Check email ends with `@my.centennialcollege.ca`.
+- **Admin Logic:** Check email ends with `@centennialcollege.ca`.
+- If domain fails, throw specific UI error: "Institutional Email Required".
+
+## Coding Standards
+
+- **LangGraph:** Define `AgentState` TypedDict clearly before creating graphs.
+- **Environment:** Use `python-dotenv` for backend, `.env.local` for frontend.
+- **UI:** Prefer "Optimistic UI". Show user input immediately while streaming response.
+- **Google AI:** Use `ChatGoogleGenerativeAI` with safety settings configured to BLOCK_NONE for academic content.
+
+## Framework Constraints
+
+- **NO Next.js** - Use Plasmo only for Chrome Extension unless you go over the plasmo documentation and find how to integrate Next.js properly (its possible)
+- **NO Next.js Admin** - Admin panel is Chrome Extension side panel, not separate app.
+- Always use `sidepanel.tsx` for Student Chat interface.
+- Always use Chrome side panel API for Admin dashboard.
+
+## Documentation
+
+- All documentation goes in `/docs` folder.
+- Feature documentation goes in `/features/[NN]-[name]/[NN]-[task].md`.
+- Reference indexed docs (@Plasmo, @LangGraph, @FastAPI) before writing code.
+
+## MCP Usage
+
+- Use shadcn MCP for UI component generation.
+- Use sequential MCP for complex logic planning.
+

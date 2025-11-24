@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?><questestinterop><assessment title="final neuron"><assessmentmetadata><bbmd_asi_object_id>_894503_1</bbmd_asi_object_id><bbmd_asitype>Assessment</bbmd_asitype><bbmd_assessmenttype>Pool</bbmd_assessmenttype><bbmd_sectiontype>Subsection</bbmd_sectiontype><bbmd_questiontype>Multiple Choice</bbmd_questiontype><bbmd_is_from_cartridge>false</bbmd_is_from_cartridge><bbmd_is_disabled>false</bbmd_is_disabled><bbmd_negative_points_ind>N</bbmd_negative_points_ind><bbmd_canvas_fullcrdt_ind>false</bbmd_canvas_fullcrdt_ind><bbmd_all_fullcredit_ind>false</bbmd_all_fullcredit_ind><bbmd_numbertype>none</bbmd_numbertype><bbmd_partialcredit></bbmd_partialcredit><bbmd_orientationtype>vertical</bbmd_orientationtype><bbmd_is_extracredit>false</bbmd_is_extracredit><bbmd_ai_state>No</bbmd_ai_state><qmd_absolutescore_max>30.000000000000000</qmd_absolutescore_max><qmd_weighting>0</qmd_weighting><qmd_instructornotes></qmd_instructornotes></assessmentmetadata><rubric view="All"><flow_mat class="Block"><material><mat_extension><mat_formattedtext type="SMART_TEXT"/></mat_extension></material></flow_mat></rubric><presentation_material><flow_mat class="Block"><material><mat_extension><mat_formattedtext type="HTML"/></mat_extension></material></flow_mat></presentation_material><section><sectionmetadata><bbmd_asi_object_id>_894537_1</bbmd_asi_object_id><bbmd_asitype>Section</bbmd_asitype><bbmd_assessmenttype>Pool</bbmd_assessmenttype><bbmd_sectiontype>Subsection</bbmd_sectiontype><bbmd_questiontype>Multiple Choice</bbmd_questiontype><bbmd_is_from_cartridge>false</bbmd_is_from_cartridge><bbmd_is_disabled>false</bbmd_is_disabled><bbmd_negative_points_ind>N</bbmd_negative_points_ind><bbmd_canvas_fullcrdt_ind>false</bbmd_canvas_fullcrdt_ind><bbmd_all_fullcredit_ind>false</bbmd_all_fullcredit_ind><bbmd_numbertype>none</bbmd_numbertype><bbmd_partialcredit></bbmd_partialcredit><bbmd_orientationtype>vertical</bbmd_orientationtype><bbmd_is_extracredit>false</bbmd_is_extracredit><bbmd_ai_state>No</bbmd_ai_state><qmd_absolutescore_max>30.000000000000000</qmd_absolutescore_max><qmd_weighting>0</qmd_weighting><qmd_instructornotes></qmd_instructornotes></sectionmetadata><item title="" maxattempts="0"><itemmetadata><bbmd_asi_object_id>_894634_1</bbmd_asi_object_id><bbmd_asitype>Item</bbmd_asitype><bbmd_assessmenttype>Pool</bbmd_assessmenttype><bbmd_sectiontype>Subsection</bbmd_sectiontype><bbmd_questiontype>Fill in the Blank Plus</bbmd_questiontype><bbmd_is_from_cartridge>false</bbmd_is_from_cartridge><bbmd_is_disabled>false</bbmd_is_disabled><bbmd_negative_points_ind>N</bbmd_negative_points_ind><bbmd_canvas_fullcrdt_ind>false</bbmd_canvas_fullcrdt_ind><bbmd_all_fullcredit_ind>false</bbmd_all_fullcredit_ind><bbmd_numbertype>none</bbmd_numbertype><bbmd_partialcredit>false</bbmd_partialcredit><bbmd_orientationtype>vertical</bbmd_orientationtype><bbmd_is_extracredit>false</bbmd_is_extracredit><bbmd_ai_state>No</bbmd_ai_state><qmd_absolutescore_max>15.000000000000000</qmd_absolutescore_max><qmd_weighting>15.000000000000000</qmd_weighting><qmd_instructornotes></qmd_instructornotes></itemmetadata><presentation><flow class="Block"><flow class="QUESTION_BLOCK"><flow class="FORMATTED_TEXT_BLOCK"><material><mat_extension><mat_formattedtext type="HTML">&lt;!-- {"bbMLEditorVersion":1} --&gt;
+&lt;div&gt; 
+ &lt;p&gt;&lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693415_1" data-bbfile="{&amp;quot;alternativeText&amp;quot;:&amp;quot;Neuron&amp;quot;,&amp;quot;linkName&amp;quot;:&amp;quot;final neuron.png&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;image/png&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;final neuron.png&lt;/a&gt;&lt;/p&gt; 
+ &lt;p&gt;In the above image of an artificial&amp;nbsp; neuron, assume the node has three inputs x = (x1, x2, x3) that receive only binary signals&lt;/p&gt; 
+ &lt;div&gt;
+   (either 0 or 1). How many different input patterns this node can receive? 
+ &lt;/div&gt; 
+ &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-1]&lt;/a&gt; 
+ &lt;div&gt;
+   Suppose that the weights corresponding 
+ &lt;/div&gt; 
+ &lt;div&gt;
+   to the three inputs have the following values: 
+  &lt;div&gt;
+    w1 =&amp;nbsp; &amp;nbsp;2 
+  &lt;/div&gt; 
+  &lt;div&gt;
+    w2 = −4 
+  &lt;/div&gt; 
+  &lt;div&gt;
+    w3 =&amp;nbsp; &amp;nbsp;1 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt;
+   and the activation of the unit is given by the step-function. 
+ &lt;/div&gt; 
+ &lt;div&gt;
+   What would be the value of y for each of the following input patterns: 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-2]&lt;/a&gt;&amp;nbsp; = 
+  &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-3]&lt;/a&gt; 
+ &lt;/div&gt; 
+ &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-4]&lt;/a&gt; 
+ &lt;p&gt;&lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-5]&lt;/a&gt;&amp;nbsp; = &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-6]&lt;/a&gt;&lt;/p&gt; 
+ &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-7]&lt;/a&gt; 
+ &lt;p&gt;&lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-8]&lt;/a&gt;&amp;nbsp; = &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-9]&lt;/a&gt;&lt;/p&gt; 
+ &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-10]&lt;/a&gt; 
+ &lt;p&gt;&lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-11]&lt;/a&gt;&amp;nbsp; = &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-12]&lt;/a&gt;&lt;/p&gt; 
+ &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-13]&lt;/a&gt; 
+&lt;/div&gt;</mat_formattedtext></mat_extension></material></flow></flow><flow class="RESPONSE_BLOCK"><response_str ident="BLANK-1" rcardinality="Single" rtiming="No"><render_fib charset="us-ascii" encoding="UTF_8" rows="0" columns="0" maxchars="0" prompt="Box" fibtype="String" minnumber="0" maxnumber="0"/></response_str><response_str ident="BLANK-2" rcardinality="Single" rtiming="No"><render_fib charset="us-ascii" encoding="UTF_8" rows="0" columns="0" maxchars="0" prompt="Box" fibtype="String" minnumber="0" maxnumber="0"/></response_str><response_str ident="BLANK-3" rcardinality="Single" rtiming="No"><render_fib charset="us-ascii" encoding="UTF_8" rows="0" columns="0" maxchars="0" prompt="Box" fibtype="String" minnumber="0" maxnumber="0"/></response_str><response_str ident="BLANK-4" rcardinality="Single" rtiming="No"><render_fib charset="us-ascii" encoding="UTF_8" rows="0" columns="0" maxchars="0" prompt="Box" fibtype="String" minnumber="0" maxnumber="0"/></response_str><response_str ident="BLANK-5" rcardinality="Single" rtiming="No"><render_fib charset="us-ascii" encoding="UTF_8" rows="0" columns="0" maxchars="0" prompt="Box" fibtype="String" minnumber="0" maxnumber="0"/></response_str></flow></flow></presentation><resprocessing scoremodel="SumOfScores"><outcomes><decvar varname="SCORE" vartype="Decimal" defaultval="0.0" minvalue="0.0" maxvalue="15.000000000"/></outcomes><respcondition title="correct"><conditionvar><and><or><varequal respident="BLANK-1" case="No">8</varequal></or><or><varequal respident="BLANK-2" case="No">1</varequal></or><or><varequal respident="BLANK-3" case="No">0</varequal></or><or><varequal respident="BLANK-4" case="No">1</varequal></or><or><varequal respident="BLANK-5" case="No">0</varequal></or></and></conditionvar><setvar variablename="SCORE" action="Set">20.0</setvar><displayfeedback linkrefid="correct" feedbacktype="Response"/></respcondition><respcondition title="incorrect"><conditionvar><other/></conditionvar><setvar variablename="SCORE" action="Set">0.0</setvar><displayfeedback linkrefid="incorrect" feedbacktype="Response"/></respcondition></resprocessing><itemfeedback ident="correct" view="All"><flow_mat class="Block"><flow_mat class="FORMATTED_TEXT_BLOCK"><material><mat_extension><mat_formattedtext type="HTML"/></mat_extension></material></flow_mat></flow_mat></itemfeedback><itemfeedback ident="incorrect" view="All"><flow_mat class="Block"><flow_mat class="FORMATTED_TEXT_BLOCK"><material><mat_extension><mat_formattedtext type="HTML"/></mat_extension></material></flow_mat></flow_mat></itemfeedback></item><item title="" maxattempts="0"><itemmetadata><bbmd_asi_object_id>_894635_1</bbmd_asi_object_id><bbmd_asitype>Item</bbmd_asitype><bbmd_assessmenttype>Pool</bbmd_assessmenttype><bbmd_sectiontype>Subsection</bbmd_sectiontype><bbmd_questiontype>Fill in the Blank Plus</bbmd_questiontype><bbmd_is_from_cartridge>false</bbmd_is_from_cartridge><bbmd_is_disabled>false</bbmd_is_disabled><bbmd_negative_points_ind>N</bbmd_negative_points_ind><bbmd_canvas_fullcrdt_ind>false</bbmd_canvas_fullcrdt_ind><bbmd_all_fullcredit_ind>false</bbmd_all_fullcredit_ind><bbmd_numbertype>none</bbmd_numbertype><bbmd_partialcredit>false</bbmd_partialcredit><bbmd_orientationtype>vertical</bbmd_orientationtype><bbmd_is_extracredit>false</bbmd_is_extracredit><bbmd_ai_state>No</bbmd_ai_state><qmd_absolutescore_max>15.000000000000000</qmd_absolutescore_max><qmd_weighting>15.000000000000000</qmd_weighting><qmd_instructornotes></qmd_instructornotes></itemmetadata><presentation><flow class="Block"><flow class="QUESTION_BLOCK"><flow class="FORMATTED_TEXT_BLOCK"><material><mat_extension><mat_formattedtext type="HTML">&lt;!-- {"bbMLEditorVersion":1} --&gt;
+&lt;div&gt; 
+ &lt;p&gt;&lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693415_1" data-bbfile="{&amp;quot;alternativeText&amp;quot;:&amp;quot;Neuron&amp;quot;,&amp;quot;linkName&amp;quot;:&amp;quot;final neuron.png&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;image/png&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;final neuron.png&lt;/a&gt;&lt;/p&gt; 
+ &lt;p&gt;In the above image of an artificial&amp;nbsp; neuron, assume the node has three inputs x = (x1, x2, x3) that receive only binary signals&lt;/p&gt; 
+ &lt;div&gt;
+   (either 0 or 1). How many different input patterns this node can receive? 
+ &lt;/div&gt; 
+ &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-1]&lt;/a&gt; 
+ &lt;div&gt;
+   Suppose that the weights corresponding 
+ &lt;/div&gt; 
+ &lt;div&gt;
+   to the three inputs have the following values: 
+  &lt;div&gt;
+    w1 =&amp;nbsp; &amp;nbsp;1 
+  &lt;/div&gt; 
+  &lt;div&gt;
+    w2 = −2 
+  &lt;/div&gt; 
+  &lt;div&gt;
+    w3 =&amp;nbsp; &amp;nbsp;4 
+  &lt;/div&gt; 
+ &lt;/div&gt; 
+ &lt;div&gt;
+   and the activation of the unit is given by the step-function. 
+ &lt;/div&gt; 
+ &lt;div&gt;
+   What would be the value of y for each of the following input patterns: 
+ &lt;/div&gt; 
+ &lt;div&gt; 
+  &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-2]&lt;/a&gt;&amp;nbsp; = 
+  &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-3]&lt;/a&gt; 
+ &lt;/div&gt; 
+ &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-4]&lt;/a&gt; 
+ &lt;p&gt;&lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-5]&lt;/a&gt;&amp;nbsp; = &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-6]&lt;/a&gt;&lt;/p&gt; 
+ &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-7]&lt;/a&gt; 
+ &lt;p&gt;&lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-8]&lt;/a&gt;&amp;nbsp; = &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-9]&lt;/a&gt;&lt;/p&gt; 
+ &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-10]&lt;/a&gt; 
+ &lt;p&gt;&lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-11]&lt;/a&gt;&amp;nbsp; = &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-12]&lt;/a&gt;&lt;/p&gt; 
+ &lt;a data-bbtype="customClass" data-bbfile="{&amp;quot;className&amp;quot;:&amp;quot;fimb-answer-value&amp;quot;}"&gt;[BLANK-13]&lt;/a&gt; 
+&lt;/div&gt;</mat_formattedtext></mat_extension></material></flow></flow><flow class="RESPONSE_BLOCK"><response_str ident="BLANK-1" rcardinality="Single" rtiming="No"><render_fib charset="us-ascii" encoding="UTF_8" rows="0" columns="0" maxchars="0" prompt="Box" fibtype="String" minnumber="0" maxnumber="0"/></response_str><response_str ident="BLANK-2" rcardinality="Single" rtiming="No"><render_fib charset="us-ascii" encoding="UTF_8" rows="0" columns="0" maxchars="0" prompt="Box" fibtype="String" minnumber="0" maxnumber="0"/></response_str><response_str ident="BLANK-3" rcardinality="Single" rtiming="No"><render_fib charset="us-ascii" encoding="UTF_8" rows="0" columns="0" maxchars="0" prompt="Box" fibtype="String" minnumber="0" maxnumber="0"/></response_str><response_str ident="BLANK-4" rcardinality="Single" rtiming="No"><render_fib charset="us-ascii" encoding="UTF_8" rows="0" columns="0" maxchars="0" prompt="Box" fibtype="String" minnumber="0" maxnumber="0"/></response_str><response_str ident="BLANK-5" rcardinality="Single" rtiming="No"><render_fib charset="us-ascii" encoding="UTF_8" rows="0" columns="0" maxchars="0" prompt="Box" fibtype="String" minnumber="0" maxnumber="0"/></response_str></flow></flow></presentation><resprocessing scoremodel="SumOfScores"><outcomes><decvar varname="SCORE" vartype="Decimal" defaultval="0.0" minvalue="0.0" maxvalue="15.000000000"/></outcomes><respcondition title="correct"><conditionvar><and><or><varequal respident="BLANK-1" case="No">8</varequal></or><or><varequal respident="BLANK-2" case="No">1</varequal></or><or><varequal respident="BLANK-3" case="No">1</varequal></or><or><varequal respident="BLANK-4" case="No">1</varequal></or><or><varequal respident="BLANK-5" case="No">1</varequal></or></and></conditionvar><setvar variablename="SCORE" action="Set">20.0</setvar><displayfeedback linkrefid="correct" feedbacktype="Response"/></respcondition><respcondition title="incorrect"><conditionvar><other/></conditionvar><setvar variablename="SCORE" action="Set">0.0</setvar><displayfeedback linkrefid="incorrect" feedbacktype="Response"/></respcondition></resprocessing><itemfeedback ident="correct" view="All"><flow_mat class="Block"><flow_mat class="FORMATTED_TEXT_BLOCK"><material><mat_extension><mat_formattedtext type="HTML"/></mat_extension></material></flow_mat></flow_mat></itemfeedback><itemfeedback ident="incorrect" view="All"><flow_mat class="Block"><flow_mat class="FORMATTED_TEXT_BLOCK"><material><mat_extension><mat_formattedtext type="HTML"/></mat_extension></material></flow_mat></flow_mat></itemfeedback></item></section></assessment></questestinterop>

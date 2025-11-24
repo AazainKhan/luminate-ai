@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONTENT id="_800706_1"><TITLE value="Lab tutorial Perceptron &amp; stochastic gradient descent"/><TITLECOLOR
+  value="#000000"/><DESCRIPTION
+   value="Content and Activity Page&#xa;Lab tutorial&#xa;Overview&#xa;In this lab tutorial we will go over all the concepts explained in the topical using a public data set of 208 observations, that describes sonar chirp returns bouncing off different services. The 60 input variables are the strength of the returns at different angles.&#xa;The tutorial is prepared by Jason Brownlee (link in references). It is a binary classification problem that requires a model to differentiate rocks from metal cylinders.&#xa;We will use python,numpy and os to carry out the following steps:&#xa;build a perceptron from scratch.&#xa;learn the weights using stochastic gradient descent.&#xa;simple data pre-processing.&#xa;Building the model and validation the model using k-fold validation and generatin..."/><BODY><TEXT>&lt;!-- {"bbMLEditorVersion":1} --&gt;&lt;div&gt; 
+ &lt;h4&gt;Lab tutorial&lt;/h4&gt; 
+ &lt;h5&gt;Overview&lt;/h5&gt; 
+ &lt;p&gt;In this lab tutorial we will go over all the concepts explained in the topical using a public data set of 208 observations, that describes sonar chirp returns bouncing off different services. The 60 input variables are the strength of the returns at different angles.&lt;/p&gt; 
+ &lt;p&gt;The tutorial is prepared by&amp;nbsp; &lt;em&gt;Jason Brownlee&lt;/em&gt;&amp;nbsp; (link in references). It is a binary classification problem that requires a model to differentiate rocks from metal cylinders.&amp;nbsp;&lt;/p&gt; 
+ &lt;p&gt;We will use python,numpy and os&amp;nbsp; to carry out the following steps:&lt;/p&gt; 
+ &lt;ol&gt; 
+  &lt;li&gt;build a perceptron from scratch.&lt;/li&gt; 
+  &lt;li&gt;learn the weights using stochastic gradient descent.&lt;/li&gt; 
+  &lt;li&gt;simple data pre-processing.&lt;/li&gt; 
+  &lt;li&gt;Building the model and validation the model using k-fold validation and generating the accuracy for the model.&lt;/li&gt; 
+ &lt;/ol&gt; 
+ &lt;p&gt;We will not be using a data frame in this lab to load the data rather a list of lists , which will be interesting.&lt;img src="https://s.brightspace.com/lib/emoticons/1.0.0/blush-light.svg" alt="blush with light skin tone emoticon"&gt;&lt;/p&gt; 
+ &lt;p&gt;Download the data set and script and follow the video.&lt;/p&gt; 
+ &lt;h5&gt;Data&lt;/h5&gt; 
+ &lt;p&gt;You can download the data for this lab tutorial from&lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693141_1" data-bbfile="{&amp;quot;linkName&amp;quot;:&amp;quot;sonar_all_data.csv&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;application/octet-stream&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt; here&lt;/a&gt;. Or from the UCI machine learning repository ( link in the references).&lt;/p&gt; 
+ &lt;h5&gt;Script(s)&lt;/h5&gt; 
+ &lt;p&gt;You can download the python&amp;nbsp; script for make prediction from &lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693143_1" data-bbfile="{&amp;quot;linkName&amp;quot;:&amp;quot;make_prediction.py&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;application/octet-stream&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt; here&lt;/a&gt;.&lt;/p&gt; 
+ &lt;p&gt;You can download the python&amp;nbsp; script for train weights from &lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693144_1" data-bbfile="{&amp;quot;linkName&amp;quot;:&amp;quot;train_weights.py&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;application/octet-stream&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;here&lt;/a&gt;.&lt;/p&gt; 
+ &lt;p&gt;You can download the python script for perceptron&amp;nbsp; from &lt;a href="@X@EmbeddedFile.requestUrlStub@X@bbcswebdav/xid-1693145_1" data-bbfile="{&amp;quot;linkName&amp;quot;:&amp;quot;perceptron.py&amp;quot;,&amp;quot;mimeType&amp;quot;:&amp;quot;application/octet-stream&amp;quot;,&amp;quot;render&amp;quot;:&amp;quot;inline&amp;quot;}"&gt;here&lt;/a&gt;.&lt;/p&gt; 
+ &lt;h5&gt;Video(s)&lt;/h5&gt; 
+ &lt;p&gt;Please watch these videos in order:&lt;/p&gt; 
+ &lt;p&gt;&lt;strong&gt;&lt;span style="color: #000000;"&gt;Make predictions&lt;/span&gt;&lt;/strong&gt;&lt;/p&gt; 
+ &lt;p&gt;&lt;strong&gt;&lt;span style="color: #000000;"&gt;&lt;a href="https://mediasite.centennialcollege.ca/Mediasite/Play/637d4269285041eba0a7a40a34bb3db91d" data-bbtype="video" data-bbfile="{&amp;quot;src&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/637d4269285041eba0a7a40a34bb3db91d&amp;quot;,&amp;quot;alt&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/637d4269285041eba0a7a40a34bb3db91d&amp;quot;}"&gt;https://mediasite.centennialcollege.ca/Mediasite/Play/637d4269285041eba0a7a40a34bb3db91d&lt;/a&gt;&lt;/span&gt;&lt;/strong&gt;&lt;/p&gt; 
+ &lt;p&gt;&lt;span style="color: #000000;"&gt;&lt;strong&gt;Train weights&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt; 
+ &lt;p&gt;&lt;span style="color: #000000;"&gt;&lt;strong&gt;&lt;a href="https://mediasite.centennialcollege.ca/Mediasite/Play/0fc768f7c5804452bff31e0d0293d9a61d" data-bbtype="video" data-bbfile="{&amp;quot;src&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/0fc768f7c5804452bff31e0d0293d9a61d&amp;quot;,&amp;quot;alt&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/0fc768f7c5804452bff31e0d0293d9a61d&amp;quot;}"&gt;https://mediasite.centennialcollege.ca/Mediasite/Play/0fc768f7c5804452bff31e0d0293d9a61d&lt;/a&gt;&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt; 
+ &lt;h6&gt;&lt;span style="color: #000000;"&gt;&lt;strong&gt;Perceptron on the "Sonar" data-set from UCI&lt;/strong&gt;&lt;/span&gt;&lt;/h6&gt; 
+ &lt;p&gt;&lt;span style="color: #000000;"&gt;&lt;strong&gt;&lt;a href="https://mediasite.centennialcollege.ca/Mediasite/Play/858c442735b34095ab23f8fb8a36854b1d" data-bbtype="video" data-bbfile="{&amp;quot;src&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/858c442735b34095ab23f8fb8a36854b1d&amp;quot;,&amp;quot;alt&amp;quot;:&amp;quot;https://mediasite.centennialcollege.ca/Mediasite/Play/858c442735b34095ab23f8fb8a36854b1d&amp;quot;}"&gt;https://mediasite.centennialcollege.ca/Mediasite/Play/858c442735b34095ab23f8fb8a36854b1d&lt;/a&gt;&lt;/strong&gt;&lt;/span&gt;&lt;/p&gt; 
+  
+ &lt;h6&gt;References&lt;/h6&gt; 
+ &lt;ol&gt; 
+  &lt;li&gt;&lt;a href="https://machinelearningmastery.com/implement-perceptron-algorithm-scratch-python/"&gt;https://machinelearningmastery.com/implement-perceptron-algorithm-scratch-python/&lt;/a&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;a href="https://archive.ics.uci.edu/ml/datasets/Connectionist+Bench+%28Sonar%2C+Mines+vs.+Rocks%29"&gt;https://archive.ics.uci.edu/ml/datasets/Connectionist+Bench+%28Sonar%2C+Mines+vs.+Rocks%29&lt;/a&gt;&lt;/li&gt; 
+ &lt;/ol&gt; 
+  
+  
+  
+&lt;/div&gt;</TEXT><TYPE
+   value="H"/></BODY><DATES><CREATED value="2024-10-04 18:31:46 EDT"/><UPDATED value="2024-10-10 12:30:57 EDT"/><START
+   value=""/><END value=""/></DATES><FLAGS><ISAVAILABLE value="true"/><ISFROMCARTRIDGE value="false"/><ISFOLDER
+   value="false"/><ISDESCRIBED value="false"/><ISTRACKED value="true"/><ISLESSON value="false"/><ISSEQUENTIAL
+   value="false"/><ALLOWGUESTS value="true"/><ALLOWOBSERVERS value="true"/><LAUNCHINNEWWINDOW
+   value="false"/><ISREVIEWABLE value="false"/><ISGROUPCONTENT value="false"/><ISSAMPLECONTENT
+   value="false"/><PARTIALLYVISIBLE value="false"/><HASTHUMBNAIL value="false"/></FLAGS><CONTENTHANDLER
+  value="resource/x-bb-document"/><RENDERTYPE value="REGULAR"/><FOLDERTYPE value=""/><URL value=""/><VIEWMODE
+  value="TEXT_ICON_ONLY"/><OFFLINENAME value=""/><OFFLINEPATH value=""/><LINKREF value=""/><PARENTID
+  value="_800528_1"/><REVIEWABLEREASON value="NONE"/><VERSION value="3"/><THUMBNAILALT value=""/><AISTATE
+  value="No"/><AIACCEPTINGUSER value=""/><EXTENDEDDATA/><FILES/></CONTENT>

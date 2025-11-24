@@ -24,9 +24,7 @@ services:
     depends_on:
       - memory_store
       - cache_layer
-      # Langfuse disabled for MVP (optional observability)
-      # - observer
-      # - langfuse_worker
+      - observer
     networks:
       - luminate_network
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
@@ -55,66 +53,69 @@ services:
       - luminate_network
     command: redis-server --appendonly yes
 
-  # Langfuse Observer - Disabled for MVP (optional observability)
-  # Uncomment and configure ClickHouse authentication if needed
-  # observer:
-  #   image: langfuse/langfuse:latest
-  #   container_name: observer
-  #   ports:
-  #     - "3000:3000"
-  #   environment:
-  #     - DATABASE_URL=postgresql://langfuse:langfuse@postgres:5432/langfuse
-  #     - NEXTAUTH_SECRET=langfuse-secret-key-change-in-production-dev-only
-  #     - NEXTAUTH_URL=http://localhost:3000
-  #     - SALT=langfuse-salt-change-in-production-dev-only
-  #     - ENCRYPTION_KEY=langfuse-encryption-key-dev-only-32-chars-long
-  #     - CLICKHOUSE_URL=http://clickhouse:8123
-  #     - CLICKHOUSE_USER=default
-  #     - CLICKHOUSE_PASSWORD=''
-  #     - CLICKHOUSE_DB=default
-  #     - CLICKHOUSE_MIGRATION_URL=clickhouse://default@clickhouse:9000
-  #     - CLICKHOUSE_MIGRATION_SSL=false
-  #     - REDIS_CONNECTION_STRING=redis://cache_layer:6379
-  #     - LANGFUSE_S3_EVENT_UPLOAD_BUCKET=langfuse-events
-  #     - LANGFUSE_S3_ENDPOINT=http://minio:9000
-  #     - LANGFUSE_S3_ACCESS_KEY_ID=minioadmin
-  #     - LANGFUSE_S3_SECRET_ACCESS_KEY=minioadmin
-  #     - LANGFUSE_S3_BUCKET_REGION=us-east-1
-  #     - LANGFUSE_S3_FORCE_PATH_STYLE=true
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     clickhouse:
-  #       condition: service_healthy
-  #     cache_layer:
-  #       condition: service_started
-  #     minio:
-  #       condition: service_started
-  #   networks:
-  #     - luminate_network
-  #   healthcheck:
-  #     test: ["CMD", "curl", "-f", "http://localhost:3000/api/public/health"]
-  #     interval: 30s
-  #     timeout: 10s
-  #     retries: 3
+  # Langfuse Observer
+  observer:
+    image: langfuse/langfuse:latest
+    container_name: observer
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://langfuse:langfuse@postgres:5432/langfuse
+      - NEXTAUTH_SECRET=langfuse-secret-key-change-in-production-dev-only
+      - NEXTAUTH_URL=http://localhost:3000
+      - SALT=langfuse-salt-change-in-production-dev-only
+      - ENCRYPTION_KEY=f2629bf18db32d7d4c1bf14f5b206f1d7ab0c472e154a2ab02609bff46def385
+      - CLICKHOUSE_URL=http://clickhouse:8123
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=default
+      - CLICKHOUSE_DB=default
+      - CLICKHOUSE_MIGRATION_URL=clickhouse://default:default@clickhouse:9000
+      - CLICKHOUSE_MIGRATION_SSL=false
+      - CLICKHOUSE_CLUSTER_ENABLED=false
+      - REDIS_CONNECTION_STRING=redis://cache_layer:6379
+      - LANGFUSE_S3_EVENT_UPLOAD_BUCKET=langfuse-events
+      - LANGFUSE_S3_ENDPOINT=http://minio:9000
+      - LANGFUSE_S3_ACCESS_KEY_ID=minioadmin
+      - LANGFUSE_S3_SECRET_ACCESS_KEY=minioadmin
+      - LANGFUSE_S3_BUCKET_REGION=us-east-1
+      - LANGFUSE_S3_FORCE_PATH_STYLE=true
+      - LANGFUSE_WORKER_HOST=langfuse_worker
+      - LANGFUSE_WORKER_PASSWORD=worker-secret-change-in-production
+    depends_on:
+      postgres:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
+      cache_layer:
+        condition: service_started
+      minio:
+        condition: service_started
+    networks:
+      - luminate_network
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:3000/api/public/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
-  # Langfuse Worker - Disabled for MVP (optional observability)
+  # Langfuse Worker (disabled - integrated into observer in latest version)
   # langfuse_worker:
   #   image: langfuse/langfuse:latest
   #   container_name: langfuse_worker
-  #   entrypoint: ["node", "dist/worker/index.js"]
+  #   entrypoint: ["node", "/app/web/.next/standalone/worker/index.js"]
   #   environment:
   #     - DATABASE_URL=postgresql://langfuse:langfuse@postgres:5432/langfuse
   #     - NEXTAUTH_SECRET=langfuse-secret-key-change-in-production-dev-only
   #     - NEXTAUTH_URL=http://localhost:3000
   #     - SALT=langfuse-salt-change-in-production-dev-only
-  #     - ENCRYPTION_KEY=langfuse-encryption-key-dev-only-32-chars-long
+  #     - ENCRYPTION_KEY=f2629bf18db32d7d4c1bf14f5b206f1d7ab0c472e154a2ab02609bff46def385
   #     - CLICKHOUSE_URL=http://clickhouse:8123
   #     - CLICKHOUSE_USER=default
-  #     - CLICKHOUSE_PASSWORD=''
+  #     - CLICKHOUSE_PASSWORD=default
   #     - CLICKHOUSE_DB=default
-  #     - CLICKHOUSE_MIGRATION_URL=clickhouse://default@clickhouse:9000
+  #     - CLICKHOUSE_MIGRATION_URL=clickhouse://default:default@clickhouse:9000
   #     - CLICKHOUSE_MIGRATION_SSL=false
+  #     - CLICKHOUSE_CLUSTER_ENABLED=false
   #     - REDIS_CONNECTION_STRING=redis://cache_layer:6379
   #     - LANGFUSE_S3_EVENT_UPLOAD_BUCKET=langfuse-events
   #     - LANGFUSE_S3_ENDPOINT=http://minio:9000
