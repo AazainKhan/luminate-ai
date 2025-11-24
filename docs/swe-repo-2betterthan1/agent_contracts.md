@@ -12,7 +12,7 @@ class AgentState(TypedDict):
     user_id: Optional[str]
     user_email: Optional[str]
     intent: str                                    # Router output: "fast", "coder", "reasoning"
-    model_selected: str                            # "gemini-2.0-flash", "claude-3-5-sonnet"
+    model_selected: str                            # Allowed: "gemini-2.0-flash", "gemini-1.5-pro-001", Groq model (e.g., "llama-3.1-70b-versatile")
     retrieved_context: List[dict]                  # From ChromaDB
     governor_approved: bool                        # Must be True to proceed
     response: Optional[str]                        # Final output
@@ -50,3 +50,7 @@ The `Governor` node enforces 3 invariants. **Do not bypass.**
 -   **Embedding Dimension:** 768 (Gemini Embedding 001)
 -   **Metadata Fields:** `source_filename`, `page_number`, `course_id`.
 
+## 5. LLM Providers (Allowed Only)
+- **Gemini (primary):** `gemini-2.0-flash`, `gemini-1.5-pro-001` for chat; `models/embedding-001` for embeddings.
+- **Groq (optional inference):** e.g., `llama-3.1-70b-versatile` if wired into supervisor.  
+- **Not permitted:** Remove or disable references to other providers/models to avoid 404s and drift.***
