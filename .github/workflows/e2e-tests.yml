@@ -1,0 +1,89 @@
+name: E2E Tests
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'extension/**'
+      - 'backend/**'
+      - '.github/workflows/e2e-tests.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'extension/**'
+      - 'backend/**'
+
+jobs:
+  e2e-tests:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
+
+      - name: Get pnpm store directory
+        shell: bash
+        run: |
+          echo "STORE_PATH=$(pnpm store path --silent)" >> $GITHUB_ENV
+
+      - name: Setup pnpm cache
+        uses: actions/cache@v4
+        with:
+          path: ${{ env.STORE_PATH }}
+          key: ${{ runner.os }}-pnpm-store-${{ hashFiles('**/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-pnpm-store-
+
+      - name: Install extension dependencies
+        run: |
+          cd extension
+          pnpm install
+
+      - name: Build extension
+        run: |
+          cd extension
+          pnpm build
+        env:
+          PLASMO_PUBLIC_SUPABASE_URL: ${{ secrets.PLASMO_PUBLIC_SUPABASE_URL }}
+          PLASMO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PLASMO_PUBLIC_SUPABASE_ANON_KEY }}
+          PLASMO_PUBLIC_API_URL: ${{ secrets.PLASMO_PUBLIC_API_URL }}
+
+      - name: Setup Chrome
+        uses: browser-actions/setup-chrome@v1
+        with:
+          chrome-version: stable
+
+      - name: Create test output directory
+        run: mkdir -p extension/test-output/screenshots
+
+      - name: Run E2E tests
+        run: |
+          cd extension
+          pnpm test:e2e
+        continue-on-error: true
+
+      - name: Upload test screenshots
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-screenshots
+          path: extension/test-output/screenshots/
+          retention-days: 7
+
+      - name: Upload test results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: e2e-results
+          path: extension/wdio-logs/
+          retention-days: 7

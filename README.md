@@ -1,104 +1,289 @@
 # Luminate AI Course Marshal
 
-Agentic AI tutoring platform for Centennial College COMP 237 course, delivered as a Chrome Extension.
+<div align="center">
+
+![Luminate AI](https://img.shields.io/badge/Luminate-AI-6366f1?style=for-the-badge)
+![Chrome Extension](https://img.shields.io/badge/Chrome-Extension-4285F4?style=for-the-badge&logo=googlechrome&logoColor=white)
+![Python](https://img.shields.io/badge/Python-3.11+-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![TypeScript](https://img.shields.io/badge/TypeScript-5.0-3178C6?style=for-the-badge&logo=typescript&logoColor=white)
+
+**Agentic AI Tutoring Platform for Centennial College COMP 237**
+
+[Quick Start](#-quick-start) • [Architecture](#-architecture) • [For AI Agents](#-for-ai-agents) • [Documentation](#-documentation)
+
+</div>
+
+---
+
+## 🎯 What is This?
+
+Luminate AI is an intelligent tutoring system delivered as a Chrome Extension. It uses a **Governor-Agent pattern** with LangGraph to:
+
+- ✅ Provide Socratic, scaffolded tutoring for AI concepts
+- ✅ Enforce academic integrity (no full solutions to assignments)
+- ✅ Auto-detect student intent and route to specialized agents
+- ✅ Track student mastery and adapt teaching approach
+
+---
 
 ## 🚀 Quick Start
 
 ### Prerequisites
 
-- Node.js 18+ and npm
-- Python 3.11+
-- Docker and Docker Compose
-- Chrome browser
+| Tool | Version | Check |
+|------|---------|-------|
+| Node.js | 18+ | `node --version` |
+| Python | 3.11+ | `python --version` |
+| Docker | Latest | `docker --version` |
+| pnpm | 8+ | `pnpm --version` |
+| Chrome | Latest | - |
 
-### Setup Steps
+### 1. Clone & Install
 
-1. **Install Dependencies**
+```bash
+# Clone the repository
+git clone https://github.com/AazainKhan/luminate-ai.git
+cd luminate-ai
 
-   ```bash
-   # Backend
-   cd backend
-   python -m venv venv
-   source venv/bin/activate  # Windows: venv\Scripts\activate
-   pip install -r requirements.txt
-   
-   # Extension
-   cd ../extension
-   npm install
-   ```
+# Backend
+cd backend
+python -m venv venv
+source venv/bin/activate  # Windows: venv\Scripts\activate
+pip install -r requirements.txt
 
-2. **Environment Variables**
+# Extension
+cd ../extension
+pnpm install
+```
 
-   Environment files are already configured:
-   - `backend/.env` - Backend configuration (Supabase, API keys)
-   - `extension/.env.local` - Extension configuration (Supabase, API URL)
+### 2. Environment Setup
 
-3. **Start Docker Services**
+Create environment files:
 
-   ```bash
-   docker-compose up -d
-   ```
+**`backend/.env`**
+```env
+SUPABASE_URL=https://your-project.supabase.co
+SUPABASE_KEY=your-anon-key
+SUPABASE_JWT_SECRET=your-jwt-secret
+GOOGLE_API_KEY=your-gemini-key
+ANTHROPIC_API_KEY=your-claude-key
+E2B_API_KEY=your-e2b-key
+CHROMADB_HOST=localhost
+CHROMADB_PORT=8001
+```
 
-   This starts:
-   - FastAPI backend (http://localhost:8000)
-   - ChromaDB (http://localhost:8001)
-   - Redis (port 6379)
-   - Langfuse (http://localhost:3000)
+**`extension/.env.local`**
+```env
+PLASMO_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+PLASMO_PUBLIC_SUPABASE_ANON_KEY=your-anon-key
+PLASMO_PUBLIC_API_URL=http://localhost:8000
+```
 
-4. **Start Backend** (if not using Docker)
+### 3. Start Services
 
-   ```bash
-   cd backend
-   source venv/bin/activate
-   uvicorn main:app --reload
-   ```
+```bash
+# Terminal 1: Docker services (ChromaDB, Redis, Langfuse)
+docker-compose up -d
 
-5. **Build Extension**
+# Terminal 2: Backend
+cd backend
+source venv/bin/activate
+uvicorn main:app --reload
 
-   ```bash
-   cd extension
-   npm run dev
-   ```
+# Terminal 3: Extension (dev mode with HMR)
+cd extension
+pnpm dev
+```
 
-6. **Load Extension in Chrome**
+### 4. Load Extension
 
-   - Open Chrome → `chrome://extensions/`
-   - Enable "Developer mode"
-   - Click "Load unpacked"
-   - Select the `extension` directory
+1. Open Chrome → `chrome://extensions/`
+2. Enable **Developer mode**
+3. Click **Load unpacked**
+4. Select `extension/build/chrome-mv3-dev/`
+5. Click the Luminate icon → Open Side Panel
 
-## 📁 Project Structure
+---
+
+## 🏗️ Architecture
+
+### Agent Pipeline (LangGraph)
+
+```
+                           USER QUERY
+                               │
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    🛡️ GOVERNOR NODE                          │
+│  Enforces 3 Laws:                                            │
+│  • Law 1: Scope (COMP 237 topics only)                      │
+│  • Law 2: Integrity (no full solutions)                     │
+│  • Law 3: Mastery (verify understanding)                    │
+└──────────────────────────────┬───────────────────────────────┘
+                               ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    🎯 SUPERVISOR NODE                         │
+│  Auto-routes to specialized agents:                          │
+│                                                              │
+│  ┌────────┬────────┬────────┬──────────┬────────┐           │
+│  │ tutor  │  math  │ coder  │ syllabus │  fast  │           │
+│  └───┬────┴───┬────┴───┬────┴────┬─────┴───┬────┘           │
+└──────┼────────┼────────┼─────────┼─────────┼─────────────────┘
+       ▼        ▼        ▼         ▼         ▼
+┌──────────┐ ┌──────┐ ┌───────┐ ┌───────┐ ┌───────┐
+│PEDAGOGICAL│ │ MATH │ │ CODE  │ │  RAG  │ │GEMINI │
+│  TUTOR   │ │AGENT │ │ AGENT │ │SEARCH │ │ FLASH │
+│          │ │      │ │       │ │       │ │       │
+│ Socratic │ │LaTeX │ │Claude │ │ChromaDB│ │ Quick │
+│Scaffolding││Derive│ │Sonnet │ │       │ │Answer │
+└────┬─────┘ └──┬───┘ └───┬───┘ └───┬───┘ └───┬───┘
+     └──────────┴─────────┴─────────┴─────────┘
+                          │
+                          ▼
+┌──────────────────────────────────────────────────────────────┐
+│                    ✅ EVALUATOR NODE                          │
+│  • Tracks student mastery                                    │
+│  • May loop back for follow-up questions                     │
+│  • Logs intent, agent_used, scaffolding_level                │
+└──────────────────────────────────────────────────────────────┘
+                          │
+                          ▼
+                   RESPONSE TO USER
+```
+
+### Tech Stack
+
+| Layer | Technologies |
+|-------|-------------|
+| **Frontend** | Plasmo, React 18, TypeScript, Tailwind CSS, Shadcn UI |
+| **Backend** | FastAPI, LangGraph, LangChain, Pydantic V2 |
+| **AI Models** | Gemini 1.5 Pro/Flash, Claude 3.5 Sonnet |
+| **Vector DB** | ChromaDB with Gemini Embeddings |
+| **Database** | Supabase (PostgreSQL + Auth + RLS) |
+| **Infra** | Docker, GitHub Actions, E2B (code sandbox) |
+
+### Project Structure
 
 ```
 luminate-ai/
-├── extension/          # Plasmo Chrome Extension
-│   ├── src/
-│   │   ├── sidepanel.tsx          # Student chat interface
-│   │   ├── admin-sidepanel.tsx    # Admin dashboard
-│   │   ├── components/            # React components
-│   │   └── lib/                   # Utilities (Supabase, API)
-│   └── package.json
-├── backend/            # FastAPI + LangGraph backend
+├── backend/                    # FastAPI + LangGraph
 │   ├── app/
-│   │   ├── agents/               # LangGraph agent definitions
-│   │   ├── api/                  # FastAPI routes
-│   │   ├── etl/                  # ETL pipeline
-│   │   ├── rag/                  # RAG & vector store
-│   │   └── tools/                 # Agent tools (E2B, etc.)
-│   ├── main.py
-│   └── requirements.txt
-├── docs/               # Documentation
-├── features/           # Feature documentation (numbered)
-├── raw_data/          # COMP 237 course materials
-└── docker-compose.yml  # Local development stack
+│   │   ├── agents/            # LangGraph nodes & state
+│   │   │   ├── tutor_agent.py      # Main entry point
+│   │   │   ├── governor.py         # Policy enforcement
+│   │   │   ├── supervisor.py       # Intent routing
+│   │   │   ├── pedagogical_tutor.py # Socratic scaffolding
+│   │   │   ├── math_agent.py       # Math derivations
+│   │   │   └── state.py            # AgentState TypedDict
+│   │   ├── api/routes/        # FastAPI endpoints
+│   │   ├── etl/               # Blackboard ETL pipeline
+│   │   ├── rag/               # ChromaDB client
+│   │   └── tools/             # E2B code execution
+│   └── main.py
+│
+├── extension/                  # Plasmo Chrome Extension
+│   ├── src/
+│   │   ├── sidepanel.tsx      # Student chat UI
+│   │   ├── admin-sidepanel.tsx # Faculty dashboard
+│   │   ├── components/        # React components
+│   │   └── hooks/             # useAuth, useChat
+│   └── test/e2e/              # WebdriverIO E2E tests
+│
+├── docs/                       # Documentation
+│   ├── agent-chain/           # 🤖 AI Agent continuity
+│   │   ├── CURRENT_STATUS.md  # READ FIRST
+│   │   ├── COMPLETED_WORK.md  # History log
+│   │   ├── DECISION_LOG.md    # ADRs
+│   │   └── KNOWN_ISSUES.md    # Bugs & debt
+│   ├── for-next-agent/        # Detailed handover
+│   └── migrations/            # SQL migrations
+│
+├── features/                   # Feature specs (01-11)
+├── .github/workflows/          # CI/CD
+└── docker-compose.yml
 ```
+
+---
+
+## 🤖 For AI Agents
+
+> **This project uses an agent chain system for continuous AI collaboration.**
+
+### First Steps (EVERY Session)
+
+```bash
+# 1. Pull latest and read status
+git pull origin main
+cat docs/agent-chain/CURRENT_STATUS.md
+
+# 2. Check recent changes
+git log --oneline -10
+
+# 3. Run health check
+cd backend && source venv/bin/activate
+python -c "from app.agents.tutor_agent import run_agent; print('✅ Agent OK')"
+```
+
+### Before Ending Session
+
+```bash
+# 1. Commit your changes
+git add -A
+git commit -m "<type>(<scope>): <description>"
+
+# 2. Update docs/agent-chain/CURRENT_STATUS.md
+
+# 3. Push
+git push origin main
+```
+
+### Documentation Map
+
+| What You Need | Where to Look |
+|---------------|---------------|
+| **Live Status** | `docs/agent-chain/CURRENT_STATUS.md` |
+| **Full Context** | `docs/for-next-agent/HANDOVER.md` |
+| **Architecture Decisions** | `docs/agent-chain/DECISION_LOG.md` |
+| **Known Bugs** | `docs/agent-chain/KNOWN_ISSUES.md` |
+| **Coding Guidelines** | `.github/copilot-instructions.md` |
+
+---
 
 ## 🔐 Authentication
 
-- **Students**: Email ending with `@my.centennialcollege.ca`
-- **Admins**: Email ending with `@centennialcollege.ca`
+| Role | Email Domain | Access |
+|------|--------------|--------|
+| **Student** | `@my.centennialcollege.ca` | Chat, study tools |
+| **Admin** | `@centennialcollege.ca` | Chat + file upload + analytics |
 
 Uses Supabase passwordless OTP authentication.
+
+---
+
+## 🧪 Testing
+
+### Backend Tests
+
+```bash
+cd backend
+source venv/bin/activate
+
+# Test intent routing
+python -c "from app.agents.supervisor import Supervisor; s = Supervisor(); print(s.route_intent('Explain gradient descent'))"
+
+# Test full agent
+python -c "from app.agents.tutor_agent import run_agent; print(run_agent('What is backpropagation?'))"
+```
+
+### E2E Tests
+
+```bash
+cd extension
+pnpm build
+pnpm test:e2e
+```
+
+---
 
 ## 🎯 Features
 
@@ -111,32 +296,39 @@ Uses Supabase passwordless OTP authentication.
 - ✅ Generative UI (quizzes, code blocks, visualizations)
 - ✅ Blackboard ETL pipeline
 
-## 🛠️ Tech Stack
-
-- **Frontend**: Plasmo, React, TypeScript, Tailwind CSS, Shadcn UI
-- **Backend**: Python 3.11, FastAPI, LangGraph, Pydantic V2
-- **AI**: Gemini 1.5 Pro/Flash, Claude 3.5 Sonnet
-- **Database**: Supabase (Postgres + Auth), ChromaDB (Vector)
-- **Infrastructure**: Docker, Docker Compose
-
-## 📝 Development
-
-See [SETUP.md](./SETUP.md) for detailed development setup and troubleshooting.
-
-## 🔒 Security Notes
-
-- `.env` files are gitignored - never commit API keys
-- Row Level Security (RLS) enabled on Supabase tables
-- JWT token validation on all backend endpoints
-- Role-based access control (student/admin)
+---
 
 ## 📚 Documentation
 
-- [PRD](./docs/PRD.md) - Product Requirements Document
-- [Setup Guide](./SETUP.md) - Detailed setup instructions
-- [Project Status](./PROJECT_STATUS.md) - Current project status and implementation details
-- [Feature Docs](./features/) - Numbered feature documentation
+| Document | Description |
+|----------|-------------|
+| [SETUP.md](./SETUP.md) | Detailed setup & troubleshooting |
+| [PROJECT_STATUS.md](./PROJECT_STATUS.md) | Implementation status |
+| [PRD.md](./docs/PRD.md) | Product Requirements |
+| [HANDOVER.md](./docs/for-next-agent/HANDOVER.md) | Agent handover notes |
+| [Database Schema](./docs/database_schema.sql) | Supabase tables |
+| [Feature Specs](./features/) | Numbered feature docs |
+
+---
+
+## 🔒 Security
+
+- ✅ Environment files are gitignored - never commit API keys
+- ✅ Row Level Security (RLS) on all Supabase tables
+- ✅ JWT validation on all API endpoints
+- ✅ Role-based access control (student/admin)
+- ✅ E2B sandboxed code execution
+
+---
 
 ## 📄 License
 
 Proprietary - Centennial College Internal Use
+
+---
+
+<div align="center">
+
+**Built with ❤️ for COMP 237 students**
+
+</div>

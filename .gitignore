@@ -1,10 +1,105 @@
-# put the venv folder in the gitignore
+# ==========================================
+# Luminate AI - Comprehensive .gitignore
+# ==========================================
+
+# ============ Python ============
 venv/
+.venv/
 __pycache__/
 *.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+.pytest_cache/
+*.egg-info/
+.eggs/
+dist/
+build/
+*.egg
+.mypy_cache/
+.ruff_cache/
+
+# ============ Node.js ============
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-store/
+
+# ============ Environment ============
 .env
 .env.local
-backend/data
-backend/cleaned_data
-chroma_db/
+.env.*.local
+.env.development
+.env.production
+*.local
+
+# ============ IDE & Editors ============
+.idea/
+.vscode/
+*.swp
+*.swo
+*.swn
+*~
+.project
+.classpath
+.settings/
+
+# ============ OS Files ============
 .DS_Store
+.DS_Store?
+._*
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# ============ Backend Specific ============
+backend/data/
+backend/cleaned_data/
+backend/chroma_db/
+backend/test_output/
+backend/*.log
+chroma_db/
+
+# ============ Extension Specific ============
+extension/build/
+extension/.plasmo/
+extension/dist/
+extension/test-output/
+extension/wdio-logs/
+!extension/test-output/.gitkeep
+
+# ============ Docker ============
+*.log
+docker-compose.override.yml
+
+# ============ Testing ============
+coverage/
+.coverage
+htmlcov/
+.nyc_output/
+test-results/
+*.lcov
+
+# ============ Misc ============
+*.bak
+*.tmp
+*.temp
+*.cache
+.cache/
+
+# ============ Secrets & Keys ============
+*.pem
+*.key
+secrets/
+credentials/
+
+# ============ Large Files ============
+*.zip
+*.tar.gz
+*.rar
+raw_data/*.zip
+!raw_data/.gitkeep
