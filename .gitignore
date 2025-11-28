@@ -71,6 +71,7 @@ extension/dist/
 extension/test-output/
 extension/wdio-logs/
 !extension/test-output/.gitkeep
+.plasmo/
 
 # ============ Docker ============
 *.log
