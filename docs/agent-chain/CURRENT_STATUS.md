@@ -1,16 +1,18 @@
 # Current Project Status
 
-> **Last Updated:** 2025-01-13
-> **Last Agent Session:** Documentation & Git cleanup
+> **Last Updated:** 2025-11-27
+> **Last Agent Session:** E2E Testing Migration (WebdriverIO → Playwright)
 
 ---
 
-## 🎯 Current State: MVP Complete, Polishing Phase
+## 🎯 Current State: MVP Complete, E2E Testing Ready
 
-The core tutoring platform is functional. Focus is now on:
-1. E2E testing infrastructure
-2. Documentation cleanup
-3. Observability improvements
+The core tutoring platform is functional with full E2E testing infrastructure:
+
+1. ✅ Playwright E2E tests passing (8/8)
+2. ✅ Dev auth bypass for testing
+3. ✅ ChromaDB connection fixed
+4. ✅ Database migration applied
 
 ---
 
@@ -18,26 +20,31 @@ The core tutoring platform is functional. Focus is now on:
 
 | Component | Status | Notes |
 |-----------|--------|-------|
-| Chrome Extension | ✅ | Side panel, auth flow |
+| Chrome Extension | ✅ | Side panel, auth flow, chat UI |
 | Backend API | ✅ | FastAPI with streaming |
 | Agent Pipeline | ✅ | Governor → Supervisor → Agents |
-| RAG System | ✅ | ChromaDB with course materials |
-| Authentication | ✅ | Supabase OTP |
+| RAG System | ✅ | ChromaDB HTTP (219 docs) |
+| Authentication | ✅ | Supabase OTP + dev bypass |
 | Mastery Tracking | ✅ | Database logging |
+| E2E Tests | ✅ | Playwright, 8 tests passing |
 
 ---
 
-## 🔧 Recently Completed
+## 🔧 Recently Completed (2025-11-27)
 
-### This Session (2025-01-13)
-- [x] Comprehensive `.gitignore` update
-- [x] README.md overhaul with architecture diagrams
-- [x] Agent chain documentation system created
-- [x] E2E testing infrastructure (WebdriverIO)
-- [x] GitHub Actions CI/CD workflow
+### This Session
+- [x] Fixed ChromaDB connection (localhost:8001 for local dev)
+- [x] Re-ingested data into Docker ChromaDB (219 documents)
+- [x] Applied database migration (agent tracking columns)
+- [x] **Migrated WebdriverIO → Playwright** for E2E testing
+- [x] Added dev auth bypass (PLASMO_PUBLIC_DEV_AUTH_BYPASS=true)
+- [x] All 8 E2E tests passing
+- [x] Cleaned up legacy scripts and unused components
+- [x] Updated gitignore for generated files
 
-### Previous Sessions
-- See [COMPLETED_WORK.md](./COMPLETED_WORK.md)
+### Key Commits
+1. feat: Infrastructure fixes and observability enhancements
+2. feat(e2e): Migrate from WebdriverIO to Playwright
 
 ---
 
@@ -47,11 +54,11 @@ Nothing currently in progress.
 
 ---
 
-## 📋 Immediate Priorities
+## 📋 Next Priorities
 
-1. **Push to remote** - User needs to authenticate and push
-2. **Test E2E setup** - Run `pnpm test:e2e` in extension/
-3. **Verify Docker services** - Ensure ChromaDB accessible
+1. **Update CI/CD workflow** - Replace WebdriverIO with Playwright in GitHub Actions
+2. **Production deployment preparation** - Review environment configs
+3. **Performance testing** - Stress test agent responses
 
 ---
 
@@ -59,17 +66,22 @@ Nothing currently in progress.
 
 See [KNOWN_ISSUES.md](./KNOWN_ISSUES.md)
 
+**Resolved this session:**
+- ~~ChromaDB connection using Docker internal hostname~~ → Fixed
+- ~~WebdriverIO deprecated CDP API~~ → Migrated to Playwright
+
 ---
 
 ## 🗂️ Key Files to Know
 
 | File | Purpose |
 |------|---------|
-| `backend/app/agents/tutor_agent.py` | Agent entry point |
-| `backend/app/agents/governor.py` | Policy enforcement |
-| `extension/src/sidepanel.tsx` | Main UI |
-| `extension/src/hooks/use-chat.ts` | Streaming hook |
-| `.github/copilot-instructions.md` | Coding guidelines |
+| backend/app/agents/tutor_agent.py | Agent entry point |
+| backend/app/agents/governor.py | Policy enforcement |
+| extension/src/sidepanel.tsx | Main UI |
+| extension/src/hooks/useAuth.ts | Auth hook (dev bypass) |
+| extension/playwright.config.ts | E2E test config |
+| extension/test/e2e/fixtures.ts | Playwright fixtures |
 
 ---
 
@@ -77,14 +89,35 @@ See [KNOWN_ISSUES.md](./KNOWN_ISSUES.md)
 
 | Test Suite | Status | Command |
 |------------|--------|---------|
-| Agent Unit | ⚠️ Manual | `python test_agent_advanced.py` |
-| E2E | 🆕 New | `pnpm test:e2e` |
+| E2E (Playwright) | ✅ 8/8 | npm run test:e2e |
+| Agent Manual | ⚠️ Manual | python test_agent_advanced.py |
 | Integration | ⚠️ Manual | Various scripts |
+
+---
+
+## 🔧 Dev Environment
+
+\`\`\`bash
+# Extension E2E tests (with auth bypass)
+cd extension
+npm run test:e2e           # Run all tests
+npm run test:e2e:headed    # Run with visible browser
+npm run test:e2e:debug     # Debug mode
+
+# Backend
+cd backend
+source venv/bin/activate
+uvicorn main:app --reload
+
+# Docker services
+docker-compose up -d
+\`\`\`
 
 ---
 
 ## 💡 Notes for Next Agent
 
-1. **Git state**: 179 files changed, need clean commit
-2. **E2E tests**: Infrastructure ready, may need mock refinement
-3. **Documentation**: Agent chain system is new, maintain it!
+1. **E2E tests use Playwright** - Not WebdriverIO anymore
+2. **Auth bypass**: Set PLASMO_PUBLIC_DEV_AUTH_BYPASS=true in .env.local for testing
+3. **ChromaDB**: Uses localhost:8001 for local dev (not Docker internal hostname)
+4. **CI/CD needs update**: GitHub Actions workflow still references WebdriverIO

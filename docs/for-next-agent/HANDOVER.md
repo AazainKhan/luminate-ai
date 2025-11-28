@@ -1,196 +1,182 @@
 # Agent Handover Notes
 
-## Session Summary (December 2025)
+## Session Summary (November 27, 2025)
 
 This document captures the work completed in this session and what the next agent should focus on.
 
 ---
 
-## Completed Work
+## Completed Work This Session
 
-### 1. Pedagogical Tutor Agent ✅
-**File:** `backend/app/agents/pedagogical_tutor.py`
+### 1. E2E Testing Migration ✅
+**From:** WebdriverIO (deprecated CDP API issues)
+**To:** Playwright (official Chrome extension support)
 
-- Socratic scaffolding with "I Do/We Do/You Do" progression
-- Four scaffolding levels: HINT → EXAMPLE → GUIDED → EXPLAIN
-- Zone of Proximal Development (ZPD) assessment
-- Visible `<thinking>` traces for stochastic exploration
-- Confusion detection → automatic higher support
+**Files:**
+- `extension/playwright.config.ts` - Test configuration
+- `extension/test/e2e/fixtures.ts` - Extension loading with `launchPersistentContext`
+- `extension/test/e2e/auth.spec.ts` - Authentication tests
+- `extension/test/e2e/chat.spec.ts` - Chat UI tests
 
-### 2. Math Agent ✅
-**File:** `backend/app/agents/math_agent.py`
+**Test Commands:**
+```bash
+cd extension
+npm run test:e2e           # Run all (8 tests, ~25s)
+npm run test:e2e:headed    # Visible browser
+npm run test:e2e:debug     # Step-through debugging
+```
 
-- Specialized for AI mathematics (gradient descent, backprop, Bayes)
-- Step-by-step derivations with LaTeX notation
-- Visual intuition FIRST approach
-- **Note:** Uses LLM (Gemini Flash) for explanations, NOT Python/SymPy
-- This is intentional for educational scaffolding, not raw computation
+### 2. Dev Auth Bypass ✅
+**File:** `extension/src/hooks/useAuth.ts`
 
-### 3. Enhanced State Schema ✅
-**File:** `backend/app/agents/state.py`
+- Environment variable: `PLASMO_PUBLIC_DEV_AUTH_BYPASS=true`
+- Skips Supabase authentication in development
+- Uses mock user: `dev@my.centennialcollege.ca` (student role)
+- Allows E2E tests to access chat UI directly
 
-New fields added:
-- `scaffolding_level`: Literal["hint", "example", "guided", "explain"]
-- `thinking_visible`: Boolean
-- `zpd_assessment`: Dict
-- `socratic_question`: String
-- `math_derivation`: MathDerivation TypedDict
+### 3. Infrastructure Fixes ✅
+- **ChromaDB connection**: Fixed `CHROMADB_HOST` from Docker internal (`memory_store`) to `localhost`
+- **Data ingestion**: Re-ingested 219 documents into Docker ChromaDB
+- **Database migration**: Applied agent tracking columns via Supabase
 
-### 4. Intent Routing ✅
-**File:** `backend/app/agents/supervisor.py`
-
-- Improved tutor vs math disambiguation
-- Confusion signals ("I don't understand") → tutor override
-- 19/19 routing tests passing
-
-### 5. Auto Intent Detection ✅ (COMPLETED)
-**File:** `extension/src/components/chat/prompt-input.tsx`
-
-- Removed manual intent hint buttons ("Course Info", "Tutor", "Math", "Code")
-- Backend supervisor auto-detects intent from query text
-- UI now shows passive text: "AI auto-detects: tutor • math • code • syllabus"
-- Cleaner, simpler interface
-
-### 6. Chat Export (.md) ✅ (COMPLETED)
-**File:** `extension/src/sidepanel.tsx`
-
-- Export button now functional
-- Downloads chat as markdown file with:
-  - Date and user info
-  - All messages formatted with role headers
-  - Sources included if present
-  - Filename: `luminate-chat-YYYY-MM-DD-HH-MM-SS.md`
-
-### 7. Database & Observability ✅ (COMPLETED)
-**Files:** 
-- `docs/database_schema.sql` (updated)
-- `docs/migrations/001_add_agent_tracking.sql` (new)
-- `backend/app/agents/evaluator.py` (updated)
-
-New tracking:
-- `intent`: Which intent was detected
-- `agent_used`: Which agent handled the request
-- `scaffolding_level`: For tutor agent, the scaffolding level used
+### 4. Git Cleanup ✅
+- Removed deprecated backend scripts
+- Removed unused shader-gradient-component
+- Updated .gitignore for generated files
+- 11 commits pushed to main
 
 ---
 
 ## Outstanding Work
 
-### 1. E2E Testing ✅ IMPLEMENTED
-**Location:** `extension/test/e2e/`
+### 1. Update CI/CD Workflow 🔴 PRIORITY
+**Location:** `.github/workflows/e2e-tests.yml`
 
-WebdriverIO E2E tests have been set up:
-- `auth.spec.ts` - Authentication flow tests
-- `chat.spec.ts` - Chat functionality tests
-- `helpers.ts` - Common test utilities
+The workflow still references WebdriverIO. Update to Playwright:
 
-**Run tests:**
-```bash
-cd extension
-pnpm build  # Build extension first
-pnpm test:e2e  # Run E2E tests
+```yaml
+- name: Install Playwright
+  run: |
+    cd extension
+    npm install
+    npx playwright install chromium
+
+- name: Run E2E tests
+  run: |
+    cd extension
+    npm run test:e2e
 ```
 
-**CI/CD:** `.github/workflows/e2e-tests.yml` runs tests on push/PR
+Note: Playwright requires headed mode for extensions. Use `xvfb-run` on Linux CI.
 
-### 2. Run Database Migration
-**Location:** `docs/migrations/001_add_agent_tracking.sql`
+### 2. Production Build Testing 🟡
+- Current tests use `chrome-mv3-prod` build with auth bypass
+- Test with `PLASMO_PUBLIC_DEV_AUTH_BYPASS=false` for production parity
+- Verify real Supabase OTP flow works
 
-Run this migration in Supabase to add the new tracking columns.
+### 3. Additional E2E Test Coverage 🟢
+Current tests are basic. Add:
+- Message sending and response streaming
+- Code execution (E2B sandbox)
+- Export chat as markdown
+- Error state handling
 
 ---
 
 ## Architecture Decisions
 
-### Why LLM for Math (Not Python/SymPy)?
+### Why Playwright Over WebdriverIO?
 
-For an **educational tutoring** context, LLM is correct:
+| Aspect | Playwright | WebdriverIO |
+|--------|-----------|-------------|
+| Extension Support | Official docs | Workarounds |
+| Manifest V3 | Built-in SW support | CDP deprecated |
+| Setup | 2 args | Complex config |
+| Maintenance | Microsoft | Community |
 
-| LLM-based | Python/SymPy |
-|-----------|--------------|
-| ✅ Explains the "why" | ❌ Just gives answers |
-| ✅ Shows intuition | ❌ No pedagogical value |
-| ✅ Adapts to confusion | ❌ Rigid outputs |
-| ⚠️ Can make calc errors | ✅ Exact computation |
+### Why Dev Auth Bypass?
 
-**Recommendation:** If numerical verification is needed later, add a Python tool as a *verification step*, not replacement.
-
-### Why Auto Intent Detection?
-
-User research shows:
-- Students don't know what "mode" they need
-- Manual selection slows down interaction
-- Backend is smart enough to route correctly (19/19 tests pass)
-- Cleaner UI = better UX
+- E2E tests need authenticated state
+- Real Supabase OTP requires email verification
+- Mock user simulates authenticated state
+- Production remains secure (bypass disabled)
 
 ---
 
 ## File Map (Key Files)
 
 ```
-backend/app/agents/
-├── state.py              # AgentState TypedDict (UPDATED)
-├── supervisor.py         # Intent routing (UPDATED)
-├── pedagogical_tutor.py  # NEW - Socratic scaffolding
-├── math_agent.py         # NEW - Mathematical derivations
-├── tutor_agent.py        # LangGraph workflow (UPDATED)
-├── evaluator.py          # Mastery tracking (UPDATED - agent tracking)
-├── governor.py           # Policy enforcement (unchanged)
-└── ...
+extension/
+├── playwright.config.ts       # E2E config
+├── test/e2e/
+│   ├── fixtures.ts            # Extension loading
+│   ├── auth.spec.ts           # Auth tests
+│   └── chat.spec.ts           # Chat tests
+├── src/hooks/useAuth.ts       # Auth bypass logic
+├── .env.local                 # Dev env vars (gitignored)
+└── build/chrome-mv3-prod/     # Built extension
 
-extension/src/
-├── sidepanel.tsx         # Main chat view (UPDATED - export logic)
-├── components/chat/
-│   ├── prompt-input.tsx  # Chat input (UPDATED - auto mode)
-│   └── ...
-└── ...
-
-extension/test/e2e/       # NEW - E2E tests
-├── auth.spec.ts          # Authentication tests
-├── chat.spec.ts          # Chat functionality tests
-└── helpers.ts            # Test utilities
-
-.github/workflows/
-└── e2e-tests.yml         # NEW - CI/CD for E2E tests
+backend/
+├── .env                       # CHROMADB_HOST=localhost
+└── app/agents/tutor_agent.py  # Agent entry point
 
 docs/
-├── for-next-agent/
-│   ├── HANDOVER.md       # This file
-│   └── E2E_TESTING.md    # E2E testing guide
-├── migrations/
-│   └── 001_add_agent_tracking.sql  # NEW
-└── database_schema.sql   # UPDATED
+├── agent-chain/
+│   ├── CURRENT_STATUS.md      # Live status
+│   ├── COMPLETED_WORK.md      # Work log
+│   └── KNOWN_ISSUES.md        # Issue tracker
+└── for-next-agent/
+    ├── HANDOVER.md            # This file
+    └── E2E_TESTING.md         # Testing guide
 ```
 
 ---
 
-## Test Commands
+## Quick Verification Commands
 
 ```bash
-# Backend routing tests
-cd backend && source venv/bin/activate
-python -c "from app.agents.supervisor import Supervisor; s = Supervisor(); print(s.route_intent('Explain gradient descent'))"
+# Verify E2E tests pass
+cd extension && npm run test:e2e
 
-# Full agent test
+# Verify backend works
+cd backend && source venv/bin/activate
 python -c "from app.agents.tutor_agent import run_agent; print(run_agent('What is gradient descent?'))"
 
-# Extension build
-cd extension && pnpm build
+# Verify Docker services
+docker-compose ps  # Should show memory_store, redis, langfuse
+
+# Verify ChromaDB has data
+curl http://localhost:8001/api/v2/collections | jq '.[] | {name, count}'
 ```
 
 ---
 
 ## Priority Order for Next Agent
 
-1. **Run DB Migration** - Add new columns to Supabase
-2. **Verify E2E Tests** - Run `pnpm test:e2e` locally to validate tests work
-3. **Production Deployment** - Prepare for demo
+1. **Update CI/CD workflow** - Replace WebdriverIO with Playwright
+2. **Test production build** - Disable auth bypass, test real flow
+3. **Add more E2E tests** - Message flow, code execution
+4. **Prepare for demo** - End-to-end user journey
 
 ---
 
-## Links
+## Known Issues
 
-- [WebdriverIO Extension Testing](https://webdriver.io/docs/extension-testing/web-extensions/)
-- [Chrome E2E Testing](https://developer.chrome.com/docs/extensions/how-to/test/end-to-end-testing)
-- [Project Status](../PROJECT_STATUS.md)
+See `docs/agent-chain/KNOWN_ISSUES.md`
 
+**Active:**
+- CI/CD workflow uses WebdriverIO (needs update)
+- langchain-chroma deprecation warning (minor)
+
+**Resolved:**
+- ChromaDB connection fixed
+- WebdriverIO CDP issues (migrated to Playwright)
+- Auth bypass for E2E tests
+
+---
+
+## Contacts & Resources
+
+- [Playwright Chrome Extensions](https://playwright.dev/docs/chrome-extensions)
+- [Project Status](../agent-chain/CURRENT_STATUS.md)
+- [Coding Guidelines](../../.github/copilot-instructions.md)

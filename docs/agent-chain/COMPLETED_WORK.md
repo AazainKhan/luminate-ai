@@ -4,6 +4,61 @@ A chronological log of significant work completed by AI agents.
 
 ---
 
+## 2025-11-27 - E2E Testing Migration & Infrastructure Fixes
+
+### Agent: GitHub Copilot (Claude Opus 4.5)
+
+**Summary:** Migrated E2E testing from WebdriverIO to Playwright, fixed infrastructure issues
+
+**Changes Made:**
+1. **E2E Testing Migration (WebdriverIO → Playwright)**
+   - Replaced WebdriverIO with Playwright (official Chrome extension support)
+   - Created `extension/playwright.config.ts` with extension-specific settings
+   - Created `extension/test/e2e/fixtures.ts` with `launchPersistentContext`
+   - Rewrote `auth.spec.ts` and `chat.spec.ts` for Playwright API
+   - All 8 E2E tests passing
+
+2. **Dev Auth Bypass**
+   - Added `PLASMO_PUBLIC_DEV_AUTH_BYPASS` environment variable
+   - Modified `useAuth.ts` to skip Supabase auth when bypass enabled
+   - Mock user/session for E2E testing without real authentication
+
+3. **Infrastructure Fixes**
+   - Fixed ChromaDB connection (changed `CHROMADB_HOST` from Docker internal `memory_store` to `localhost`)
+   - Re-ingested 219 documents into Docker ChromaDB
+   - Applied database migration via Supabase MCP (agent tracking columns)
+
+4. **Cleanup**
+   - Removed deprecated backend scripts
+   - Removed unused shader-gradient-component
+   - Updated .gitignore for generated test files
+
+**Files Created/Modified:**
+- `extension/playwright.config.ts` (new)
+- `extension/test/e2e/fixtures.ts` (new)
+- `extension/test/e2e/auth.spec.ts` (rewritten)
+- `extension/test/e2e/chat.spec.ts` (rewritten)
+- `extension/src/hooks/useAuth.ts` (modified - dev bypass)
+- `extension/package.json` (modified - Playwright scripts)
+- `backend/.env` (modified - ChromaDB host)
+- `docs/migrations/001_add_agent_tracking.sql` (new)
+
+**Decisions Made:**
+- **Playwright over WebdriverIO**: Official Chrome extension documentation, simpler `launchPersistentContext` API, no deprecated CDP issues
+- **Dev auth bypass via env var**: Allows E2E tests to skip authentication while production remains secure
+- **localhost for ChromaDB**: Docker internal hostnames only work inside containers; local dev needs localhost
+
+**Test Results:**
+```
+8 passed (25.4s)
+✅ Auth bypass working
+✅ Chat UI visible
+✅ 16 buttons detected
+✅ Dark theme confirmed
+```
+
+---
+
 ## 2025-01-13 - Documentation & Testing Session
 
 ### Agent: GitHub Copilot (Claude Opus 4.5)

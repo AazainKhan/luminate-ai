@@ -2,193 +2,188 @@
 
 ## Overview
 
-This document provides resources and guidance for implementing end-to-end (E2E) testing for the Luminate AI Chrome Extension.
+E2E tests use **Playwright** with official Chrome extension support via `launchPersistentContext`.
 
 ---
 
-## Recommended Testing Frameworks
+## Quick Start
 
-### 1. WebdriverIO (Recommended)
-**Official Chrome Extension Testing Support**
-
-📚 **Documentation:** https://webdriver.io/docs/extension-testing/web-extensions/
-
-**Why WebdriverIO:**
-- First-class Chrome extension support
-- Can test side panels, popups, and content scripts
-- Integrates with CI/CD pipelines
-- Supports parallel testing
-
-**Setup:**
 ```bash
 cd extension
-pnpm add -D @wdio/cli @wdio/local-runner @wdio/mocha-framework
-npx wdio config
-```
 
-**Example Test (Side Panel):**
-```typescript
-import { browser } from '@wdio/globals'
+# Run all tests
+npm run test:e2e
 
-describe('Luminate AI Side Panel', () => {
-  before(async () => {
-    // Load extension
-    await browser.url('chrome-extension://YOUR_EXTENSION_ID/sidepanel.html')
-  })
+# Run with visible browser
+npm run test:e2e:headed
 
-  it('should display chat interface', async () => {
-    const chatContainer = await $('[data-testid="chat-container"]')
-    await expect(chatContainer).toBeDisplayed()
-  })
+# Debug mode (step through tests)
+npm run test:e2e:debug
 
-  it('should send a message', async () => {
-    const input = await $('textarea[placeholder*="Ask anything"]')
-    await input.setValue('What is gradient descent?')
-    
-    const sendButton = await $('button*=Send')
-    await sendButton.click()
-    
-    // Wait for response
-    const response = await $('[data-testid="ai-message"]')
-    await expect(response).toBeDisplayed()
-  })
-})
+# Interactive UI mode
+npm run test:e2e:ui
+
+# View HTML report
+npm run test:e2e:report
 ```
 
 ---
 
-### 2. Puppeteer (Alternative)
-**Google's Official Browser Automation**
+## Dev Auth Bypass
 
-📚 **Documentation:** https://developer.chrome.com/docs/extensions/how-to/test/end-to-end-testing
+For E2E testing, authentication is bypassed using an environment variable:
 
-**Setup:**
-```bash
-pnpm add -D puppeteer
+**In `extension/.env.local`:**
+```
+PLASMO_PUBLIC_DEV_AUTH_BYPASS=true
 ```
 
-**Example:**
-```typescript
-import puppeteer from 'puppeteer'
-import path from 'path'
+When enabled:
+- Login screen is skipped
+- Mock user: `dev@my.centennialcollege.ca` (student role)
+- Chat UI is immediately accessible
 
-const extensionPath = path.join(__dirname, '../build/chrome-mv3-prod')
-
-async function runTest() {
-  const browser = await puppeteer.launch({
-    headless: false,
-    args: [
-      `--disable-extensions-except=${extensionPath}`,
-      `--load-extension=${extensionPath}`,
-    ],
-  })
-
-  // Get extension ID
-  const targets = await browser.targets()
-  const extensionTarget = targets.find(t => t.type() === 'service_worker')
-  const extensionId = extensionTarget?.url().split('/')[2]
-
-  // Open side panel
-  const page = await browser.newPage()
-  await page.goto(`chrome-extension://${extensionId}/sidepanel.html`)
-
-  // Test interactions...
-}
+**To disable for production testing:**
+```
+PLASMO_PUBLIC_DEV_AUTH_BYPASS=false
 ```
 
 ---
 
-## Testing Strategy
+## Test Structure
 
-### Unit Tests (Existing)
-- Components: `extension/src/__tests__/`
-- Use Vitest or Jest
+```
+extension/
+├── playwright.config.ts      # Playwright configuration
+├── test/
+│   └── e2e/
+│       ├── fixtures.ts       # Extension loading fixtures
+│       ├── auth.spec.ts      # Authentication tests
+│       └── chat.spec.ts      # Chat functionality tests
+└── test-output/              # Screenshots, reports
+```
 
-### Integration Tests
-- API mocking with MSW
-- Component integration
+---
 
-### E2E Tests (New - Implement These)
-1. **Authentication Flow**
-   - Login with OTP
-   - Domain validation (@my.centennialcollege.ca)
-   - Session persistence
+## Key Files
 
-2. **Chat Functionality**
-   - Send message → receive response
-   - Streaming responses
-   - Code execution
-   - Intent routing (tutor/math/code)
+### `playwright.config.ts`
+```typescript
+export default defineConfig({
+  testDir: './test/e2e',
+  timeout: 60000,
+  workers: 1,  // Extensions require single worker
+  use: {
+    headless: false,  // Extensions need headed mode
+  },
+});
+```
 
-3. **Admin Panel** (if admin)
-   - File upload
-   - ETL status
+### `fixtures.ts`
+```typescript
+import { test as base, chromium } from '@playwright/test';
+
+const EXTENSION_PATH = path.join(__dirname, '..', '..', 'build', 'chrome-mv3-prod');
+
+export const test = base.extend({
+  context: async ({}, use) => {
+    const context = await chromium.launchPersistentContext('', {
+      headless: false,
+      args: [
+        `--disable-extensions-except=${EXTENSION_PATH}`,
+        `--load-extension=${EXTENSION_PATH}`,
+      ],
+    });
+    await use(context);
+    await context.close();
+  },
+  
+  extensionId: async ({ context }, use) => {
+    let serviceWorker = context.serviceWorkers()[0];
+    if (!serviceWorker) {
+      serviceWorker = await context.waitForEvent('serviceworker');
+    }
+    const extensionId = serviceWorker.url().split('/')[2];
+    await use(extensionId);
+  },
+});
+```
+
+---
+
+## Test Scenarios
+
+| Test | Description | Status |
+|------|-------------|--------|
+| Auth bypass detection | Verify auth bypass works | ✅ |
+| User greeting | Show greeting when authenticated | ✅ |
+| Extension ID | Valid extension loaded | ✅ |
+| No critical errors | No console errors on load | ✅ |
+| Chat UI visible | Chat container renders | ✅ |
+| Accessible buttons | 16+ buttons found | ✅ |
+| Chat input detected | Textarea and suggestions visible | ✅ |
+| Dark theme default | Dark mode applied | ✅ |
+
+---
+
+## Writing New Tests
+
+```typescript
+import { test, expect, navigateToSidePanel } from './fixtures';
+
+test.describe('My Feature', () => {
+  test('should do something', async ({ context, extensionId }) => {
+    const page = await navigateToSidePanel(context, extensionId);
+    
+    await page.waitForLoadState('domcontentloaded');
+    
+    // Your assertions
+    await expect(page.locator('button')).toBeVisible();
+  });
+});
+```
+
+---
+
+## Debugging Tips
+
+1. **Use headed mode**: `npm run test:e2e:headed`
+2. **Debug mode**: `npm run test:e2e:debug` (pauseOnFirst)
+3. **Screenshots**: Automatically captured on failure in `test-output/results/`
+4. **Console logs**: Capture with `page.on('console', msg => ...)`
+5. **HTML report**: `npm run test:e2e:report`
 
 ---
 
 ## CI/CD Integration
 
-**GitHub Actions Example:**
+**TODO:** Update `.github/workflows/e2e-tests.yml` to use Playwright:
+
 ```yaml
-name: E2E Tests
-
-on: [push, pull_request]
-
-jobs:
-  e2e:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          
-      - name: Install dependencies
-        run: |
-          cd extension
-          pnpm install
-          
-      - name: Build extension
-        run: |
-          cd extension
-          pnpm build
-          
-      - name: Run E2E tests
-        run: |
-          cd extension
-          pnpm test:e2e
+- name: Run E2E tests
+  run: |
+    cd extension
+    npm run test:e2e
 ```
 
----
-
-## Key Test Scenarios
-
-| Priority | Scenario | Agent/Feature |
-|----------|----------|---------------|
-| 🔴 High | Login → Chat → Response | Auth + Agent |
-| 🔴 High | Tutor mode scaffolding | PedagogicalTutor |
-| 🔴 High | Math derivation rendering | MathAgent |
-| 🟡 Med | Code execution | E2B Sandbox |
-| 🟡 Med | Export chat as .md | UI Feature |
-| 🟢 Low | Admin file upload | ETL Pipeline |
+Note: Playwright can run in CI with `xvfb-run` on Linux for headed mode.
 
 ---
 
-## Next Steps for Agent
+## Why Playwright Over WebdriverIO?
 
-1. Install WebdriverIO: `pnpm add -D @wdio/cli`
-2. Create `extension/wdio.conf.ts`
-3. Add test files to `extension/test/e2e/`
-4. Implement authentication test first
-5. Add to CI/CD pipeline
+| Feature | Playwright | WebdriverIO |
+|---------|-----------|-------------|
+| Extension Support | ✅ Official docs | ⚠️ Workarounds needed |
+| Manifest V3 | ✅ Built-in SW support | ❌ CDP deprecated |
+| Setup | Simple 2 args | Complex config |
+| Speed | Fast | Slower |
+| Maintenance | Microsoft active | Community |
 
 ---
 
 ## Resources
 
-- [WebdriverIO Extension Testing](https://webdriver.io/docs/extension-testing/web-extensions/)
-- [Chrome E2E Testing Guide](https://developer.chrome.com/docs/extensions/how-to/test/end-to-end-testing)
-- [Puppeteer Extension Testing](https://pptr.dev/guides/chrome-extensions)
-- [Plasmo Testing Guide](https://docs.plasmo.com/framework/workflows/testing)
+- [Playwright Chrome Extensions](https://playwright.dev/docs/chrome-extensions)
+- [Playwright Test API](https://playwright.dev/docs/api/class-test)
+- [launchPersistentContext](https://playwright.dev/docs/api/class-browsertype#browser-type-launch-persistent-context)

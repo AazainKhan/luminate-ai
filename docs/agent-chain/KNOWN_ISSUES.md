@@ -12,17 +12,11 @@ _None currently_
 
 ## 🟡 Medium Priority
 
-### Issue: E2E Tests Need Mock Refinement
-**Area:** Testing
-**Description:** E2E authentication mocks may need adjustment for real Supabase flow
-**Workaround:** Tests use mock authentication
-**TODO:** Test with real auth flow once stable
-
-### Issue: Large Git Diff
-**Area:** Repository
-**Description:** ~179 files show as changed, includes some that should be gitignored
-**Workaround:** Focus on core files when committing
-**TODO:** Clean commit with selective staging
+### Issue: CI/CD Workflow Still Uses WebdriverIO
+**Area:** Infra
+**Description:** `.github/workflows/e2e-tests.yml` still references WebdriverIO commands
+**Workaround:** E2E tests run locally with Playwright
+**TODO:** Update workflow to use `npm run test:e2e` (Playwright)
 
 ---
 
@@ -46,11 +40,31 @@ _None currently_
 **Impact:** No production observability
 **TODO:** Enable for production deployment
 
+### Debt: langchain-chroma Deprecation Warning
+**Area:** Backend
+**Description:** `Chroma` class from `langchain_community.vectorstores` is deprecated
+**Workaround:** Still works, just logs warning
+**TODO:** Run `pip install -U langchain-chroma` and update imports
+
 ---
 
 ## ✅ Resolved Issues
 
-_None yet - this is a new tracking document_
+### ~~Issue: ChromaDB Using Docker Internal Hostname~~
+**Resolved:** 2025-11-27
+**Solution:** Changed `CHROMADB_HOST` from `memory_store` to `localhost` in backend/.env
+
+### ~~Issue: WebdriverIO Deprecated CDP API~~
+**Resolved:** 2025-11-27
+**Solution:** Migrated to Playwright with `launchPersistentContext`
+
+### ~~Issue: E2E Tests Need Mock Refinement~~
+**Resolved:** 2025-11-27
+**Solution:** Added dev auth bypass via `PLASMO_PUBLIC_DEV_AUTH_BYPASS` env var
+
+### ~~Issue: Large Git Diff~~
+**Resolved:** 2025-11-27
+**Solution:** Committed changes in focused commits, updated gitignore
 
 ---
 
