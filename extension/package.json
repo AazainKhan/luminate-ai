@@ -9,8 +9,11 @@
     "dev": "plasmo dev",
     "build": "plasmo build",
     "package": "plasmo package",
-    "test:e2e": "wdio run ./wdio.conf.ts",
-    "test:e2e:headless": "wdio run ./wdio.conf.ts --headless"
+    "test:e2e": "npx playwright test",
+    "test:e2e:headed": "npx playwright test --headed",
+    "test:e2e:debug": "npx playwright test --debug",
+    "test:e2e:ui": "npx playwright test --ui",
+    "test:e2e:report": "npx playwright show-report test-output/playwright-report"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",
@@ -72,6 +75,7 @@
   },
   "devDependencies": {
     "@ianvs/prettier-plugin-sort-imports": "^4.1.1",
+    "@playwright/test": "^1.57.0",
     "@types/chrome": "^0.0.258",
     "@types/node": "^20.11.5",
     "@types/react": "^18.3.1",

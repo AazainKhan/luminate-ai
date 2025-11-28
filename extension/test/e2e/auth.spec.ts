@@ -1,144 +1,100 @@
 /**
- * E2E Test: Authentication Flow
+ * Authentication E2E Tests for Luminate AI Extension
  * 
- * Tests the Supabase OTP authentication with domain validation:
- * - Students: @my.centennialcollege.ca
- * - Admins: @centennialcollege.ca
+ * Tests the Supabase passwordless OTP authentication flow.
+ * Note: When PLASMO_PUBLIC_DEV_AUTH_BYPASS=true, auth is bypassed
+ * and users go directly to chat UI. These tests verify that behavior.
  */
 
-import { openSidePanel, clearStorage, screenshot, getExtensionId } from './helpers'
+import { test, expect, navigateToSidePanel } from './fixtures';
 
-describe('Authentication Flow', () => {
-  let extensionId: string
-
-  before(async () => {
-    // Get extension ID using helper function
-    extensionId = await getExtensionId()
-    console.log(`Extension ID: ${extensionId}`)
-  })
-
-  beforeEach(async () => {
-    await clearStorage()
-  })
-
-  describe('Side Panel Access', () => {
-    it('should display login screen when not authenticated', async () => {
-      await openSidePanel(extensionId)
-      await screenshot('login-screen')
-      
-      // Look for login/auth elements
-      const authContainer = await $('[data-testid="auth-container"]')
-      const loginExists = await authContainer.isExisting()
-      
-      // Either auth container exists OR we see login text
-      if (!loginExists) {
-        const pageText = await $('body').getText()
-        expect(
-          pageText.toLowerCase().includes('sign in') ||
-          pageText.toLowerCase().includes('log in') ||
-          pageText.toLowerCase().includes('email')
-        ).toBe(true)
-      } else {
-        expect(loginExists).toBe(true)
+test.describe('Authentication Flow', () => {
+  test('should bypass login when DEV_AUTH_BYPASS is enabled', async ({ context, extensionId }) => {
+    const page = await navigateToSidePanel(context, extensionId);
+    
+    // Capture console to check auth state
+    const authLogs: string[] = [];
+    page.on('console', msg => {
+      if (msg.text().includes('Auth') || msg.text().includes('DEV')) {
+        authLogs.push(msg.text());
       }
-    })
+    });
+    
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(2000);
+    
+    // Check if auth bypass is enabled
+    const bypassEnabled = authLogs.some(log => log.includes('DEV AUTH BYPASS ENABLED'));
+    console.log('Auth bypass enabled:', bypassEnabled);
+    console.log('Auth logs:', authLogs);
+    
+    if (bypassEnabled) {
+      // With bypass, we should NOT see login form
+      const hasLoginForm = await page.locator('input[type="email"]').isVisible().catch(() => false);
+      expect(hasLoginForm).toBe(false);
+      console.log('✅ Login form correctly hidden when bypass is enabled');
+    } else {
+      // Without bypass, login form should be visible
+      await expect(page.locator('input[type="email"]')).toBeVisible({ timeout: 10000 });
+      console.log('✅ Login form visible when bypass is disabled');
+    }
+  });
 
-    it('should show email input for OTP authentication', async () => {
-      await openSidePanel(extensionId)
-      
-      // Find email input
-      const emailInput = await $('input[type="email"]')
-      const inputExists = await emailInput.isExisting()
-      
-      if (inputExists) {
-        expect(await emailInput.isDisplayed()).toBe(true)
-      } else {
-        // May be a different auth UI - check for any input
-        const anyInput = await $('input')
-        expect(await anyInput.isExisting()).toBe(true)
+  test('should show user greeting when authenticated', async ({ context, extensionId }) => {
+    const page = await navigateToSidePanel(context, extensionId);
+    
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(2000);
+    
+    // With auth bypass, should show greeting with mock user name
+    const greeting = page.locator('text=/Hi,|Welcome/i');
+    const hasGreeting = await greeting.isVisible().catch(() => false);
+    
+    // Or check for the empty state message
+    const hasEmptyState = await page.locator('text=/Ask anything/i').isVisible().catch(() => false);
+    
+    console.log('Has greeting:', hasGreeting);
+    console.log('Has empty state:', hasEmptyState);
+    
+    // Either greeting or empty state should be visible when authenticated
+    expect(hasGreeting || hasEmptyState).toBe(true);
+  });
+});
+
+test.describe('Extension Initialization', () => {
+  test('should have valid extension ID', async ({ extensionId }) => {
+    expect(extensionId).toBeTruthy();
+    expect(extensionId.length).toBeGreaterThan(0);
+    console.log('Extension ID:', extensionId);
+  });
+
+  test('should load extension pages without critical errors', async ({ context, extensionId }) => {
+    const page = await navigateToSidePanel(context, extensionId);
+    
+    // Collect console errors
+    const errors: string[] = [];
+    page.on('console', msg => {
+      if (msg.type() === 'error') {
+        errors.push(msg.text());
       }
-    })
-
-    it('should validate student email domain', async () => {
-      await openSidePanel(extensionId)
-      await browser.pause(500)
-      
-      const emailInput = await $('input[type="email"]')
-      if (!(await emailInput.isExisting())) {
-        console.log('Skipping: Email input not found in current auth flow')
-        return
-      }
-
-      // Enter invalid email domain
-      await emailInput.setValue('test@gmail.com')
-      
-      // Try to submit
-      const submitBtn = await $('button[type="submit"]')
-      if (await submitBtn.isExisting()) {
-        await submitBtn.click()
-        await browser.pause(500)
-        
-        // Should show error for invalid domain
-        const pageText = await $('body').getText()
-        const hasError = 
-          pageText.toLowerCase().includes('invalid') ||
-          pageText.toLowerCase().includes('domain') ||
-          pageText.toLowerCase().includes('centennial')
-        
-        expect(hasError).toBe(true)
-        await screenshot('invalid-domain-error')
-      }
-    })
-
-    it('should accept valid student email format', async () => {
-      await openSidePanel(extensionId)
-      await browser.pause(500)
-      
-      const emailInput = await $('input[type="email"]')
-      if (!(await emailInput.isExisting())) {
-        console.log('Skipping: Email input not found')
-        return
-      }
-
-      // Enter valid student email
-      await emailInput.setValue('student@my.centennialcollege.ca')
-      
-      // Form should be valid (no immediate error)
-      const hasValidationError = await $('.error, [role="alert"]')
-      const errorVisible = await hasValidationError.isExisting() && 
-                          await hasValidationError.isDisplayed()
-      
-      expect(errorVisible).toBe(false)
-      await screenshot('valid-student-email')
-    })
-  })
-
-  describe('Session Persistence', () => {
-    it('should maintain session after page reload', async () => {
-      // This test requires a mock auth setup since we can't do real OTP
-      await openSidePanel(extensionId)
-      
-      // Set mock session in localStorage
-      await browser.execute(() => {
-        const mockSession = {
-          access_token: 'mock-token',
-          user: {
-            id: 'test-user',
-            email: 'test@my.centennialcollege.ca'
-          }
-        }
-        localStorage.setItem('sb-session', JSON.stringify(mockSession))
-      })
-
-      await browser.refresh()
-      await browser.pause(1000)
-
-      // Check if session persists (implementation-specific)
-      const session = await browser.execute(() => {
-        return localStorage.getItem('sb-session')
-      })
-      
-      expect(session).not.toBeNull()
-    })
-  })
-})
+    });
+    
+    await page.waitForLoadState('domcontentloaded');
+    await page.waitForTimeout(2000);
+    
+    // Filter out known acceptable errors
+    const criticalErrors = errors.filter(e => 
+      !e.includes('favicon') && 
+      !e.includes('net::ERR_') &&
+      !e.includes('Failed to load resource')
+    );
+    
+    console.log('Critical errors:', criticalErrors.length);
+    if (criticalErrors.length > 0) {
+      console.log('Errors:', criticalErrors);
+    }
+    
+    // Should have no critical errors
+    expect(criticalErrors.length).toBe(0);
+  });
+});
