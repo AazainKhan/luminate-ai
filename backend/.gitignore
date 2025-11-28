@@ -32,3 +32,8 @@ data/
 .DS_Store
 Thumbs.db
 
+# Generated test scripts (large, session-specific)
+assess_data_quality*.py
+debug_*.py
+test_*.py
+
