@@ -14,18 +14,21 @@ services:
       - ENVIRONMENT=development
       - CHROMADB_HOST=memory_store
       - CHROMADB_PORT=8000
-      - REDIS_HOST=cache_layer
+      - REDIS_HOST=redis
       - REDIS_PORT=6379
-      - LANGFUSE_HOST=http://observer:3000
+      - REDIS_PASSWORD=myredissecret
+      - LANGFUSE_HOST=http://langfuse-web:3000
       - LANGFUSE_PORT=3000
-      - LANGFUSE_BASE_URL=http://observer:3000
+      - LANGFUSE_BASE_URL=
     volumes:
       - ./backend:/app
       - backend_data:/app/data
     depends_on:
       - memory_store
-      - cache_layer
-      - observer
+      - redis
+      - langfuse-web
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     networks:
       - luminate_network
     command: uvicorn main:app --host 0.0.0.0 --port 8000 --reload
@@ -43,105 +46,123 @@ services:
     networks:
       - luminate_network
 
-  cache_layer:
-    image: redis:alpine
-    container_name: cache_layer
+  redis:
+    image: docker.io/redis:7
+    container_name: redis
+    restart: always
+    command: --requirepass myredissecret
     ports:
       - "6379:6379"
     volumes:
       - redis_data:/data
     networks:
       - luminate_network
-    command: redis-server --appendonly yes
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "myredissecret", "ping"]
+      interval: 3s
+      timeout: 10s
+      retries: 10
 
-  # Langfuse Observer
-  observer:
-    image: langfuse/langfuse:latest
-    container_name: observer
-    ports:
-      - "3000:3000"
+  langfuse-worker:
+    image: docker.io/langfuse/langfuse-worker:3
+    container_name: langfuse-worker
+    restart: always
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      clickhouse:
+        condition: service_healthy
     environment:
       - DATABASE_URL=postgresql://langfuse:langfuse@postgres:5432/langfuse
-      - NEXTAUTH_SECRET=langfuse-secret-key-change-in-production-dev-only
       - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=langfuse-secret-key-change-in-production-dev-only
       - SALT=langfuse-salt-change-in-production-dev-only
       - ENCRYPTION_KEY=f2629bf18db32d7d4c1bf14f5b206f1d7ab0c472e154a2ab02609bff46def385
       - CLICKHOUSE_URL=http://clickhouse:8123
       - CLICKHOUSE_USER=default
       - CLICKHOUSE_PASSWORD=default
-      - CLICKHOUSE_DB=default
       - CLICKHOUSE_MIGRATION_URL=clickhouse://default:default@clickhouse:9000
-      - CLICKHOUSE_MIGRATION_SSL=false
-      - CLICKHOUSE_CLUSTER_ENABLED=false
-      - REDIS_CONNECTION_STRING=redis://cache_layer:6379
-      - LANGFUSE_S3_EVENT_UPLOAD_BUCKET=langfuse-events
-      - LANGFUSE_S3_ENDPOINT=http://minio:9000
-      - LANGFUSE_S3_ACCESS_KEY_ID=minioadmin
-      - LANGFUSE_S3_SECRET_ACCESS_KEY=minioadmin
-      - LANGFUSE_S3_BUCKET_REGION=us-east-1
-      - LANGFUSE_S3_FORCE_PATH_STYLE=true
-      - LANGFUSE_WORKER_HOST=langfuse_worker
-      - LANGFUSE_WORKER_PASSWORD=worker-secret-change-in-production
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_AUTH=myredissecret
+      # S3 / Blob Storage Configuration
+      - LANGFUSE_S3_EVENT_UPLOAD_BUCKET=langfuse
+      - LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT=http://minio:9000
+      - LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID=luminate_minio_user
+      - LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY=luminate_minio_pass
+      - LANGFUSE_S3_EVENT_UPLOAD_REGION=us-east-1
+      - LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE=true
+      - LANGFUSE_S3_EVENT_UPLOAD_PREFIX=events/
+      # Batch Export Configuration (Reuse same bucket)
+      - LANGFUSE_S3_BATCH_EXPORT_ENABLED=true
+      - LANGFUSE_S3_BATCH_EXPORT_BUCKET=langfuse
+      - LANGFUSE_S3_BATCH_EXPORT_ENDPOINT=http://minio:9000
+      - LANGFUSE_S3_BATCH_EXPORT_ACCESS_KEY_ID=luminate_minio_user
+      - LANGFUSE_S3_BATCH_EXPORT_SECRET_ACCESS_KEY=luminate_minio_pass
+      - LANGFUSE_S3_BATCH_EXPORT_REGION=us-east-1
+      - LANGFUSE_S3_BATCH_EXPORT_FORCE_PATH_STYLE=true
+      - LANGFUSE_S3_BATCH_EXPORT_PREFIX=exports/
+    networks:
+      - luminate_network
+
+  langfuse-web:
+    image: docker.io/langfuse/langfuse:3
+    container_name: langfuse-web
+    restart: always
     depends_on:
       postgres:
         condition: service_healthy
+      minio:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
       clickhouse:
         condition: service_healthy
-      cache_layer:
-        condition: service_started
-      minio:
-        condition: service_started
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://langfuse:langfuse@postgres:5432/langfuse
+      - NEXTAUTH_URL=http://localhost:3000
+      - NEXTAUTH_SECRET=langfuse-secret-key-change-in-production-dev-only
+      - SALT=langfuse-salt-change-in-production-dev-only
+      - ENCRYPTION_KEY=f2629bf18db32d7d4c1bf14f5b206f1d7ab0c472e154a2ab02609bff46def385
+      - CLICKHOUSE_URL=http://clickhouse:8123
+      - CLICKHOUSE_USER=default
+      - CLICKHOUSE_PASSWORD=default
+      - CLICKHOUSE_MIGRATION_URL=clickhouse://default:default@clickhouse:9000
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_AUTH=myredissecret
+      # S3 / Blob Storage Configuration
+      - LANGFUSE_S3_EVENT_UPLOAD_BUCKET=langfuse
+      - LANGFUSE_S3_EVENT_UPLOAD_ENDPOINT=http://minio:9000
+      - LANGFUSE_S3_EVENT_UPLOAD_ACCESS_KEY_ID=luminate_minio_user
+      - LANGFUSE_S3_EVENT_UPLOAD_SECRET_ACCESS_KEY=luminate_minio_pass
+      - LANGFUSE_S3_EVENT_UPLOAD_REGION=us-east-1
+      - LANGFUSE_S3_EVENT_UPLOAD_FORCE_PATH_STYLE=true
+      - LANGFUSE_S3_EVENT_UPLOAD_PREFIX=events/
+      # Batch Export Configuration (Reuse same bucket)
+      - LANGFUSE_S3_BATCH_EXPORT_ENABLED=true
+      - LANGFUSE_S3_BATCH_EXPORT_BUCKET=langfuse
+      - LANGFUSE_S3_BATCH_EXPORT_ENDPOINT=http://minio:9000
+      - LANGFUSE_S3_BATCH_EXPORT_ACCESS_KEY_ID=luminate_minio_user
+      - LANGFUSE_S3_BATCH_EXPORT_SECRET_ACCESS_KEY=luminate_minio_pass
+      - LANGFUSE_S3_BATCH_EXPORT_REGION=us-east-1
+      - LANGFUSE_S3_BATCH_EXPORT_FORCE_PATH_STYLE=true
+      - LANGFUSE_S3_BATCH_EXPORT_PREFIX=exports/
     networks:
       - luminate_network
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:3000/api/public/health"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-
-  # Langfuse Worker (disabled - integrated into observer in latest version)
-  # langfuse_worker:
-  #   image: langfuse/langfuse:latest
-  #   container_name: langfuse_worker
-  #   entrypoint: ["node", "/app/web/.next/standalone/worker/index.js"]
-  #   environment:
-  #     - DATABASE_URL=postgresql://langfuse:langfuse@postgres:5432/langfuse
-  #     - NEXTAUTH_SECRET=langfuse-secret-key-change-in-production-dev-only
-  #     - NEXTAUTH_URL=http://localhost:3000
-  #     - SALT=langfuse-salt-change-in-production-dev-only
-  #     - ENCRYPTION_KEY=f2629bf18db32d7d4c1bf14f5b206f1d7ab0c472e154a2ab02609bff46def385
-  #     - CLICKHOUSE_URL=http://clickhouse:8123
-  #     - CLICKHOUSE_USER=default
-  #     - CLICKHOUSE_PASSWORD=default
-  #     - CLICKHOUSE_DB=default
-  #     - CLICKHOUSE_MIGRATION_URL=clickhouse://default:default@clickhouse:9000
-  #     - CLICKHOUSE_MIGRATION_SSL=false
-  #     - CLICKHOUSE_CLUSTER_ENABLED=false
-  #     - REDIS_CONNECTION_STRING=redis://cache_layer:6379
-  #     - LANGFUSE_S3_EVENT_UPLOAD_BUCKET=langfuse-events
-  #     - LANGFUSE_S3_ENDPOINT=http://minio:9000
-  #     - LANGFUSE_S3_ACCESS_KEY_ID=minioadmin
-  #     - LANGFUSE_S3_SECRET_ACCESS_KEY=minioadmin
-  #     - LANGFUSE_S3_BUCKET_REGION=us-east-1
-  #     - LANGFUSE_S3_FORCE_PATH_STYLE=true
-  #   depends_on:
-  #     postgres:
-  #       condition: service_healthy
-  #     clickhouse:
-  #       condition: service_healthy
-  #     cache_layer:
-  #       condition: service_started
-  #     minio:
-  #       condition: service_started
-  #   networks:
-  #     - luminate_network
 
   clickhouse:
     image: clickhouse/clickhouse-server:latest
     container_name: clickhouse
     ports:
-      - "8123:8123"  # HTTP interface
-      - "9000:9000"  # Native protocol
+      - "8123:8123"
+      - "9000:9000"
     volumes:
       - clickhouse_data:/var/lib/clickhouse
     environment:
@@ -152,29 +173,31 @@ services:
       - luminate_network
     healthcheck:
       test: ["CMD", "wget", "--spider", "-q", "http://localhost:8123/ping"]
-      interval: 10s
+      interval: 5s
       timeout: 5s
       retries: 5
 
   minio:
-    image: minio/minio:latest
+    image: docker.io/minio/minio
     container_name: minio
+    restart: always
+    entrypoint: sh
+    command: -c 'mkdir -p /data/langfuse && minio server --address ":9000" --console-address ":9001" /data'
+    environment:
+      - MINIO_ROOT_USER=luminate_minio_user
+      - MINIO_ROOT_PASSWORD=luminate_minio_pass
     ports:
-      - "9001:9001"  # Console
-      - "9002:9000"  # API (changed from 9000 to avoid conflict)
+      - "9090:9000"
+      - "9091:9001"
     volumes:
       - minio_data:/data
-    environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
-    command: server /data --console-address ":9001"
     networks:
       - luminate_network
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
 
   postgres:
     image: postgres:15-alpine
@@ -189,9 +212,9 @@ services:
       - luminate_network
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U langfuse"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+      interval: 3s
+      timeout: 3s
+      retries: 10
 
 volumes:
   backend_data:

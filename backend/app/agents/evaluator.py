@@ -5,7 +5,12 @@ Implements 3-step verification loop (Passive Validation, Active Validation, Outc
 
 from typing import Dict, Optional, List
 import logging
+import time
 from app.agents.state import AgentState
+from app.observability.langfuse_client import (
+    create_observation,
+    update_observation_with_usage
+)
 
 logger = logging.getLogger(__name__)
 
@@ -128,9 +133,36 @@ class Evaluator:
 
 def evaluator_node(state: AgentState) -> AgentState:
     """
-    Evaluator node for LangGraph
+    Evaluator node for LangGraph with observability
     Evaluates student responses and updates mastery scores
     """
+    logger.info("Evaluator: Verifying mastery and quality")
+    start_time = time.time()
+    
+    # Create observation
+    observation = None
+    trace_id = state.get("trace_id")
+    if trace_id:
+        from app.observability.langfuse_client import get_langfuse_client
+        client = get_langfuse_client()
+        if client:
+            try:
+                observation = client.start_span(
+                    trace_context={"trace_id": trace_id},
+                    name="mastery_verification_evaluator",
+                    input={
+                        "query": state.get("query"),
+                        "response_preview": state.get("response", "")[:100] + "...",
+                        "user_context": state.get("user_role")
+                    },
+                    metadata={
+                        "component": "evaluator",
+                        "evaluation_framework": "pedagogical_quality"
+                    }
+                )
+            except Exception as e:
+                logger.warning(f"Could not create evaluator observation: {e}")
+
     evaluator = Evaluator()
     
     # This would be called after student interaction
@@ -138,17 +170,52 @@ def evaluator_node(state: AgentState) -> AgentState:
     
     # Extract concept from query or context
     query = state.get("query", "")
+    intent = state.get("intent", "fast")  # Track which agent was used
+    scaffolding_level = state.get("scaffolding_level", None)  # Track scaffolding
+    
     # In production, would extract concept tags from query
     
     # Evaluate (placeholder - would use actual student response)
     evaluation = evaluator.evaluate_response(
-        user_response="",  # Would come from student interaction
+        user_response=state.get("response", ""),  # Use actual response from state
         expected_concept="",
         question_type="recall"
     )
     
+    # Add agent metadata to evaluation
+    evaluation["agent_used"] = intent
+    evaluation["scaffolding_level"] = scaffolding_level
+    
+    # Calculate processing time
+    processing_time = (time.time() - start_time) * 1000
+    
+    # Update processing times
+    processing_times = state.get("processing_times", {})
+    processing_times["evaluator"] = processing_time
+    state["processing_times"] = processing_times
+    
     # Store evaluation in state
     state["evaluation"] = evaluation
+    
+    # Update observation
+    if observation:
+        update_observation_with_usage(
+            observation,
+            output_data={
+                "evaluation_result": evaluation,
+                "agent_used": intent,
+                "scaffolding_level": scaffolding_level,
+                "processing_metrics": {
+                    "duration_ms": processing_time,
+                    "quality_score": evaluation.get("confidence", 0)
+                }
+            },
+            level="DEFAULT" if evaluation["passed"] else "WARNING",
+            latency_seconds=processing_time / 1000.0
+        )
+        observation.end()
+    
+    logger.info(f"Evaluator: {'✓ Passed' if evaluation['passed'] else '⚠ Flagged'} ({processing_time:.1f}ms)")
     
     return state
 

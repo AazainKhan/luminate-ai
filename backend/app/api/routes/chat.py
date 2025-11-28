@@ -11,11 +11,48 @@ import asyncio
 
 from app.api.middleware import require_student
 from app.agents.tutor_agent import run_agent
+from app.observability import get_langfuse_client
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
+
+
+class ScoreRequest(BaseModel):
+    trace_id: str = Field(..., description="Trace ID to attach score to")
+    name: str = Field(..., description="Name of the score (e.g., 'user_feedback')")
+    value: float = Field(..., description="Numeric value of the score")
+    comment: Optional[str] = Field(None, description="Optional comment")
+    observation_id: Optional[str] = Field(None, description="Optional observation ID")
+
+
+@router.post("/feedback")
+async def submit_feedback(
+    request: ScoreRequest,
+    user_info: dict = Depends(require_student),
+):
+    """
+    Submit user feedback (score) for a chat response.
+    """
+    client = get_langfuse_client()
+    if not client:
+        logger.warning("Langfuse client not available, skipping feedback")
+        return {"status": "skipped", "reason": "observability_disabled"}
+        
+    try:
+        client.create_score(
+            trace_id=request.trace_id,
+            name=request.name,
+            value=request.value,
+            comment=request.comment,
+            observation_id=request.observation_id
+        )
+        return {"status": "success"}
+    except Exception as e:
+        logger.error(f"Error submitting feedback: {e}")
+        raise HTTPException(status_code=500, detail="Failed to submit feedback")
+
 
 
 class ChatMessage(BaseModel):
@@ -27,6 +64,7 @@ class ChatMessage(BaseModel):
 class ChatRequest(BaseModel):
     messages: List[ChatMessage] = Field(..., min_length=1, description="List of chat messages")
     stream: bool = Field(default=True, description="Whether to stream the response")
+    session_id: Optional[str] = Field(default=None, description="Session ID for observability")
 
 
 @router.post("/stream")
@@ -50,56 +88,25 @@ async def stream_chat(
             yield f'data: {json.dumps({"type": "finish"})}\n\n'
             return
 
-        loop = asyncio.get_event_loop()
         try:
-            # Run the blocking agent call in a thread pool
-            result = await loop.run_in_executor(
-                None,
-                run_agent,
+            from app.agents.tutor_agent import astream_agent
+            
+            # Stream events from the agent
+            async for event in astream_agent(
                 user_message,
                 user_info.get("user_id"),
-                user_info.get("email")
-            )
-
-            # Extract response components
-            response_text = result.get("response", "")
-            reasoning = result.get("reasoning", [])
-            sources = result.get("sources", [])
-            
-            # Stream reasoning if available
-            if reasoning:
-                reasoning_text = "\n".join([f"{step.get('step', '')}: {step.get('details', '')}" for step in reasoning])
-                yield f'data: {json.dumps({"type": "reasoning-delta", "reasoningDelta": reasoning_text})}\n\n'
-            
-            # Stream main response text in chunks
-            if response_text:
-                logger.info(f"Agent generated response: '{response_text[:100]}...'")
-                # Simulate streaming by chunking the response
-                chunk_size = 10  # words per chunk
-                words = response_text.split()
-                for i in range(0, len(words), chunk_size):
-                    chunk = " ".join(words[i:i + chunk_size])
-                    if i + chunk_size < len(words):
-                        chunk += " "
-                    yield f'data: {json.dumps({"type": "text-delta", "textDelta": chunk})}\n\n'
-                    await asyncio.sleep(0.05)  # Small delay for smooth streaming
-                
-                # Stream sources if available
-                if sources:
-                    yield f'data: {json.dumps({"type": "sources", "sources": sources})}\n\n'
-            else:
-                error_msg = result.get("error", "I apologize, but I couldn't generate a response.")
-                logger.error(f"Agent returned an error or no response: {error_msg}")
-                yield f'data: {json.dumps({"type": "text-delta", "textDelta": error_msg})}\n\n'
+                user_info.get("email"),
+                request.session_id
+            ):
+                yield f'data: {json.dumps(event)}\n\n'
 
             # Signal completion
             yield f'data: {json.dumps({"type": "finish"})}\n\n'
 
         except Exception as e:
             logger.error(f"Error during agent execution: {e}", exc_info=True)
-            error_message = "An unexpected error occurred while processing your request."
-            yield f'data: {json.dumps({"type": "text-delta", "textDelta": error_message})}\n\n'
-            yield f'data: {json.dumps({"type": "finish"})}\n\n'
+            error_msg = "An unexpected error occurred while processing your request."
+            yield f'data: {json.dumps({"type": "error", "error": error_msg})}\n\n'
 
     # Return StreamingResponse with proper SSE headers
     return StreamingResponse(

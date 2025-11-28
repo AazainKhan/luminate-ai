@@ -25,6 +25,8 @@ class ChromaEmbeddingWrapper:
         return self.langchain_embeddings.embed_documents(input)
         
     def embed_query(self, input: str) -> List[float]:
+        if isinstance(input, list):
+            return self.langchain_embeddings.embed_documents(input)
         return self.langchain_embeddings.embed_query(input)
         
     def embed_documents(self, input: List[str]) -> List[List[float]]:
@@ -38,11 +40,22 @@ class ChromaDBClient:
 
     def __init__(self):
         """Initialize ChromaDB client"""
-        self.client = chromadb.HttpClient(
-            host=settings.chromadb_host,
-            port=settings.chromadb_port,
-            settings=Settings(anonymized_telemetry=False)
-        )
+        try:
+            self.client = chromadb.HttpClient(
+                host=settings.chromadb_host,
+                port=settings.chromadb_port,
+                settings=Settings(anonymized_telemetry=False)
+            )
+            # Test connection
+            self.client.heartbeat()
+            logger.info(f"Connected to ChromaDB HTTP server at {settings.chromadb_host}:{settings.chromadb_port}")
+        except Exception as e:
+            logger.warning(f"Could not connect to ChromaDB HTTP server: {e}. Falling back to PersistentClient.")
+            self.client = chromadb.PersistentClient(
+                path="./chroma_db",
+                settings=Settings(anonymized_telemetry=False)
+            )
+            
         self.collection_name = "comp237_course_materials"
         self.collection = None
         # Wrap the LangChain embedding generator

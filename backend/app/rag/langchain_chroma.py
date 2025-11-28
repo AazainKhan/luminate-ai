@@ -5,10 +5,15 @@ This provides better compatibility with embeddings and query operations
 
 from typing import List, Dict, Optional, Tuple
 import logging
-from langchain_community.vectorstores import Chroma
+# Updated import for LangChain 0.2+ compatibility
+try:
+    from langchain_chroma import Chroma
+except ImportError:
+    from langchain_community.vectorstores import Chroma
 from langchain_core.documents import Document
 from app.config import settings
 from app.rag.embeddings import get_embedding_generator
+from app.rag.chromadb_client import ChromaEmbeddingWrapper
 import chromadb
 from chromadb.config import Settings as ChromaSettings
 
@@ -25,14 +30,25 @@ class LangChainChromaClient:
         """Initialize LangChain Chroma client"""
         # Get embedding function
         embedding_gen = get_embedding_generator()
-        self.embeddings = embedding_gen.embeddings
+        # Wrap it to ensure compatibility with ChromaDB's expectations
+        self.embeddings = ChromaEmbeddingWrapper(embedding_gen.embeddings)
         
         # Create ChromaDB HTTP client
-        self.chroma_client = chromadb.HttpClient(
-            host=settings.chromadb_host,
-            port=settings.chromadb_port,
-            settings=ChromaSettings(anonymized_telemetry=False)
-        )
+        try:
+            self.chroma_client = chromadb.HttpClient(
+                host=settings.chromadb_host,
+                port=settings.chromadb_port,
+                settings=ChromaSettings(anonymized_telemetry=False)
+            )
+            # Test connection
+            self.chroma_client.heartbeat()
+            logger.info(f"Connected to ChromaDB HTTP server at {settings.chromadb_host}:{settings.chromadb_port}")
+        except Exception as e:
+            logger.warning(f"Could not connect to ChromaDB HTTP server: {e}. Falling back to PersistentClient.")
+            self.chroma_client = chromadb.PersistentClient(
+                path="./chroma_db",
+                settings=ChromaSettings(anonymized_telemetry=False)
+            )
         
         self.collection_name = "comp237_course_materials"
         
@@ -185,4 +201,3 @@ def get_langchain_chroma_client() -> LangChainChromaClient:
     if _langchain_chroma_client is None:
         _langchain_chroma_client = LangChainChromaClient()
     return _langchain_chroma_client
-
