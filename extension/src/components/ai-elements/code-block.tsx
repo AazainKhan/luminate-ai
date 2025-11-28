@@ -74,3 +74,4 @@ export function CodeBlockCopyButton({ code, onCopy, onError, timeout = 2000 }: C
     </Button>
   )
 }
+

@@ -1,5 +1,6 @@
 -- Luminate AI Course Marshal - Database Schema
 -- Run this in Supabase SQL Editor
+-- Updated: December 2025 - Added agent tracking fields
 
 -- Concepts table (static course data)
 CREATE TABLE IF NOT EXISTS concepts (
@@ -21,7 +22,7 @@ CREATE TABLE IF NOT EXISTS student_mastery (
   PRIMARY KEY (user_id, concept_tag)
 );
 
--- Interactions log table
+-- Interactions log table (UPDATED: added agent tracking)
 CREATE TABLE IF NOT EXISTS interactions (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   student_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
@@ -29,6 +30,10 @@ CREATE TABLE IF NOT EXISTS interactions (
   concept_focus TEXT,
   outcome TEXT CHECK (outcome IN ('correct', 'incorrect', 'confusion_detected', 'passive_read')),
   sentiment TEXT,
+  -- NEW: Agent tracking fields (December 2025)
+  intent TEXT,  -- 'tutor', 'math', 'coder', 'syllabus_query', 'fast'
+  agent_used TEXT,  -- Which specialized agent handled the request
+  scaffolding_level TEXT CHECK (scaffolding_level IN ('hint', 'example', 'guided', 'explain', NULL)),
   metadata JSONB,
   created_at TIMESTAMP DEFAULT NOW()
 );

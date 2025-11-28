@@ -22,6 +22,46 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
     })
   }
 
+  const handleExportChat = () => {
+    if (messages.length === 0) return
+    
+    const now = new Date()
+    const dateStr = now.toISOString().split('T')[0]
+    const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-')
+    
+    // Build markdown content
+    let markdown = `# Chat Export - COMP 237\n`
+    markdown += `**Date:** ${now.toLocaleDateString()}\n`
+    markdown += `**User:** ${user.email}\n\n---\n\n`
+    
+    for (const msg of messages) {
+      const role = msg.role === 'user' ? '## 👤 You' : '## 🤖 Tutor'
+      markdown += `${role}\n\n${msg.content}\n\n`
+      
+      // Include sources if present
+      if (msg.sources && msg.sources.length > 0) {
+        markdown += `**Sources:**\n`
+        for (const source of msg.sources) {
+          markdown += `- ${source.file || source.source || 'Course Material'}\n`
+        }
+        markdown += '\n'
+      }
+      
+      markdown += `---\n\n`
+    }
+    
+    // Download as .md file
+    const blob = new Blob([markdown], { type: 'text/markdown' })
+    const url = URL.createObjectURL(blob)
+    const a = document.createElement('a')
+    a.href = url
+    a.download = `luminate-chat-${dateStr}-${timeStr}.md`
+    document.body.appendChild(a)
+    a.click()
+    document.body.removeChild(a)
+    URL.revokeObjectURL(url)
+  }
+
   return (
     <div className="relative flex h-screen w-full bg-slate-950 text-slate-50 overflow-hidden font-sans antialiased transition-colors duration-300">
       {/* Main Content Area */}
@@ -86,7 +126,8 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
             setInput={setInput}
             onSend={handleSendMessage}
             isLoading={isLoading}
-            toggleHistory={() => {}}
+            onExport={handleExportChat}
+            hasMessages={messages.length > 0}
           />
         </div>
       </div>

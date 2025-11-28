@@ -76,3 +76,4 @@ const TaskItemFile = React.forwardRef<HTMLSpanElement, React.HTMLAttributes<HTML
 TaskItemFile.displayName = "TaskItemFile"
 
 export { Task, TaskTrigger, TaskContent, TaskItem, TaskItemFile }
+

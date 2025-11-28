@@ -88,6 +88,17 @@ export default function useChat(providedSession?: Session | null) {
                   updatedMsg.reasoning = (updatedMsg.reasoning || "") + parsed.reasoningDelta
                 } else if (parsed.type === "sources") {
                   updatedMsg.sources = parsed.sources
+                } else if (parsed.type === "tool-call") {
+                  const toolCall = {
+                    name: parsed.toolName,
+                    args: parsed.toolInput,
+                    status: "in-progress" as const
+                  }
+                  updatedMsg.tools = [...(updatedMsg.tools || []), toolCall]
+                } else if (parsed.type === "tool-result") {
+                  updatedMsg.tools = updatedMsg.tools?.map(t => 
+                    t.name === parsed.toolName ? { ...t, result: parsed.toolOutput, status: "completed" } : t
+                  )
                 } else if (parsed.type === "finish") {
                    // Handle finish
                 }

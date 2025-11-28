@@ -27,3 +27,4 @@ Uncomment the logging lines in `backend/app/agents/governor.py` to ensure we can
 ## Handover Note
 Everything you need is in `docs/swe-repo/`. Follow the roadmap. The architecture is sound. Do not over-engineer. Just fill the database and fix the frontend hook.
 
+

@@ -20,3 +20,8 @@ dist/
 # OS
 .DS_Store
 Thumbs.db
+
+# Test outputs
+test-output/*
+!test-output/.gitkeep
+wdio-logs/
