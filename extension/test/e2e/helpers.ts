@@ -9,30 +9,44 @@
 
 /**
  * Get the extension ID from the loaded extension
+ * Uses a simpler approach that works with modern WebdriverIO
  */
 export async function getExtensionId(): Promise<string> {
-  // Navigate to chrome://extensions to find our extension
-  await browser.url('chrome://extensions/')
+  // Navigate to chrome://extensions
+  await browser.url('chrome://extensions')
+  await browser.pause(2000)
   
-  // Enable developer mode if not already enabled
-  const devModeToggle = await $('extensions-manager').$('extensions-toolbar').$('#devMode')
-  const isDevMode = await devModeToggle.getAttribute('checked')
-  if (!isDevMode) {
-    await devModeToggle.click()
-    await browser.pause(500)
-  }
-
-  // Find Luminate AI extension
-  const extensions = await $$('extensions-item')
-  for (const ext of extensions) {
-    const name = await ext.$('#name').getText()
-    if (name.includes('Luminate AI')) {
-      const id = await ext.getAttribute('id')
-      return id
+  // Execute script to find extension ID through page evaluation
+  const extensionId = await browser.execute(() => {
+    // Try to access extensions manager through DOM
+    const manager = document.querySelector('extensions-manager')
+    if (manager && manager.shadowRoot) {
+      const itemList = manager.shadowRoot.querySelector('extensions-item-list')
+      if (itemList && itemList.shadowRoot) {
+        const items = itemList.shadowRoot.querySelectorAll('extensions-item')
+        for (const item of items) {
+          const nameEl = item.shadowRoot?.querySelector('#name')
+          const name = nameEl?.textContent || ''
+          if (name.toLowerCase().includes('luminate')) {
+            return item.id
+          }
+        }
+      }
     }
+    return null
+  })
+  
+  if (extensionId) {
+    return extensionId
   }
-
-  throw new Error('Luminate AI extension not found. Make sure it is built and loaded.')
+  
+  // Fallback: Read from manifest.json in build directory
+  // This requires the extension ID to be stable (unpacked extensions have dynamic IDs)
+  console.warn('Could not find extension ID through chrome://extensions, using fallback')
+  
+  // Try navigating directly to a known extension page pattern
+  // Unpacked extensions have predictable IDs based on the path
+  throw new Error('Luminate AI extension not found. Make sure it is built and loaded correctly.')
 }
 
 /**

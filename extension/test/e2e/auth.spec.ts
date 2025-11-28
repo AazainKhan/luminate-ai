@@ -6,37 +6,14 @@
  * - Admins: @centennialcollege.ca
  */
 
-import { openSidePanel, clearStorage, screenshot } from './helpers'
+import { openSidePanel, clearStorage, screenshot, getExtensionId } from './helpers'
 
 describe('Authentication Flow', () => {
   let extensionId: string
 
   before(async () => {
-    // Get extension ID from the URL after extension loads
-    // Navigate to a blank page first, then find extension
-    await browser.url('about:blank')
-    await browser.pause(2000)
-    
-    // Get the extension ID from service worker
-    const targets = await browser.call(async () => {
-      // @ts-ignore - Chrome DevTools Protocol
-      const { targetInfos } = await browser.cdp('Target', 'getTargets')
-      const extTarget = targetInfos.find((t: any) => 
-        t.type === 'service_worker' && t.url.includes('chrome-extension://')
-      )
-      if (extTarget) {
-        const match = extTarget.url.match(/chrome-extension:\/\/([^\/]+)/)
-        return match ? match[1] : null
-      }
-      return null
-    })
-
-    if (!targets) {
-      // Fallback: hardcode or read from manifest
-      throw new Error('Could not determine extension ID. Ensure extension is built.')
-    }
-    
-    extensionId = targets as unknown as string
+    // Get extension ID using helper function
+    extensionId = await getExtensionId()
     console.log(`Extension ID: ${extensionId}`)
   })
 
