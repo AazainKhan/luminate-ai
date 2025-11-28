@@ -67,3 +67,4 @@ pnpm dev
 | **Embeddings Error** | Dimension Mismatch | Run `scripts/delete_collection.py` then re-ingest. |
 | **Connection Refused** | Docker down | `docker compose up -d`. |
 
+
