@@ -1,0 +1,287 @@
+/**
+ * AITutor Chrome Extension - Styles
+ * 
+ * Clean, modern styling for the floating chatbot panel
+ */
+
+/* ============================================================
+   MAIN CONTAINER
+   ============================================================ */
+
+.aitutor-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 350px;
+  height: 450px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  display: flex;
+  flex-direction: column;
+  z-index: 999999; /* Ensure it's always on top */
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  overflow: hidden;
+}
+
+/* ============================================================
+   HEADER
+   ============================================================ */
+
+.aitutor-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Close button */
+.aitutor-close-button {
+  background: transparent;
+  border: none;
+  color: #ffffff;
+  font-size: 32px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  font-weight: 300;
+}
+
+.aitutor-close-button:hover {
+  background: rgba(255, 255, 255, 0.2);
+  transform: scale(1.1);
+}
+
+.aitutor-close-button:active {
+  transform: scale(0.95);
+}
+
+/* ============================================================
+   MESSAGES AREA
+   ============================================================ */
+
+.aitutor-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Scrollbar styling */
+.aitutor-messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+.aitutor-messages::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+.aitutor-messages::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.aitutor-messages::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* ============================================================
+   MESSAGE BUBBLES
+   ============================================================ */
+
+.aitutor-message {
+  display: flex;
+  margin-bottom: 4px;
+}
+
+/* AI messages - left aligned */
+.aitutor-message-ai {
+  justify-content: flex-start;
+}
+
+/* User messages - right aligned */
+.aitutor-message-user {
+  justify-content: flex-end;
+}
+
+.aitutor-message-content {
+  max-width: 75%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  font-size: 14px;
+  line-height: 1.6;
+  word-wrap: break-word;
+  white-space: normal;
+}
+
+.aitutor-message-content strong {
+  font-weight: 600;
+  color: inherit;
+}
+
+.aitutor-message-content br {
+  display: block;
+  content: "";
+  margin: 4px 0;
+}
+
+/* AI message styling */
+.aitutor-message-ai .aitutor-message-content {
+  background-color: #ffffff;
+  color: #333333;
+  border: 1px solid #e1e4e8;
+  border-radius: 12px 12px 12px 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+/* User message styling */
+.aitutor-message-user .aitutor-message-content {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border-radius: 12px 12px 4px 12px;
+  box-shadow: 0 1px 3px rgba(102, 126, 234, 0.4);
+}
+
+/* ============================================================
+   INPUT AREA
+   ============================================================ */
+
+.aitutor-input-area {
+  display: flex;
+  padding: 12px;
+  background-color: #ffffff;
+  border-top: 1px solid #e1e4e8;
+  gap: 8px;
+}
+
+.aitutor-input {
+  flex: 1;
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 14px;
+  font-family: inherit;
+  outline: none;
+  transition: border-color 0.2s ease;
+}
+
+.aitutor-input:focus {
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.aitutor-input::placeholder {
+  color: #9ca3af;
+}
+
+/* ============================================================
+   SEND BUTTON
+   ============================================================ */
+
+.aitutor-send-button {
+  padding: 10px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+}
+
+.aitutor-send-button:hover:not(:disabled) {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(102, 126, 234, 0.3);
+}
+
+.aitutor-send-button:active:not(:disabled) {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(102, 126, 234, 0.2);
+}
+
+.aitutor-send-button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* ============================================================
+   LOADING INDICATOR
+   ============================================================ */
+
+.aitutor-loading {
+  animation: pulse 1.5s ease-in-out infinite;
+  font-size: 20px;
+  letter-spacing: 4px;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* ============================================================
+   TOGGLE BUTTON (for reopening chatbot)
+   ============================================================ */
+
+.aitutor-toggle-button {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  border: none;
+  font-size: 28px;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+  z-index: 999998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+}
+
+.aitutor-toggle-button:hover {
+  transform: scale(1.1);
+  box-shadow: 0 6px 16px rgba(102, 126, 234, 0.5);
+}
+
+.aitutor-toggle-button:active {
+  transform: scale(1.05);
+}
+
+/* ============================================================
+   RESPONSIVE ADJUSTMENTS
+   ============================================================ */
+
+@media (max-width: 480px) {
+  .aitutor-panel {
+    width: calc(100% - 40px);
+    right: 20px;
+    left: 20px;
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "manifest_version": 3,
+  "name": "Luminate AITutor",
+  "description": "AI-powered tutoring assistant for Centennial College Luminate",
+  "version": "1.0.0",
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://luminate.centennialcollege.ca/ultra/institution-page*",
+        "https://luminate.centennialcollege.ca/*"
+      ],
+      "js": ["contentScript.js"],
+      "css": ["styles.css"],
+      "run_at": "document_end"
+    }
+  ],
+  "permissions": [],
+  "host_permissions": [
+    "http://localhost:8000/*"
+  ]
+}

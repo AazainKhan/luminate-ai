@@ -1,0 +1,1624 @@
+INFO:     Will watch for changes in these directories: ['/Users/adarshsprabhan/Desktop/AiTutor ']
+INFO:     Uvicorn running on http://127.0.0.1:8000 (Press CTRL+C to quit)
+INFO:     Started reloader process [35241] using WatchFiles
+INFO:     Started server process [35287]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+
+==================================================
+[ask] New request - CID: conv_1763941225493_lrh0nx5lh, Turn: 0
+[ask] Question: what is A* search
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not retrieve conversation history: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Invoking graph...
+
+================================================================================
+[planner_node] LLM-first planning for: what is A* search
+[PlannerAgent] Planning for query: what is A* search
+[PlannerAgent] Trying LLM-first planning...
+
+================================================================================
+[PlannerAgent] _llm_plan_raw called with query: what is A* search
+[PlannerAgent] LLM type: ChatGoogleGenerativeAI
+
+[PlannerAgent] Formatting prompt...
+
+[PlannerAgent] Formatted messages:
+  [0] role=system content[:120]="You are PlannerAgent. Your sole job is to classify and decompose the user's query into subtasks.\nYou NEVER answer the qu"
+  [1] role=human content[:120]='User query:\nwhat is A* search\n'
+
+[PlannerAgent] Raw LLM content (first 400 chars):
+```json
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "A* search algorithm"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query asks for an explanation of A* search, which falls under the 'explain' task type. The topic is clearly 'A* search algorithm'.",
+  "rules_triggered": [],
+  "llm_used": true
+}
+```
+
+[PlannerAgent] Extracted JSON block:
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "A* search algorithm"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query asks for an explanation of A* search, which falls under the 'explain' task type. The topic is clearly 'A* search algorithm'.",
+  "rules_triggered": [],
+  "llm_used": true
+}
+
+[PlannerAgent] LLM plan succeeded
+
+[planner_node] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of A* search, which falls under the 'explain' task type. The topic is clearly 'A* search algorithm'."}
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm'}}]
+[router_node] Current subtask index: 0
+[router_node] Selected subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm'}}
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[route_from_current_subtask] current task=explain, payload={'topic': 'A* search algorithm'}
+[route_from_current_subtask] → tutor
+
+================================================================================
+[tutor_node] Starting tutor_node
+[tutor_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[tutor_node] Current subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm'}}
+[tutor_node] Using topic for tutor: A* search algorithm
+
+======================================================================
+[TutorAgent] tutor_node called
+[TutorAgent] Incoming state keys: ['student_input', 'conversation_id', 'turn_index', 'plan']
+[TutorAgent] Processing Topic: A* search algorithm | mode=full
+[RAG] Ensuring ChromaDB directory exists at: ./chroma_db
+[RAG] Available collections: ['course_comp237']
+[RAG] Loaded collection 'course_comp237'
+[RAG] course_comp237: Retrieved 3 documents
+[RAG] Failed to load collection 'oer_resources': Collection [oer_resources] does not exist
+[RAG] Total retrieved: 3 documents
+[RAG] Successfully retrieved 3 documents | has_comp237=True | sources=['course_comp237']
+[TutorAgent] COMP237 context found → in-scope teaching mode.
+[TutorAgent] Generated response length: 469 chars
+[tutor_node] Response (first 120 chars): 'Okay, I will help the student understand A* search.\n\nThink about how you might find the shortest route on a map. You pro'
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm'}}]
+[router_node] Current subtask index: 1
+[router_node] No more subtasks, marking end of execution
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[route_from_current_subtask] _routing_decision is __end__
+
+================================================================================
+[feedback_node] Starting feedback_node
+[feedback_node] Final state keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[ask] Graph execution completed. Result keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision', 'final_response']
+
+[ask] Full result structure:
+  student_input: what is A* search
+  conversation_id: conv_1763941225493_lrh0nx5lh
+  turn_index: 0
+  conversation_history: []
+  outputs: [{'response': "Okay, I will help the student understand A* search.\n\nThink about how you might find the shortest route on a map. You probably wouldn't explore every single road, right? You'd likely f...
+  plan: {'subtasks': [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm'}}], 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of A* search, which fall...
+  routing_info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of A* search, which falls under the 'explain' task type. The to...
+  _subtask_index: 1
+  current_subtask: None
+  plan_for_tutor: {'topic': 'A* search algorithm'}
+  output: Okay, I will help the student understand A* search.
+
+Think about how you might find the shortest route on a map. You probably wouldn't explore every single road, right? You'd likely focus on roads tha...
+  rag_metadata: {'docs_retrieved': 3, 'sources_used': ['course_comp237'], 'retrieval_success': True, 'has_comp237': True}
+  is_fallback_response: False
+  node_processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'A* search algorithm'}
+  _routing_decision: __end__
+  final_response: OK
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of A* search, which falls under the 'explain' task type. The topic is clearly 'A* search algorithm'."}
+[ask] Node processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'A* search algorithm'}
+[ask] Sending response. Output length: 469
+[ask] Response keys: ['conversation_id', 'output', 'student_input', 'plan', 'outputs', 'rag_metadata', 'is_fallback_response', 'routing_info', 'node_processing', 'status']
+[ask] Response output type: <class 'str'>
+[ask] First 100 chars of output: Okay, I will help the student understand A* search.
+
+Think about how you might find the shortest rou
+==================================================
+
+INFO:     127.0.0.1:51329 - "POST /ask HTTP/1.1" 200 OK
+
+==================================================
+[ask] New request - CID: conv_1763941225493_lrh0nx5lh, Turn: 1
+[ask] Question: give me a proper answe for A* search not with example
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not retrieve conversation history: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Invoking graph...
+
+================================================================================
+[planner_node] LLM-first planning for: give me a proper answe for A* search not with example
+[PlannerAgent] Planning for query: give me a proper answe for A* search not with example
+[PlannerAgent] Trying LLM-first planning...
+
+================================================================================
+[PlannerAgent] _llm_plan_raw called with query: give me a proper answe for A* search not with example
+[PlannerAgent] LLM type: ChatGoogleGenerativeAI
+
+[PlannerAgent] Formatting prompt...
+
+[PlannerAgent] Formatted messages:
+  [0] role=system content[:120]="You are PlannerAgent. Your sole job is to classify and decompose the user's query into subtasks.\nYou NEVER answer the qu"
+  [1] role=human content[:120]='User query:\ngive me a proper answe for A* search not with example\n'
+
+[PlannerAgent] Raw LLM content (first 400 chars):
+```json
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "A* search algorithm explanation"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The user is asking for an explanation of the A* search algorithm, so the task type is 'explain'. The topic is 'A* search algorithm explanation'.",
+  "rules_triggered": [
+    "rule3"
+  ],
+  "llm_used": true
+}
+`
+
+[PlannerAgent] Extracted JSON block:
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "A* search algorithm explanation"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The user is asking for an explanation of the A* search algorithm, so the task type is 'explain'. The topic is 'A* search algorithm explanation'.",
+  "rules_triggered": [
+    "rule3"
+  ],
+  "llm_used": true
+}
+
+[PlannerAgent] LLM plan succeeded
+
+[planner_node] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The user is asking for an explanation of the A* search algorithm, so the task type is 'explain'. The topic is 'A* search algorithm explanation'."}
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm explanation'}}]
+[router_node] Current subtask index: 0
+[router_node] Selected subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm explanation'}}
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[route_from_current_subtask] current task=explain, payload={'topic': 'A* search algorithm explanation'}
+[route_from_current_subtask] → tutor
+
+================================================================================
+[tutor_node] Starting tutor_node
+[tutor_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[tutor_node] Current subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm explanation'}}
+[tutor_node] Using topic for tutor: A* search algorithm explanation
+
+======================================================================
+[TutorAgent] tutor_node called
+[TutorAgent] Incoming state keys: ['student_input', 'conversation_id', 'turn_index', 'plan']
+[TutorAgent] Processing Topic: A* search algorithm explanation | mode=full
+[RAG] Ensuring ChromaDB directory exists at: ./chroma_db
+[RAG] Available collections: ['course_comp237']
+[RAG] Loaded collection 'course_comp237'
+[RAG] course_comp237: Retrieved 3 documents
+[RAG] Failed to load collection 'oer_resources': Collection [oer_resources] does not exist
+[RAG] Total retrieved: 3 documents
+[RAG] Successfully retrieved 3 documents | has_comp237=True | sources=['course_comp237']
+[TutorAgent] COMP237 context found → in-scope teaching mode.
+[TutorAgent] Generated response length: 1169 chars
+[tutor_node] Response (first 120 chars): 'Okay, I will provide a proper explanation of the A* search algorithm without relying on specific examples.\n\nA* search is'
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm explanation'}}]
+[router_node] Current subtask index: 1
+[router_node] No more subtasks, marking end of execution
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[route_from_current_subtask] _routing_decision is __end__
+
+================================================================================
+[feedback_node] Starting feedback_node
+[feedback_node] Final state keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[ask] Graph execution completed. Result keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision', 'final_response']
+
+[ask] Full result structure:
+  student_input: give me a proper answe for A* search not with example
+  conversation_id: conv_1763941225493_lrh0nx5lh
+  turn_index: 1
+  conversation_history: []
+  outputs: [{'response': "Okay, I will provide a proper explanation of the A* search algorithm without relying on specific examples.\n\nA* search is an informed search algorithm used to find the lowest-cost path...
+  plan: {'subtasks': [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm explanation'}}], 'router_confidence': 0.95, 'reasoning': "The user is asking for an explanation of the A...
+  routing_info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The user is asking for an explanation of the A* search algorithm, so the task type is 'explain'. ...
+  _subtask_index: 1
+  current_subtask: None
+  plan_for_tutor: {'topic': 'A* search algorithm explanation'}
+  output: Okay, I will provide a proper explanation of the A* search algorithm without relying on specific examples.
+
+A* search is an informed search algorithm used to find the lowest-cost path from a starting ...
+  rag_metadata: {'docs_retrieved': 3, 'sources_used': ['course_comp237'], 'retrieval_success': True, 'has_comp237': True}
+  is_fallback_response: False
+  node_processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'A* search algorithm explanation'}
+  _routing_decision: __end__
+  final_response: OK
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The user is asking for an explanation of the A* search algorithm, so the task type is 'explain'. The topic is 'A* search algorithm explanation'."}
+[ask] Node processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'A* search algorithm explanation'}
+[ask] Sending response. Output length: 1169
+[ask] Response keys: ['conversation_id', 'output', 'student_input', 'plan', 'outputs', 'rag_metadata', 'is_fallback_response', 'routing_info', 'node_processing', 'status']
+[ask] Response output type: <class 'str'>
+[ask] First 100 chars of output: Okay, I will provide a proper explanation of the A* search algorithm without relying on specific exa
+==================================================
+
+INFO:     127.0.0.1:51354 - "POST /ask HTTP/1.1" 200 OK
+
+==================================================
+[ask] New request - CID: conv_1763941225493_lrh0nx5lh, Turn: 2
+[ask] Question: yes
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not retrieve conversation history: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Invoking graph...
+
+================================================================================
+[planner_node] LLM-first planning for: yes
+[PlannerAgent] Planning for query: yes
+[PlannerAgent] Trying LLM-first planning...
+
+================================================================================
+[PlannerAgent] _llm_plan_raw called with query: yes
+[PlannerAgent] LLM type: ChatGoogleGenerativeAI
+
+[PlannerAgent] Formatting prompt...
+
+[PlannerAgent] Formatted messages:
+  [0] role=system content[:120]="You are PlannerAgent. Your sole job is to classify and decompose the user's query into subtasks.\nYou NEVER answer the qu"
+  [1] role=human content[:120]='User query:\nyes\n'
+
+[PlannerAgent] Raw LLM content (first 400 chars):
+```json
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "continue previous explanation"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query is a short affirmative response, indicating a follow-up to a previous explanation.",
+  "rules_triggered": [
+    "rule1"
+  ],
+  "llm_used": true
+}
+```
+
+[PlannerAgent] Extracted JSON block:
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "continue previous explanation"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query is a short affirmative response, indicating a follow-up to a previous explanation.",
+  "rules_triggered": [
+    "rule1"
+  ],
+  "llm_used": true
+}
+
+[PlannerAgent] LLM plan succeeded
+
+[planner_node] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': 'The query is a short affirmative response, indicating a follow-up to a previous explanation.'}
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}]
+[router_node] Current subtask index: 0
+[router_node] Selected subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[route_from_current_subtask] current task=explain, payload={'topic': 'continue previous explanation'}
+[route_from_current_subtask] → tutor
+
+================================================================================
+[tutor_node] Starting tutor_node
+[tutor_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[tutor_node] Current subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}
+[tutor_node] Using topic for tutor: continue previous explanation
+
+======================================================================
+[TutorAgent] tutor_node called
+[TutorAgent] Incoming state keys: ['student_input', 'conversation_id', 'turn_index', 'plan']
+[TutorAgent] Processing Topic: continue previous explanation | mode=full
+[RAG] Ensuring ChromaDB directory exists at: ./chroma_db
+[RAG] Available collections: ['course_comp237']
+[RAG] Loaded collection 'course_comp237'
+[RAG] course_comp237: Retrieved 3 documents
+[RAG] Failed to load collection 'oer_resources': Collection [oer_resources] does not exist
+[RAG] Total retrieved: 3 documents
+[RAG] Successfully retrieved 3 documents | has_comp237=True | sources=['course_comp237']
+[TutorAgent] COMP237 context found → in-scope teaching mode.
+[TutorAgent] Generated response length: 702 chars
+[tutor_node] Response (first 120 chars): 'Okay, I will continue with the scaffolding questions in "full" mode.\n\nYou said "yes". I assume you mean "yes, continue t'
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}]
+[router_node] Current subtask index: 1
+[router_node] No more subtasks, marking end of execution
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[route_from_current_subtask] _routing_decision is __end__
+
+================================================================================
+[feedback_node] Starting feedback_node
+[feedback_node] Final state keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[ask] Graph execution completed. Result keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision', 'final_response']
+
+[ask] Full result structure:
+  student_input: yes
+  conversation_id: conv_1763941225493_lrh0nx5lh
+  turn_index: 2
+  conversation_history: []
+  outputs: [{'response': 'Okay, I will continue with the scaffolding questions in "full" mode.\n\nYou said "yes". I assume you mean "yes, continue the previous explanation".\n\nPreviously, we were discussing how...
+  plan: {'subtasks': [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}], 'router_confidence': 0.95, 'reasoning': 'The query is a short affirmative response, indic...
+  routing_info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': 'The query is a short affirmative response, indicating a follow-up to a previous explanation.'}
+  _subtask_index: 1
+  current_subtask: None
+  plan_for_tutor: {'topic': 'continue previous explanation'}
+  output: Okay, I will continue with the scaffolding questions in "full" mode.
+
+You said "yes". I assume you mean "yes, continue the previous explanation".
+
+Previously, we were discussing how to represent state...
+  rag_metadata: {'docs_retrieved': 3, 'sources_used': ['course_comp237'], 'retrieval_success': True, 'has_comp237': True}
+  is_fallback_response: False
+  node_processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'continue previous explanation'}
+  _routing_decision: __end__
+  final_response: OK
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': 'The query is a short affirmative response, indicating a follow-up to a previous explanation.'}
+[ask] Node processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'continue previous explanation'}
+[ask] Sending response. Output length: 702
+[ask] Response keys: ['conversation_id', 'output', 'student_input', 'plan', 'outputs', 'rag_metadata', 'is_fallback_response', 'routing_info', 'node_processing', 'status']
+[ask] Response output type: <class 'str'>
+[ask] First 100 chars of output: Okay, I will continue with the scaffolding questions in "full" mode.
+
+You said "yes". I assume you m
+==================================================
+
+INFO:     127.0.0.1:51371 - "POST /ask HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'ingest_comp237_content.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [35287]
+INFO:     Started server process [36042]
+INFO:     Waiting for application startup.
+INFO:     Application startup complete.
+INFO:     127.0.0.1:52362 - "GET / HTTP/1.1" 404 Not Found
+INFO:     127.0.0.1:52472 - "OPTIONS /ask HTTP/1.1" 200 OK
+
+==================================================
+[ask] New request - CID: conv_1764186220442_sxex1p5of, Turn: 0
+[ask] Question: what is A* search
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not retrieve conversation history: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Invoking graph...
+
+================================================================================
+[planner_node] LLM-first planning for: what is A* search
+[PlannerAgent] Planning for query: what is A* search
+[PlannerAgent] Trying LLM-first planning...
+
+================================================================================
+[PlannerAgent] _llm_plan_raw called with query: what is A* search
+[PlannerAgent] LLM type: ChatGoogleGenerativeAI
+
+[PlannerAgent] Formatting prompt...
+
+[PlannerAgent] Formatted messages:
+  [0] role=system content[:120]="You are PlannerAgent. Your sole job is to classify and decompose the user's query into subtasks.\nYou NEVER answer the qu"
+  [1] role=human content[:120]='User query:\nwhat is A* search\n'
+
+[PlannerAgent] Raw LLM content (first 400 chars):
+```json
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "A* search algorithm"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query asks for an explanation of the A* search algorithm, which falls under the 'explain' task type.",
+  "rules_triggered": [
+    "rule3"
+  ],
+  "llm_used": true
+}
+```
+
+[PlannerAgent] Extracted JSON block:
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "A* search algorithm"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query asks for an explanation of the A* search algorithm, which falls under the 'explain' task type.",
+  "rules_triggered": [
+    "rule3"
+  ],
+  "llm_used": true
+}
+
+[PlannerAgent] LLM plan succeeded
+
+[planner_node] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of the A* search algorithm, which falls under the 'explain' task type."}
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm'}}]
+[router_node] Current subtask index: 0
+[router_node] Selected subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm'}}
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[route_from_current_subtask] current task=explain, payload={'topic': 'A* search algorithm'}
+[route_from_current_subtask] → tutor
+
+================================================================================
+[tutor_node] Starting tutor_node
+[tutor_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[tutor_node] Current subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm'}}
+[tutor_node] Using topic for tutor: A* search algorithm
+
+======================================================================
+[TutorAgent] tutor_node called
+[TutorAgent] Incoming state keys: ['student_input', 'conversation_id', 'turn_index', 'plan']
+[TutorAgent] Processing Topic: A* search algorithm | mode=full
+[RAG] Ensuring ChromaDB directory exists at: ./chroma_db
+[RAG] Available collections: ['course_comp237']
+[RAG] Loaded collection 'course_comp237'
+[RAG] course_comp237: Retrieved 3 documents
+[RAG] Failed to load collection 'oer_resources': Collection [oer_resources] does not exist
+[RAG] Total retrieved: 3 documents
+[RAG] Successfully retrieved 3 documents | has_comp237=True | sources=['course_comp237']
+[TutorAgent] COMP237 context found → in-scope teaching mode.
+[TutorAgent] Generated response length: 405 chars
+[tutor_node] Response (first 120 chars): 'Okay, I will help the student understand A* search.\n\nThink about how you might find the shortest route on a map. You pro'
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm'}}]
+[router_node] Current subtask index: 1
+[router_node] No more subtasks, marking end of execution
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[route_from_current_subtask] _routing_decision is __end__
+
+================================================================================
+[feedback_node] Starting feedback_node
+[feedback_node] Final state keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[ask] Graph execution completed. Result keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision', 'final_response']
+
+[ask] Full result structure:
+  student_input: what is A* search
+  conversation_id: conv_1764186220442_sxex1p5of
+  turn_index: 0
+  conversation_history: []
+  outputs: [{'response': "Okay, I will help the student understand A* search.\n\nThink about how you might find the shortest route on a map. You probably wouldn't explore every single road, right? You'd likely f...
+  plan: {'subtasks': [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'A* search algorithm'}}], 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of the A* search algorit...
+  routing_info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of the A* search algorithm, which falls under the 'explain' tas...
+  _subtask_index: 1
+  current_subtask: None
+  plan_for_tutor: {'topic': 'A* search algorithm'}
+  output: Okay, I will help the student understand A* search.
+
+Think about how you might find the shortest route on a map. You probably wouldn't explore every single road, right? You'd likely focus on roads tha...
+  rag_metadata: {'docs_retrieved': 3, 'sources_used': ['course_comp237'], 'retrieval_success': True, 'has_comp237': True}
+  is_fallback_response: False
+  node_processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'A* search algorithm'}
+  _routing_decision: __end__
+  final_response: OK
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of the A* search algorithm, which falls under the 'explain' task type."}
+[ask] Node processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'A* search algorithm'}
+[ask] Sending response. Output length: 405
+[ask] Response keys: ['conversation_id', 'output', 'student_input', 'plan', 'outputs', 'rag_metadata', 'is_fallback_response', 'routing_info', 'node_processing', 'status']
+[ask] Response output type: <class 'str'>
+[ask] First 100 chars of output: Okay, I will help the student understand A* search.
+
+Think about how you might find the shortest rou
+==================================================
+
+INFO:     127.0.0.1:52472 - "POST /ask HTTP/1.1" 200 OK
+
+==================================================
+[ask] New request - CID: conv_1764186220442_sxex1p5of, Turn: 1
+[ask] Question: i dont know
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not retrieve conversation history: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Invoking graph...
+
+================================================================================
+[planner_node] LLM-first planning for: i dont know
+[PlannerAgent] Planning for query: i dont know
+[PlannerAgent] Trying LLM-first planning...
+
+================================================================================
+[PlannerAgent] _llm_plan_raw called with query: i dont know
+[PlannerAgent] LLM type: ChatGoogleGenerativeAI
+
+[PlannerAgent] Formatting prompt...
+
+[PlannerAgent] Formatted messages:
+  [0] role=system content[:120]="You are PlannerAgent. Your sole job is to classify and decompose the user's query into subtasks.\nYou NEVER answer the qu"
+  [1] role=human content[:120]='User query:\ni dont know\n'
+
+[PlannerAgent] Raw LLM content (first 400 chars):
+```json
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "clarification needed on previous topic"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The user said 'i dont know', which indicates they need help understanding the previous topic discussed.",
+  "rules_triggered": [
+    "rule1"
+  ],
+  "llm_used": true
+}
+```
+
+[PlannerAgent] Extracted JSON block:
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "clarification needed on previous topic"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The user said 'i dont know', which indicates they need help understanding the previous topic discussed.",
+  "rules_triggered": [
+    "rule1"
+  ],
+  "llm_used": true
+}
+
+[PlannerAgent] LLM plan succeeded
+
+[planner_node] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The user said 'i dont know', which indicates they need help understanding the previous topic discussed."}
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'clarification needed on previous topic'}}]
+[router_node] Current subtask index: 0
+[router_node] Selected subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'clarification needed on previous topic'}}
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[route_from_current_subtask] current task=explain, payload={'topic': 'clarification needed on previous topic'}
+[route_from_current_subtask] → tutor
+
+================================================================================
+[tutor_node] Starting tutor_node
+[tutor_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[tutor_node] Current subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'clarification needed on previous topic'}}
+[tutor_node] Using topic for tutor: clarification needed on previous topic
+
+======================================================================
+[TutorAgent] tutor_node called
+[TutorAgent] Incoming state keys: ['student_input', 'conversation_id', 'turn_index', 'plan']
+[TutorAgent] Processing Topic: clarification needed on previous topic | mode=full
+[RAG] Ensuring ChromaDB directory exists at: ./chroma_db
+[RAG] Available collections: ['course_comp237']
+[RAG] Loaded collection 'course_comp237'
+[RAG] course_comp237: Retrieved 3 documents
+[RAG] Failed to load collection 'oer_resources': Collection [oer_resources] does not exist
+[RAG] Total retrieved: 3 documents
+[RAG] Successfully retrieved 3 documents | has_comp237=True | sources=['course_comp237']
+[TutorAgent] COMP237 context found → in-scope teaching mode.
+[TutorAgent] Generated response length: 1038 chars
+[tutor_node] Response (first 120 chars): 'Current message: "i dont know"\n\nDoes it contain "don\'t know" OR "dont know" OR "idk" OR "explain"?\n\n✅ YES → Student is S'
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'clarification needed on previous topic'}}]
+[router_node] Current subtask index: 1
+[router_node] No more subtasks, marking end of execution
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[route_from_current_subtask] _routing_decision is __end__
+
+================================================================================
+[feedback_node] Starting feedback_node
+[feedback_node] Final state keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[ask] Graph execution completed. Result keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision', 'final_response']
+
+[ask] Full result structure:
+  student_input: i dont know
+  conversation_id: conv_1764186220442_sxex1p5of
+  turn_index: 1
+  conversation_history: []
+  outputs: [{'response': 'Current message: "i dont know"\n\nDoes it contain "don\'t know" OR "dont know" OR "idk" OR "explain"?\n\n✅ YES → Student is STUCK\n- Look at conversation history\n- Find the LAST messag...
+  plan: {'subtasks': [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'clarification needed on previous topic'}}], 'router_confidence': 0.95, 'reasoning': "The user said 'i dont know', which indi...
+  routing_info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The user said 'i dont know', which indicates they need help understanding the previous topic disc...
+  _subtask_index: 1
+  current_subtask: None
+  plan_for_tutor: {'topic': 'clarification needed on previous topic'}
+  output: Current message: "i dont know"
+
+Does it contain "don't know" OR "dont know" OR "idk" OR "explain"?
+
+✅ YES → Student is STUCK
+- Look at conversation history
+- Find the LAST message from "AI Tutor:"
+- I...
+  rag_metadata: {'docs_retrieved': 3, 'sources_used': ['course_comp237'], 'retrieval_success': True, 'has_comp237': True}
+  is_fallback_response: False
+  node_processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'clarification needed on previous topic'}
+  _routing_decision: __end__
+  final_response: OK
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The user said 'i dont know', which indicates they need help understanding the previous topic discussed."}
+[ask] Node processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'clarification needed on previous topic'}
+[ask] Sending response. Output length: 1038
+[ask] Response keys: ['conversation_id', 'output', 'student_input', 'plan', 'outputs', 'rag_metadata', 'is_fallback_response', 'routing_info', 'node_processing', 'status']
+[ask] Response output type: <class 'str'>
+[ask] First 100 chars of output: Current message: "i dont know"
+
+Does it contain "don't know" OR "dont know" OR "idk" OR "explain"?
+
+
+==================================================
+
+INFO:     127.0.0.1:52496 - "POST /ask HTTP/1.1" 200 OK
+
+==================================================
+[ask] New request - CID: conv_1764186220442_sxex1p5of, Turn: 2
+[ask] Question: yes
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not retrieve conversation history: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Invoking graph...
+
+================================================================================
+[planner_node] LLM-first planning for: yes
+[PlannerAgent] Planning for query: yes
+[PlannerAgent] Trying LLM-first planning...
+
+================================================================================
+[PlannerAgent] _llm_plan_raw called with query: yes
+[PlannerAgent] LLM type: ChatGoogleGenerativeAI
+
+[PlannerAgent] Formatting prompt...
+
+[PlannerAgent] Formatted messages:
+  [0] role=system content[:120]="You are PlannerAgent. Your sole job is to classify and decompose the user's query into subtasks.\nYou NEVER answer the qu"
+  [1] role=human content[:120]='User query:\nyes\n'
+
+[PlannerAgent] Raw LLM content (first 400 chars):
+```json
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "continue previous explanation"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query 'yes' is a short conversational response, indicating a follow-up to a previous explanation. Therefore, the task is 'explain' and the topic is 'continue previous explanation'.",
+  "rules_triggered": [
+ 
+
+[PlannerAgent] Extracted JSON block:
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "continue previous explanation"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query 'yes' is a short conversational response, indicating a follow-up to a previous explanation. Therefore, the task is 'explain' and the topic is 'continue previous explanation'.",
+  "rules_triggered": [
+    "rule1"
+  ],
+  "llm_used": true
+}
+
+[PlannerAgent] LLM plan succeeded
+
+[planner_node] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query 'yes' is a short conversational response, indicating a follow-up to a previous explanation. Therefore, the task is 'explain' and the topic is 'continue previous explanation'."}
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}]
+[router_node] Current subtask index: 0
+[router_node] Selected subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[route_from_current_subtask] current task=explain, payload={'topic': 'continue previous explanation'}
+[route_from_current_subtask] → tutor
+
+================================================================================
+[tutor_node] Starting tutor_node
+[tutor_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[tutor_node] Current subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}
+[tutor_node] Using topic for tutor: continue previous explanation
+
+======================================================================
+[TutorAgent] tutor_node called
+[TutorAgent] Incoming state keys: ['student_input', 'conversation_id', 'turn_index', 'plan']
+[TutorAgent] Processing Topic: continue previous explanation | mode=full
+[RAG] Ensuring ChromaDB directory exists at: ./chroma_db
+[RAG] Available collections: ['course_comp237']
+[RAG] Loaded collection 'course_comp237'
+[RAG] course_comp237: Retrieved 3 documents
+[RAG] Failed to load collection 'oer_resources': Collection [oer_resources] does not exist
+[RAG] Total retrieved: 3 documents
+[RAG] Successfully retrieved 3 documents | has_comp237=True | sources=['course_comp237']
+[TutorAgent] COMP237 context found → in-scope teaching mode.
+[TutorAgent] Generated response length: 168 chars
+[tutor_node] Response (first 120 chars): 'The student said "yes", so I will continue the previous explanation.\n\nI don\'t have enough information to continue the pr'
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}]
+[router_node] Current subtask index: 1
+[router_node] No more subtasks, marking end of execution
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[route_from_current_subtask] _routing_decision is __end__
+
+================================================================================
+[feedback_node] Starting feedback_node
+[feedback_node] Final state keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[ask] Graph execution completed. Result keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision', 'final_response']
+
+[ask] Full result structure:
+  student_input: yes
+  conversation_id: conv_1764186220442_sxex1p5of
+  turn_index: 2
+  conversation_history: []
+  outputs: [{'response': 'The student said "yes", so I will continue the previous explanation.\n\nI don\'t have enough information to continue the previous explanation. Please provide more context.', 'error': ''...
+  plan: {'subtasks': [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}], 'router_confidence': 0.95, 'reasoning': "The query 'yes' is a short conversational respon...
+  routing_info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query 'yes' is a short conversational response, indicating a follow-up to a previous explanat...
+  _subtask_index: 1
+  current_subtask: None
+  plan_for_tutor: {'topic': 'continue previous explanation'}
+  output: The student said "yes", so I will continue the previous explanation.
+
+I don't have enough information to continue the previous explanation. Please provide more context.
+  rag_metadata: {'docs_retrieved': 3, 'sources_used': ['course_comp237'], 'retrieval_success': True, 'has_comp237': True}
+  is_fallback_response: False
+  node_processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'continue previous explanation'}
+  _routing_decision: __end__
+  final_response: OK
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query 'yes' is a short conversational response, indicating a follow-up to a previous explanation. Therefore, the task is 'explain' and the topic is 'continue previous explanation'."}
+[ask] Node processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'continue previous explanation'}
+[ask] Sending response. Output length: 168
+[ask] Response keys: ['conversation_id', 'output', 'student_input', 'plan', 'outputs', 'rag_metadata', 'is_fallback_response', 'routing_info', 'node_processing', 'status']
+[ask] Response output type: <class 'str'>
+[ask] First 100 chars of output: The student said "yes", so I will continue the previous explanation.
+
+I don't have enough informatio
+==================================================
+
+INFO:     127.0.0.1:52509 - "POST /ask HTTP/1.1" 200 OK
+
+==================================================
+[ask] New request - CID: conv_1764186220442_sxex1p5of, Turn: 3
+[ask] Question: how to make pizza
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not retrieve conversation history: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Invoking graph...
+
+================================================================================
+[planner_node] LLM-first planning for: how to make pizza
+[PlannerAgent] Planning for query: how to make pizza
+[PlannerAgent] Trying LLM-first planning...
+
+================================================================================
+[PlannerAgent] _llm_plan_raw called with query: how to make pizza
+[PlannerAgent] LLM type: ChatGoogleGenerativeAI
+
+[PlannerAgent] Formatting prompt...
+
+[PlannerAgent] Formatted messages:
+  [0] role=system content[:120]="You are PlannerAgent. Your sole job is to classify and decompose the user's query into subtasks.\nYou NEVER answer the qu"
+  [1] role=human content[:120]='User query:\nhow to make pizza\n'
+
+[PlannerAgent] Raw LLM content (first 400 chars):
+```json
+{
+  "subtasks": [
+    {
+      "task": "reject",
+      "payload": {
+        "reason": "This appears to be about cooking, which is outside the scope of COMP237 course material."
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query is about making pizza, which is a cooking topic and not related to computer science or AI.",
+  "rules_triggered": [
+    "rule2"
+  ],
+  "llm_us
+
+[PlannerAgent] Extracted JSON block:
+{
+  "subtasks": [
+    {
+      "task": "reject",
+      "payload": {
+        "reason": "This appears to be about cooking, which is outside the scope of COMP237 course material."
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query is about making pizza, which is a cooking topic and not related to computer science or AI.",
+  "rules_triggered": [
+    "rule2"
+  ],
+  "llm_used": true
+}
+
+[PlannerAgent] LLM plan succeeded
+
+[planner_node] Routing info: {'routes': [<TaskType.REJECT: 'reject'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': 'The query is about making pizza, which is a cooking topic and not related to computer science or AI.'}
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info']
+[router_node] Subtasks: [{'task': <TaskType.REJECT: 'reject'>, 'payload': {'reason': 'This appears to be about cooking, which is outside the scope of COMP237 course material.'}}]
+[router_node] Current subtask index: 0
+[router_node] Selected subtask: {'task': <TaskType.REJECT: 'reject'>, 'payload': {'reason': 'This appears to be about cooking, which is outside the scope of COMP237 course material.'}}
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[route_from_current_subtask] current task=reject, payload={'reason': 'This appears to be about cooking, which is outside the scope of COMP237 course material.'}
+[route_from_current_subtask] → reject
+
+================================================================================
+[reject_node] Starting reject_node
+[reject_node] Response: This question is outside the course scope. Please ask me a COMP-related question.
+
+================================================================================
+[feedback_node] Starting feedback_node
+[feedback_node] Final state keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'output', 'node_processing', 'is_fallback_response']
+[ask] Graph execution completed. Result keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'output', 'node_processing', 'is_fallback_response', 'final_response']
+
+[ask] Full result structure:
+  student_input: how to make pizza
+  conversation_id: conv_1764186220442_sxex1p5of
+  turn_index: 3
+  conversation_history: []
+  outputs: [{'response': 'This question is outside the course scope. Please ask me a COMP-related question.', 'error': ''}]
+  plan: {'subtasks': [{'task': <TaskType.REJECT: 'reject'>, 'payload': {'reason': 'This appears to be about cooking, which is outside the scope of COMP237 course material.'}}], 'router_confidence': 0.95, 'rea...
+  routing_info: {'routes': [<TaskType.REJECT: 'reject'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': 'The query is about making pizza, which is a cooking topic and not related to computer science or AI...
+  _subtask_index: 1
+  current_subtask: {'task': <TaskType.REJECT: 'reject'>, 'payload': {'reason': 'This appears to be about cooking, which is outside the scope of COMP237 course material.'}}
+  output: This question is outside the course scope. Please ask me a COMP-related question.
+  node_processing: {'node_type': 'reject', 'task': 'reject'}
+  is_fallback_response: True
+  final_response: OK
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Routing info: {'routes': [<TaskType.REJECT: 'reject'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': 'The query is about making pizza, which is a cooking topic and not related to computer science or AI.'}
+[ask] Node processing: {'node_type': 'reject', 'task': 'reject'}
+[ask] Sending response. Output length: 81
+[ask] Response keys: ['conversation_id', 'output', 'student_input', 'plan', 'outputs', 'rag_metadata', 'is_fallback_response', 'routing_info', 'node_processing', 'status']
+[ask] Response output type: <class 'str'>
+[ask] First 100 chars of output: This question is outside the course scope. Please ask me a COMP-related question.
+==================================================
+
+INFO:     127.0.0.1:52518 - "POST /ask HTTP/1.1" 200 OK
+
+==================================================
+[ask] New request - CID: conv_1764186220442_sxex1p5of, Turn: 4
+[ask] Question: what is neural network explain how you will explain it to a 7 year old
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not retrieve conversation history: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Invoking graph...
+
+================================================================================
+[planner_node] LLM-first planning for: what is neural network explain how you will explain it to a 7 year old
+[PlannerAgent] Planning for query: what is neural network explain how you will explain it to a 7 year old
+[PlannerAgent] Trying LLM-first planning...
+
+================================================================================
+[PlannerAgent] _llm_plan_raw called with query: what is neural network explain how you will explain it to a 7 year old
+[PlannerAgent] LLM type: ChatGoogleGenerativeAI
+
+[PlannerAgent] Formatting prompt...
+
+[PlannerAgent] Formatted messages:
+  [0] role=system content[:120]="You are PlannerAgent. Your sole job is to classify and decompose the user's query into subtasks.\nYou NEVER answer the qu"
+  [1] role=human content[:120]='User query:\nwhat is neural network explain how you will explain it to a 7 year old\n'
+
+[PlannerAgent] Raw LLM content (first 400 chars):
+```json
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "neural networks explained for a 7 year old"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query asks for an explanation of neural networks, tailored for a 7-year-old, which falls under the 'explain' task type.",
+  "rules_triggered": [],
+  "llm_used": true
+}
+```
+
+[PlannerAgent] Extracted JSON block:
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "neural networks explained for a 7 year old"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query asks for an explanation of neural networks, tailored for a 7-year-old, which falls under the 'explain' task type.",
+  "rules_triggered": [],
+  "llm_used": true
+}
+
+[PlannerAgent] LLM plan succeeded
+
+[planner_node] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of neural networks, tailored for a 7-year-old, which falls under the 'explain' task type."}
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'neural networks explained for a 7 year old'}}]
+[router_node] Current subtask index: 0
+[router_node] Selected subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'neural networks explained for a 7 year old'}}
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[route_from_current_subtask] current task=explain, payload={'topic': 'neural networks explained for a 7 year old'}
+[route_from_current_subtask] → tutor
+
+================================================================================
+[tutor_node] Starting tutor_node
+[tutor_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[tutor_node] Current subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'neural networks explained for a 7 year old'}}
+[tutor_node] Using topic for tutor: neural networks explained for a 7 year old
+
+======================================================================
+[TutorAgent] tutor_node called
+[TutorAgent] Incoming state keys: ['student_input', 'conversation_id', 'turn_index', 'plan']
+[TutorAgent] Processing Topic: neural networks explained for a 7 year old | mode=full
+[RAG] Ensuring ChromaDB directory exists at: ./chroma_db
+[RAG] Available collections: ['course_comp237']
+[RAG] Loaded collection 'course_comp237'
+[RAG] course_comp237: Retrieved 3 documents
+[RAG] Failed to load collection 'oer_resources': Collection [oer_resources] does not exist
+[RAG] Total retrieved: 3 documents
+[RAG] Successfully retrieved 3 documents | has_comp237=True | sources=['course_comp237']
+[TutorAgent] COMP237 context found → in-scope teaching mode.
+[TutorAgent] Generated response length: 413 chars
+[tutor_node] Response (first 120 chars): "Okay, I can help you understand neural networks, and how to explain them to a 7-year-old!\n\nLet's start with something fa"
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'neural networks explained for a 7 year old'}}]
+[router_node] Current subtask index: 1
+[router_node] No more subtasks, marking end of execution
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[route_from_current_subtask] _routing_decision is __end__
+
+================================================================================
+[feedback_node] Starting feedback_node
+[feedback_node] Final state keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[ask] Graph execution completed. Result keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision', 'final_response']
+
+[ask] Full result structure:
+  student_input: what is neural network explain how you will explain it to a 7 year old
+  conversation_id: conv_1764186220442_sxex1p5of
+  turn_index: 4
+  conversation_history: []
+  outputs: [{'response': "Okay, I can help you understand neural networks, and how to explain them to a 7-year-old!\n\nLet's start with something familiar. Have you ever played with building blocks or LEGOs?\n\n...
+  plan: {'subtasks': [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'neural networks explained for a 7 year old'}}], 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation o...
+  routing_info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of neural networks, tailored for a 7-year-old, which falls unde...
+  _subtask_index: 1
+  current_subtask: None
+  plan_for_tutor: {'topic': 'neural networks explained for a 7 year old'}
+  output: Okay, I can help you understand neural networks, and how to explain them to a 7-year-old!
+
+Let's start with something familiar. Have you ever played with building blocks or LEGOs?
+
+Imagine you want to...
+  rag_metadata: {'docs_retrieved': 3, 'sources_used': ['course_comp237'], 'retrieval_success': True, 'has_comp237': True}
+  is_fallback_response: False
+  node_processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'neural networks explained for a 7 year old'}
+  _routing_decision: __end__
+  final_response: OK
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of neural networks, tailored for a 7-year-old, which falls under the 'explain' task type."}
+[ask] Node processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'neural networks explained for a 7 year old'}
+[ask] Sending response. Output length: 413
+[ask] Response keys: ['conversation_id', 'output', 'student_input', 'plan', 'outputs', 'rag_metadata', 'is_fallback_response', 'routing_info', 'node_processing', 'status']
+[ask] Response output type: <class 'str'>
+[ask] First 100 chars of output: Okay, I can help you understand neural networks, and how to explain them to a 7-year-old!
+
+Let's sta
+==================================================
+
+INFO:     127.0.0.1:52527 - "POST /ask HTTP/1.1" 200 OK
+
+==================================================
+[ask] New request - CID: conv_1764186220442_sxex1p5of, Turn: 5
+[ask] Question: now explain the concept of neural network
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not retrieve conversation history: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Invoking graph...
+
+================================================================================
+[planner_node] LLM-first planning for: now explain the concept of neural network
+[PlannerAgent] Planning for query: now explain the concept of neural network
+[PlannerAgent] Trying LLM-first planning...
+
+================================================================================
+[PlannerAgent] _llm_plan_raw called with query: now explain the concept of neural network
+[PlannerAgent] LLM type: ChatGoogleGenerativeAI
+
+[PlannerAgent] Formatting prompt...
+
+[PlannerAgent] Formatted messages:
+  [0] role=system content[:120]="You are PlannerAgent. Your sole job is to classify and decompose the user's query into subtasks.\nYou NEVER answer the qu"
+  [1] role=human content[:120]='User query:\nnow explain the concept of neural network\n'
+
+[PlannerAgent] Raw LLM content (first 400 chars):
+```json
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "neural network"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query asks for an explanation of a concept, specifically 'neural network', which falls under the 'explain' task type.",
+  "rules_triggered": [
+    "rule3"
+  ],
+  "llm_used": true
+}
+```
+
+[PlannerAgent] Extracted JSON block:
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "neural network"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query asks for an explanation of a concept, specifically 'neural network', which falls under the 'explain' task type.",
+  "rules_triggered": [
+    "rule3"
+  ],
+  "llm_used": true
+}
+
+[PlannerAgent] LLM plan succeeded
+
+[planner_node] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of a concept, specifically 'neural network', which falls under the 'explain' task type."}
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'neural network'}}]
+[router_node] Current subtask index: 0
+[router_node] Selected subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'neural network'}}
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[route_from_current_subtask] current task=explain, payload={'topic': 'neural network'}
+[route_from_current_subtask] → tutor
+
+================================================================================
+[tutor_node] Starting tutor_node
+[tutor_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[tutor_node] Current subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'neural network'}}
+[tutor_node] Using topic for tutor: neural network
+
+======================================================================
+[TutorAgent] tutor_node called
+[TutorAgent] Incoming state keys: ['student_input', 'conversation_id', 'turn_index', 'plan']
+[TutorAgent] Processing Topic: neural network | mode=full
+[RAG] Ensuring ChromaDB directory exists at: ./chroma_db
+[RAG] Available collections: ['course_comp237']
+[RAG] Loaded collection 'course_comp237'
+[RAG] course_comp237: Retrieved 3 documents
+[RAG] Failed to load collection 'oer_resources': Collection [oer_resources] does not exist
+[RAG] Total retrieved: 3 documents
+[RAG] Successfully retrieved 3 documents | has_comp237=True | sources=['course_comp237']
+[TutorAgent] COMP237 context found → in-scope teaching mode.
+[TutorAgent] Generated response length: 401 chars
+[tutor_node] Response (first 120 chars): "Okay, let's explore the concept of neural networks.\n\nThink about how your brain works. It's made up of interconnected ne"
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'neural network'}}]
+[router_node] Current subtask index: 1
+[router_node] No more subtasks, marking end of execution
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[route_from_current_subtask] _routing_decision is __end__
+
+================================================================================
+[feedback_node] Starting feedback_node
+[feedback_node] Final state keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[ask] Graph execution completed. Result keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision', 'final_response']
+
+[ask] Full result structure:
+  student_input: now explain the concept of neural network
+  conversation_id: conv_1764186220442_sxex1p5of
+  turn_index: 5
+  conversation_history: []
+  outputs: [{'response': "Okay, let's explore the concept of neural networks.\n\nThink about how your brain works. It's made up of interconnected neurons that process information. A neural network is a computati...
+  plan: {'subtasks': [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'neural network'}}], 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of a concept, specifically 'n...
+  routing_info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of a concept, specifically 'neural network', which falls under ...
+  _subtask_index: 1
+  current_subtask: None
+  plan_for_tutor: {'topic': 'neural network'}
+  output: Okay, let's explore the concept of neural networks.
+
+Think about how your brain works. It's made up of interconnected neurons that process information. A neural network is a computational model inspir...
+  rag_metadata: {'docs_retrieved': 3, 'sources_used': ['course_comp237'], 'retrieval_success': True, 'has_comp237': True}
+  is_fallback_response: False
+  node_processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'neural network'}
+  _routing_decision: __end__
+  final_response: OK
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query asks for an explanation of a concept, specifically 'neural network', which falls under the 'explain' task type."}
+[ask] Node processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'neural network'}
+[ask] Sending response. Output length: 401
+[ask] Response keys: ['conversation_id', 'output', 'student_input', 'plan', 'outputs', 'rag_metadata', 'is_fallback_response', 'routing_info', 'node_processing', 'status']
+[ask] Response output type: <class 'str'>
+[ask] First 100 chars of output: Okay, let's explore the concept of neural networks.
+
+Think about how your brain works. It's made up 
+==================================================
+
+INFO:     127.0.0.1:52537 - "POST /ask HTTP/1.1" 200 OK
+
+==================================================
+[ask] New request - CID: conv_1764186220442_sxex1p5of, Turn: 6
+[ask] Question: give me answer from the content
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not retrieve conversation history: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Invoking graph...
+
+================================================================================
+[planner_node] LLM-first planning for: give me answer from the content
+[PlannerAgent] Planning for query: give me answer from the content
+[PlannerAgent] Trying LLM-first planning...
+
+================================================================================
+[PlannerAgent] _llm_plan_raw called with query: give me answer from the content
+[PlannerAgent] LLM type: ChatGoogleGenerativeAI
+
+[PlannerAgent] Formatting prompt...
+
+[PlannerAgent] Formatted messages:
+  [0] role=system content[:120]="You are PlannerAgent. Your sole job is to classify and decompose the user's query into subtasks.\nYou NEVER answer the qu"
+  [1] role=human content[:120]='User query:\ngive me answer from the content\n'
+
+[PlannerAgent] Raw LLM content (first 400 chars):
+```json
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "continue previous explanation"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query is a short response indicating a follow-up to a previous question, so it should be classified as 'explain' to continue the conversation.",
+  "rules_triggered": [
+    "rule1"
+  ],
+  "llm_used": true
+}
+`
+
+[PlannerAgent] Extracted JSON block:
+{
+  "subtasks": [
+    {
+      "task": "explain",
+      "payload": {
+        "topic": "continue previous explanation"
+      }
+    }
+  ],
+  "router_confidence": 0.95,
+  "reasoning": "The query is a short response indicating a follow-up to a previous question, so it should be classified as 'explain' to continue the conversation.",
+  "rules_triggered": [
+    "rule1"
+  ],
+  "llm_used": true
+}
+
+[PlannerAgent] LLM plan succeeded
+
+[planner_node] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query is a short response indicating a follow-up to a previous question, so it should be classified as 'explain' to continue the conversation."}
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}]
+[router_node] Current subtask index: 0
+[router_node] Selected subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[route_from_current_subtask] current task=explain, payload={'topic': 'continue previous explanation'}
+[route_from_current_subtask] → tutor
+
+================================================================================
+[tutor_node] Starting tutor_node
+[tutor_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask']
+[tutor_node] Current subtask: {'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}
+[tutor_node] Using topic for tutor: continue previous explanation
+
+======================================================================
+[TutorAgent] tutor_node called
+[TutorAgent] Incoming state keys: ['student_input', 'conversation_id', 'turn_index', 'plan']
+[TutorAgent] Processing Topic: continue previous explanation | mode=full
+[RAG] Ensuring ChromaDB directory exists at: ./chroma_db
+[RAG] Available collections: ['course_comp237']
+[RAG] Loaded collection 'course_comp237'
+[RAG] course_comp237: Retrieved 3 documents
+[RAG] Failed to load collection 'oer_resources': Collection [oer_resources] does not exist
+[RAG] Total retrieved: 3 documents
+[RAG] Successfully retrieved 3 documents | has_comp237=True | sources=['course_comp237']
+[TutorAgent] COMP237 context found → in-scope teaching mode.
+[TutorAgent] Generated response length: 488 chars
+[tutor_node] Response (first 120 chars): 'The message "give me answer from the content" indicates the student is stuck. Looking back at the conversation history, '
+
+================================================================================
+[router_node] Starting router_node
+[router_node] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing']
+[router_node] Subtasks: [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}]
+[router_node] Current subtask index: 1
+[router_node] No more subtasks, marking end of execution
+
+================================================================================
+[route_from_current_subtask] Deciding next node
+[route_from_current_subtask] State keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[route_from_current_subtask] _routing_decision is __end__
+
+================================================================================
+[feedback_node] Starting feedback_node
+[feedback_node] Final state keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision']
+[ask] Graph execution completed. Result keys: ['student_input', 'conversation_id', 'turn_index', 'conversation_history', 'outputs', 'plan', 'routing_info', '_subtask_index', 'current_subtask', 'plan_for_tutor', 'output', 'rag_metadata', 'is_fallback_response', 'node_processing', '_routing_decision', 'final_response']
+
+[ask] Full result structure:
+  student_input: give me answer from the content
+  conversation_id: conv_1764186220442_sxex1p5of
+  turn_index: 6
+  conversation_history: []
+  outputs: [{'response': 'The message "give me answer from the content" indicates the student is stuck. Looking back at the conversation history, there is no previous AI Tutor message. Since this is the first me...
+  plan: {'subtasks': [{'task': <TaskType.EXPLAIN: 'explain'>, 'payload': {'topic': 'continue previous explanation'}}], 'router_confidence': 0.95, 'reasoning': "The query is a short response indicating a follo...
+  routing_info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query is a short response indicating a follow-up to a previous question, so it should be clas...
+  _subtask_index: 1
+  current_subtask: None
+  plan_for_tutor: {'topic': 'continue previous explanation'}
+  output: The message "give me answer from the content" indicates the student is stuck. Looking back at the conversation history, there is no previous AI Tutor message. Since this is the first message, I will s...
+  rag_metadata: {'docs_retrieved': 3, 'sources_used': ['course_comp237'], 'retrieval_success': True, 'has_comp237': True}
+  is_fallback_response: False
+  node_processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'continue previous explanation'}
+  _routing_decision: __end__
+  final_response: OK
+Attempting to connect with PG_OPTS: {'host': 'localhost', 'port': 5432, 'user': 'reet', 'password': '', 'dbname': 'ai_tutor'}
+[WARNING] Could not log to database: connection to server at "localhost" (127.0.0.1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+connection to server at "localhost" (::1), port 5432 failed: Connection refused
+	Is the server running on that host and accepting TCP/IP connections?
+
+[ask] Routing info: {'routes': [<TaskType.EXPLAIN: 'explain'>], 'llm_used': True, 'router_confidence': 0.95, 'reasoning': "The query is a short response indicating a follow-up to a previous question, so it should be classified as 'explain' to continue the conversation."}
+[ask] Node processing: {'node_type': 'tutor', 'task': <TaskType.EXPLAIN: 'explain'>, 'topic': 'continue previous explanation'}
+[ask] Sending response. Output length: 488
+[ask] Response keys: ['conversation_id', 'output', 'student_input', 'plan', 'outputs', 'rag_metadata', 'is_fallback_response', 'routing_info', 'node_processing', 'status']
+[ask] Response output type: <class 'str'>
+[ask] First 100 chars of output: The message "give me answer from the content" indicates the student is stuck. Looking back at the co
+==================================================
+
+INFO:     127.0.0.1:52554 - "POST /ask HTTP/1.1" 200 OK
+WARNING:  WatchFiles detected changes in 'agents/tutor_agent.py'. Reloading...
+INFO:     Shutting down
+INFO:     Waiting for application shutdown.
+INFO:     Application shutdown complete.
+INFO:     Finished server process [36042]
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x00000001f813e080 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'agents/tutor_agent.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x00000001f813e080 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'agents/tutor_agent.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x00000001f813e080 (most recent call first):
+  <no Python frame>
+WARNING:  WatchFiles detected changes in 'agents/tutor_agent.py'. Reloading...
+Fatal Python error: init_sys_streams: can't initialize sys standard streams
+Python runtime state: core initialized
+OSError: [Errno 9] Bad file descriptor
+
+Current thread 0x00000001f813e080 (most recent call first):
+  <no Python frame>
+INFO:     Stopping reloader process [35241]

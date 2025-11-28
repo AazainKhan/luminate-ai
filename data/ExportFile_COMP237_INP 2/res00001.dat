@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<COURSE id="_11378_1"><COURSEID value="COMP237_INP.DEV"/><BATCHUID value="COMP237_INP.DEV"/><TITLE
+  value="Introduction to AI (In Person) Development"/><DESCRIPTION/><ROW_STATUS value="0"/><DATES><CREATED
+   value="2024-10-10 12:17:17 EDT"/><UPDATED value="2025-02-10 00:30:41 EST"/></DATES><FLAGS><INCATALOG
+   value="true"/><ISDESCRIBED value="false"/><EMAILENROLL value="false"/></FLAGS><SERVICELEVEL
+  value="F"/><INSTITUTIONNAME value=""/><STORAGELIMITS><HARD value="0"/><SOFT value="0"/><UPLOAD
+  value="0"/></STORAGELIMITS><BANNERALT value=""/><SHOWBANNERIND value="false"/><CLASSIFICATION
+   value="Education"><CLASSIFICATION value="HigherEducation"/></CLASSIFICATION><REGISTRY><REGISTRYENTRY
+   key="GBSET:EV:afterDecimal" value="5"/><REGISTRYENTRY key="PREF:VS:telem.threshold.days.absent"
+   value="15"/><REGISTRYENTRY key="student_course_messaging_availability_mode" value="msg_to_anyone"/><REGISTRYENTRY
+   key="GBSET:NS:promptUserToPostWhenDone" value="false"/><REGISTRYENTRY key="x-bbgs.partner-cloud.providers.available"
+   value="true"/><REGISTRYENTRY key="last access" value="2025-08-31 10:25:40.754"/><REGISTRYENTRY
+   key="x-bbgs.mbs.course.published" value="true"/><REGISTRYENTRY
+   key="blackboard.apps.cx.autoarchiver.lastArchiveRunReason" value="Last access time criteria met"/><REGISTRYENTRY
+   key="last access by un-enrolled admin" value="2025-01-08 13:07:46.168"/><REGISTRYENTRY
+   key="PREF:VS:telem.threshold.missed.due.dates" value="NaN"/><REGISTRYENTRY
+   key="last_archived_activity_accumulator_pk1" value="237432292"/><REGISTRYENTRY
+   key="x-bbgs.partner-cloud.providers.list.updated" value="20250902T092105.533-0400"/><REGISTRYENTRY
+   key="courseMessages.persistenceType" value="relational"/><REGISTRYENTRY key="GBSET:EV:beforeDecimal"
+   value="10"/><REGISTRYENTRY key="x-bbgs.partner-cloud.providers.list.available" value="ALLY1"/><REGISTRYENTRY
+   key="x-bbgs.partner-cloud.providers.updated" value="20250918T153224.588-0400"/><REGISTRYENTRY
+   key="PREF:VS:telem.threshold.failing.grade" value="NaN"/><REGISTRYENTRY
+   key="blackboard.apps.cx.autoarchiver.lastSyncStatus" value="COMPLETE"/><REGISTRYENTRY
+   key="blackboard.apps.cx.autoarchiver.lastSyncTime" value="2025-09-01T09:21:11.078-04:00"/><REGISTRYENTRY
+   key="PREF:VS:telem.student.alerts.enabled" value="true"/><REGISTRYENTRY
+   key="admin.discussion.suggested.grade.task.last.run" value="2024-10-10T00:21:12.689"/></REGISTRY><UUID
+  value="b42481100a2c4bfd9bfb1e9fb4782da2"/><COURSEVIEWOPTION value="U"/><ULTRASTATUS value="U"/><ISCLOSED
+  value="false"/><COPYFROMUUIDS
+  value="65546908bbe14c6c8423b8b77823d387,e5437a55669943d08e1e6f4fa315ba5b,c3bb1f3ae49f40cabb28fd8ee110f55c,49cd9730c7da45f6a671a22eb66fc057,dd269bcc5307478a8448d8b69b37b992,73fe269fe75341b4aa6b0b9a3179222e,c0fa4da23cd140e492db0880dafcc2b4,a175a6ea769d44e097eaffe815677176"/><PROGRESSTRACKINGENABLED value="DISABLED"/></COURSE>

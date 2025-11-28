@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<COURSEASSESSMENT id="_36501_1"><ASMTID value="res00053"/><DELIVERYTYPE value="ALL_AT_ONCE"/><PASSWORD
+  value=""/><TIMELIMIT value=""/><SOFTTIMELIMIT value=""/><TIMERCOMPLETION value="CONTINUAL"/><ATTEMPTCOUNT
+  value="0"/><FEEDBACKSETTINGS value="aag:s,ca|as:ua,f,aa"/><RANDOMIZEANSWERS
+   value="NEVER"/><FLAGS><ALLOWMULTIPLEATTEMPTS value="true"/><ISPASSWORDPROTECTED value="false"/><LAUNCHINNEWWINDOW
+   value="false"/><FORCECOMPLETION value="false"/><ISBACKTRACKPROHIBITED value="false"/><RANDOMIZEQUESTIONS
+   value="false"/><RANDOMIZEPAGES value="false"/><KEEPFIRSTPAGEFIRST value="false"/><COLLECT_EXT_SUBS
+   value="false"/><SHOWSCORE value="false"/><SHOWUSERANSWER value="false"/><SHOWCORRECTANSWER
+   value="false"/><SHOWFEEDBACK value="false"/><ISUNLIMITEDATTEMPTS value="true"/><SHOWINSTINSTRUCTIONS
+   value="false"/><SHOWINSTDESCRIPTION value="false"/><ALLOWLATESUBMISSION value="false"/><ENFORCEDUEDATE
+   value="false"/><IP_FILTER value="false"/><REQSECBROWSERTOTAKE value="false"/><REQSECBROWSERTOREVIEW
+   value="false"/><REQWEBCAM value="false"/><ALLOWSTUDENTSUBMISSION value="true"/><ALLOWFILESUBMISSION
+   value="true"/><ALLOWTEXTSUBMISSION value="true"/></FLAGS></COURSEASSESSMENT>

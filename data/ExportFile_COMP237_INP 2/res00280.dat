@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<CONTENT id="_800641_1"><TITLE value="Project assignment (NLP)"/><TITLECOLOR value="#000000"/><DESCRIPTION
+   value="Content and Activity Page&#xa;NLP Project&#xa;Overview&#xa;In this project you will work in groups of five to build a simple text classifier using the &quot;Bag of words&quot; language model &amp; the Navie Bayes classifier. As you know movies on Youtube are very common and once a movie is made available many comments are posted over the internet by viewers in response to the movie. But in some instances these comments are auto generated and considered spam.&#xa;The purpose of your model is to filter the spam comments by training an Naive Bayes classifier. The data is available for five movies at the UCI machine learning repository.&#xa;Each team should group will be assigned a movie comments file to work on by the professor.&#xa;Due date and submission &amp; presentation&#xa;Due da..."/><BODY><TEXT>&lt;!-- {"bbMLEditorVersion":1} --&gt;&lt;div&gt; 
+ &lt;h4&gt;NLP Project&lt;/h4&gt; 
+ &lt;h5&gt;Overview&lt;/h5&gt; 
+ &lt;p&gt;In this project you will work in groups of&lt;span style="color: #000000; font-size: 0.875rem;"&gt; &lt;strong&gt;five&amp;nbsp;&lt;/strong&gt;&lt;/span&gt;to build a simple text classifier using the&amp;nbsp; &lt;strong&gt;&lt;span style="color: #000000;"&gt;"Bag of words"&lt;/span&gt;&lt;/strong&gt;&amp;nbsp; language model &amp;amp; the &lt;strong&gt;&lt;span style="color: #000000;"&gt;Navie Bayes&lt;/span&gt; &lt;/strong&gt;classifier. As you know movies on &lt;span style="color: #000000;"&gt;&lt;strong&gt;Youtube&lt;/strong&gt;&lt;/span&gt; are very common and once a movie is made available many comments are posted over the internet by viewers in response to the movie. But in some instances these comments are auto generated and considered &lt;strong&gt;&lt;span style="color: #000000;"&gt;spam.&lt;/span&gt;&lt;/strong&gt;&lt;/p&gt; 
+ &lt;p&gt;The purpose of your model is to filter the spam comments by training an Naive Bayes classifier.&amp;nbsp; The data is available for five movies at the UCI machine learning repository.&amp;nbsp;&amp;nbsp;&lt;/p&gt; 
+ &lt;p&gt;Each team should group &lt;span style="text-decoration: underline;"&gt;will be assigned&lt;/span&gt; a movie comments file to work on by the professor.&lt;/p&gt; 
+  
+ &lt;h5&gt;Due date and submission &amp;amp; presentation&lt;/h5&gt; 
+ &lt;p&gt;Due date for code submission and presentation is week #13. Each group will have ten minutes to demo the code and the results, all team members should participate in the presentation.&amp;nbsp;&lt;/p&gt; 
+ &lt;p&gt;Presentations can happen during the optional scheduled virtual session timing, if a group cannot make that time, then a different time &lt;span style="text-decoration: underline;"&gt;during that day&lt;/span&gt;&amp;nbsp;should be mutually agreed with the professor.&lt;/p&gt; 
+ &lt;h5&gt;Data&lt;/h5&gt; 
+ &lt;p&gt;The data can be downloaded from the "UCI machine learning repository"&amp;nbsp; at this link : &lt;a href="https://archive.ics.uci.edu/ml/datasets/YouTube+Spam+Collection" rel="noopener"&gt;https://archive.ics.uci.edu/ml/datasets/YouTube+Spam+Collection&lt;/a&gt; &amp;nbsp;&lt;/p&gt; 
+ &lt;h5&gt;Requirements&lt;/h5&gt; 
+ &lt;ol&gt; 
+  &lt;li&gt;Load the data into a pandas data frame.&lt;/li&gt; 
+  &lt;li&gt;Carry out some basic data exploration and present your results. (Note: You only need two columns for this project, make sure you identify them correctly, if any doubts ask your professor)&lt;/li&gt; 
+  &lt;li&gt;Using &lt;span style="color: #000000;"&gt;&lt;strong&gt;nltk toolkit &lt;/strong&gt;&lt;span style="color: #000000;"&gt;classes and methods &lt;span style="text-decoration: underline;"&gt;prepare the data&lt;/span&gt; for model building, refer to the third lab tutorial in module 11 (Building a&amp;nbsp;Category text predictor&amp;nbsp;). Use count_vectorizer.fit_transform().&lt;/span&gt;&lt;/span&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;span style="color: #000000;"&gt;&lt;span style="color: #000000;"&gt;Present highlights of the output (initial features) such as the new shape of the data and any other useful information before proceeding. &lt;/span&gt;&lt;/span&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;span style="color: #000000;"&gt;&lt;span style="color: #000000;"&gt;Downscale the transformed data using &lt;strong&gt;&lt;span style="color: #000000;"&gt;tf-idf&lt;/span&gt;&lt;/strong&gt; and again present highlights of the output (final features) such as the new shape of the data and any other useful information before proceeding.&lt;/span&gt;&lt;/span&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;span style="color: #000000;"&gt;&lt;span style="color: #000000;"&gt;Use pandas.sample to shuffle the dataset, set frac =1&amp;nbsp;&lt;/span&gt;&lt;/span&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;span style="color: #000000;"&gt;&lt;span style="color: #000000;"&gt;&lt;span style="text-decoration: underline;"&gt;Using pandas&lt;/span&gt; split your dataset into 75% for training and 25% for testing, make sure to separate the class from the feature(s). (Do not use test_train_ split)&lt;/span&gt;&lt;/span&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;span style="color: #000000;"&gt;&lt;span style="color: #000000;"&gt;Fit the training data into a &lt;strong&gt;&lt;span style="color: #000000;"&gt;Naive Bayes classifier.&lt;/span&gt;&lt;/strong&gt;&amp;nbsp;&lt;/span&gt;&lt;/span&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;span style="color: #000000;"&gt;&lt;span style="color: #000000;"&gt;Cross validate the model on the training data using 5-fold and print the mean results of model accuracy.&lt;/span&gt;&lt;/span&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;span style="color: #000000;"&gt;&lt;span style="color: #000000;"&gt;Test the model on the test data, print the confusion matrix and the accuracy of the model.&lt;/span&gt;&lt;/span&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;span style="color: #000000;"&gt;&lt;span style="color: #000000;"&gt;As a group come up with 6 new comments (4 comments should be non spam and 2 comment spam) and pass them to the classifier and check the results. You can be very creative and even do more&amp;nbsp;&lt;img src="https://s.brightspace.com/lib/emoticons/1.0.0/happy-light.svg" alt="happy with light skin tone emoticon"&gt;.&lt;/span&gt;&lt;/span&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;span style="color: #000000;"&gt;&lt;span style="color: #000000;"&gt;Present all the results and conclusions.&lt;/span&gt;&lt;/span&gt;&lt;/li&gt; 
+  &lt;li&gt;&lt;span style="color: #000000;"&gt;&lt;span style="color: #000000;"&gt;Drop code, report and power point presentation into the project assessment folder for grading.&lt;/span&gt;&lt;/span&gt;&lt;/li&gt; 
+ &lt;/ol&gt; 
+ &lt;h5&gt;Rubric&lt;/h5&gt; 
+ &lt;p&gt;The following will be considered when grading:&lt;/p&gt; 
+ &lt;table&gt; 
+  &lt;tbody&gt; 
+   &lt;tr&gt; 
+    &lt;td&gt;&lt;/td&gt; 
+    &lt;td&gt;&lt;/td&gt; 
+    &lt;td&gt; &lt;p&gt;Excellent&lt;/p&gt; &lt;p&gt;(80%-100%)&lt;/p&gt; &lt;/td&gt; 
+    &lt;td&gt; &lt;p&gt;Good&lt;/p&gt; &lt;p&gt;(51%-79%)&lt;/p&gt; &lt;/td&gt; 
+    &lt;td&gt; &lt;p&gt;Weak&lt;/p&gt; &lt;p&gt;(0%-50%)&lt;/p&gt; &lt;/td&gt; 
+   &lt;/tr&gt; 
+   &lt;tr&gt; 
+    &lt;td&gt;Basic Data exploration&lt;/td&gt; 
+    &lt;td&gt;15%&lt;/td&gt; 
+    &lt;td&gt;Correct loading of the data and presentation showing a clear understanding. Thorough analysis is evident, through facts presented.&lt;/td&gt; 
+    &lt;td&gt;Some analysis done but missing a few facts.&lt;/td&gt; 
+    &lt;td&gt;Incorrect loading or presentment of data or correct loading but with minimum or no analysis, indicating lack of understanding.&lt;/td&gt; 
+   &lt;/tr&gt; 
+   &lt;tr&gt; 
+    &lt;td&gt;Data pre-processing&lt;/td&gt; 
+    &lt;td&gt;25%&lt;/td&gt; 
+    &lt;td&gt; &lt;p&gt;Working code, no additional variables. Correct selection of classes and methods.&lt;/p&gt; &lt;p&gt;Optimized and well commented code.&lt;/p&gt; &lt;/td&gt; 
+    &lt;td&gt;Working code with minor issues. Not the best choice for classes and methods used.&lt;/td&gt; 
+    &lt;td&gt;Code not working. Wrong use of Classes and methods.&lt;/td&gt; 
+   &lt;/tr&gt; 
+   &lt;tr&gt; 
+    &lt;td&gt;Model training&lt;/td&gt; 
+    &lt;td&gt;20%&lt;/td&gt; 
+    &lt;td&gt; &lt;p&gt;Working code, no additional variables.&lt;/p&gt; &lt;p&gt;Optimized and well commented code.&lt;/p&gt; &lt;/td&gt; 
+    &lt;td&gt;Working code with minor issues. Not the best choice for classes and methods used.&lt;/td&gt; 
+    &lt;td&gt;Code not working. Wrong use of Classes and methods.&lt;/td&gt; 
+   &lt;/tr&gt; 
+   &lt;tr&gt; 
+    &lt;td&gt;Model testing&lt;/td&gt; 
+    &lt;td&gt;20%&lt;/td&gt; 
+    &lt;td&gt; &lt;p&gt;Working code, no additional variables.&lt;/p&gt; &lt;p&gt;Optimized and well commented code.&lt;/p&gt; &lt;/td&gt; 
+    &lt;td&gt;Working code with minor issues. Not the best choice for classes and methods used.&lt;/td&gt; 
+    &lt;td&gt;Code not working. Wrong use of Classes and methods.&lt;/td&gt; 
+   &lt;/tr&gt; 
+   &lt;tr&gt; 
+    &lt;td&gt;Presentation (Code and results)&lt;/td&gt; 
+    &lt;td&gt;20%&lt;/td&gt; 
+    &lt;td&gt;All team members participated and showed collaboration.&lt;/td&gt; 
+    &lt;td&gt;All team members participated, but there were inconsistencies indicating lack of coordination.&lt;/td&gt; 
+    &lt;td&gt;Some team members did not show for presentation. Complete disorganization&lt;/td&gt; 
+   &lt;/tr&gt; 
+  &lt;/tbody&gt; 
+ &lt;/table&gt; 
+  
+  
+  
+  
+  
+  
+  
+  
+  
+&lt;/div&gt;</TEXT><TYPE
+   value="H"/></BODY><DATES><CREATED value="2024-10-04 18:31:49 EDT"/><UPDATED value="2024-10-10 12:30:50 EDT"/><START
+   value=""/><END value=""/></DATES><FLAGS><ISAVAILABLE value="true"/><ISFROMCARTRIDGE value="false"/><ISFOLDER
+   value="false"/><ISDESCRIBED value="false"/><ISTRACKED value="true"/><ISLESSON value="false"/><ISSEQUENTIAL
+   value="false"/><ALLOWGUESTS value="true"/><ALLOWOBSERVERS value="true"/><LAUNCHINNEWWINDOW
+   value="false"/><ISREVIEWABLE value="false"/><ISGROUPCONTENT value="false"/><ISSAMPLECONTENT
+   value="false"/><PARTIALLYVISIBLE value="false"/><HASTHUMBNAIL value="false"/></FLAGS><CONTENTHANDLER
+  value="resource/x-bb-document"/><RENDERTYPE value="REGULAR"/><FOLDERTYPE value=""/><URL value=""/><VIEWMODE
+  value="TEXT_ICON_ONLY"/><OFFLINENAME value=""/><OFFLINEPATH value=""/><LINKREF value=""/><PARENTID
+  value="_800563_1"/><REVIEWABLEREASON value="NONE"/><VERSION value="3"/><THUMBNAILALT value=""/><AISTATE
+  value="No"/><AIACCEPTINGUSER value=""/><EXTENDEDDATA/><FILES/></CONTENT>
