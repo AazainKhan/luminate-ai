@@ -334,8 +334,9 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
           ref={sidebarRef}
           data-testid="nav-rail"
           onMouseDown={(e) => e.stopPropagation()}
+          style={{ backgroundColor: 'var(--sidebar)' }}
           className={cn(
-            "h-full bg-background text-foreground flex flex-col border-l border-r border-border shadow-xl transition-all duration-500 ease-smooth overflow-hidden",
+            "h-full bg-sidebar text-foreground flex flex-col border-l border-r border-border shadow-xl transition-all duration-500 ease-smooth overflow-hidden",
             isExpanded ? "w-[260px]" : "w-[54px]",
           )}
         >
@@ -564,7 +565,7 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
           </ScrollArea>
 
           {/* User Profile Footer - Fitts's Law: Large clickable area */}
-          <div className="p-2 border-t border-border bg-background">
+          <div className="p-2 border-t border-border bg-sidebar">
             <DropdownMenu onOpenChange={setIsAnyMenuOpen}>
               <DropdownMenuTrigger asChild>
                 <button 
@@ -576,7 +577,7 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                   data-testid="user-profile-trigger"
                 >
                   <div className="relative shrink-0">
-                    <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white font-medium text-xs shadow-lg ring-2 ring-background">
+                    <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 font-medium text-xs shadow-lg ring-2 ring-background">
                       {initials}
                     </div>
                     <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></div>
@@ -599,7 +600,7 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
               </DropdownMenuTrigger>
               <DropdownMenuContent align="start" side={isExpanded ? "top" : "right"} className="w-64 bg-popover border-border ml-2 mb-2 text-popover-foreground z-[100]" data-testid="user-profile-menu">
                 <div className="flex items-center gap-3 p-3 bg-muted/50 mb-1">
-                  <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 font-semibold text-sm shrink-0">
                     {initials}
                   </div>
                   <div className="flex flex-col overflow-hidden">
@@ -651,7 +652,7 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                 <DropdownMenuSeparator className="bg-border" />
                 
                 <DropdownMenuItem 
-                  className="text-destructive focus:bg-destructive/10 focus:text-destructive"
+                  className="text-foreground hover:text-destructive focus:bg-destructive/10 focus:text-destructive"
                   onClick={() => signOut()}
                   data-testid="logout-item"
                 >
@@ -757,7 +758,7 @@ function TreeItem({
          ref={itemRef}
          className={cn(
             "flex items-center gap-2 px-2 py-2 cursor-pointer border-l-2 border-transparent hover:bg-accent rounded transition-colors group relative pr-8",
-            active ? "bg-accent/70 border-l-2 border-violet-500 text-foreground" : "text-muted-foreground hover:text-foreground"
+            active ? "bg-primary/10 border-l-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"
          )}
          data-testid={`tree-item-${itemId}`}
          onClick={onClick}
@@ -784,7 +785,7 @@ function TreeItem({
          ) : (
             <div className="w-3 shrink-0" /> 
          )}
-         <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "text-violet-400" : "text-muted-foreground")} />
+         <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
          <span className="text-xs truncate leading-none flex-1">{label}</span>
          
          <div className="flex items-center gap-1 absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity">

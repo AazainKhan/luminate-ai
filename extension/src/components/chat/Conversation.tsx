@@ -21,7 +21,7 @@ export function Conversation({ messages, isLoading }: ConversationProps) {
 
   return (
     <div className="h-full relative">
-      <Card className="h-full bg-slate-900/80 border-slate-800 rounded-2xl shadow-lg mx-4 my-4 overflow-hidden">
+      <Card className="h-full bg-card/80 border-border rounded-2xl shadow-lg mx-4 my-4 overflow-hidden">
         <ScrollArea className="h-full">
           <div 
             ref={scrollRef} 
@@ -37,7 +37,7 @@ export function Conversation({ messages, isLoading }: ConversationProps) {
                     <span className="text-xs font-bold">L</span>
                   </div>
                   <div className="flex-1 pt-1">
-                    <div className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-slate-800/50 border border-slate-700/50 text-slate-300">
+                    <div className="inline-flex items-center gap-2 px-4 py-3 rounded-2xl bg-muted/50 border border-border text-muted-foreground">
                       <div className="flex gap-1">
                         <div className="h-1.5 w-1.5 bg-violet-400 rounded-full animate-bounce [animation-delay:-0.3s]" />
                         <div className="h-1.5 w-1.5 bg-violet-400 rounded-full animate-bounce [animation-delay:-0.15s]" />
@@ -55,4 +55,3 @@ export function Conversation({ messages, isLoading }: ConversationProps) {
     </div>
   )
 }
-

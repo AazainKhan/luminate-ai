@@ -43,10 +43,10 @@ export function RenameDialog({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-800 text-slate-200">
+      <DialogContent className="sm:max-w-[425px] bg-popover border-border text-popover-foreground">
         <DialogHeader>
-          <DialogTitle className="text-slate-100">{title}</DialogTitle>
-          <DialogDescription className="text-slate-400">
+          <DialogTitle className="text-foreground">{title}</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             Enter a new name for this item.
           </DialogDescription>
         </DialogHeader>
@@ -56,15 +56,15 @@ export function RenameDialog({
               id="name"
               value={value}
               onChange={(e) => setValue(e.target.value)}
-              className="col-span-3 bg-slate-950 border-slate-800 text-slate-200 focus:ring-violet-500"
+              className="col-span-3 bg-input border-border text-foreground focus:ring-primary"
               autoFocus
             />
           </div>
           <DialogFooter>
-            <Button type="button" variant="ghost" onClick={onClose} className="text-slate-400 hover:text-slate-200 hover:bg-slate-800">
+            <Button type="button" variant="ghost" onClick={onClose} className="text-muted-foreground hover:text-foreground hover:bg-muted">
               Cancel
             </Button>
-            <Button type="submit" className="bg-violet-600 hover:bg-violet-500 text-white">
+            <Button type="submit" className="bg-primary hover:bg-primary/90 text-primary-foreground">
               Save changes
             </Button>
           </DialogFooter>

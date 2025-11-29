@@ -3,6 +3,7 @@ import { CodeBlock } from "./CodeBlock"
 import { QuizCard } from "./QuizCard"
 import { Visualizer } from "./Visualizer"
 import { ThinkingAccordion } from "./ThinkingAccordion"
+import { cn } from "@/lib/utils"
 
 export interface Message {
   role: "user" | "assistant"
@@ -63,23 +64,25 @@ export function ChatMessage({ message, thinkingSteps }: ChatMessageProps) {
 
   return (
     <div
-      className={`flex gap-3 p-4 ${
-        isUser ? "bg-gray-50" : "bg-white"
-      }`}
+      className={cn(
+        "flex gap-3 p-4 transition-colors",
+        isUser ? "bg-muted/30" : "bg-background"
+      )}
     >
       <div
-        className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
-          isUser ? "bg-blue-100" : "bg-purple-100"
-        }`}
+        className={cn(
+          "flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center shadow-sm",
+          isUser ? "bg-primary/10 text-primary" : "bg-secondary text-secondary-foreground"
+        )}
       >
         {isUser ? (
-          <User className="w-4 h-4 text-blue-600" />
+          <User className="w-4 h-4" />
         ) : (
-          <Bot className="w-4 h-4 text-purple-600" />
+          <Bot className="w-4 h-4" />
         )}
       </div>
       <div className="flex-1 min-w-0">
-        <div className="text-sm font-medium text-gray-700 mb-1">
+        <div className="text-sm font-medium text-muted-foreground mb-1">
           {isUser ? "You" : "Course Marshal"}
         </div>
         {!isUser && thinkingSteps && thinkingSteps.length > 0 && (
@@ -87,11 +90,10 @@ export function ChatMessage({ message, thinkingSteps }: ChatMessageProps) {
             <ThinkingAccordion steps={thinkingSteps} />
           </div>
         )}
-        <div className="text-gray-900 whitespace-pre-wrap break-words space-y-3">
+        <div className="text-foreground whitespace-pre-wrap break-words space-y-3 leading-relaxed">
           {parseContent(message.content)}
         </div>
       </div>
     </div>
   )
 }
-

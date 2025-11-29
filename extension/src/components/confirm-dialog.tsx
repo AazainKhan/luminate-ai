@@ -32,10 +32,10 @@ export function ConfirmDialog({
 }: ConfirmDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[425px] bg-slate-900 border-slate-800 text-slate-200 z-[200]">
+      <DialogContent className="sm:max-w-[425px] bg-popover border-border text-popover-foreground z-[200]">
         <DialogHeader>
-          <DialogTitle className="text-slate-100">{title}</DialogTitle>
-          <DialogDescription className="text-slate-400">
+          <DialogTitle className="text-foreground">{title}</DialogTitle>
+          <DialogDescription className="text-muted-foreground">
             {description}
           </DialogDescription>
         </DialogHeader>
@@ -43,7 +43,7 @@ export function ConfirmDialog({
           <Button
             variant="ghost"
             onClick={onClose}
-            className="text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+            className="text-muted-foreground hover:text-foreground hover:bg-muted"
           >
             {cancelText}
           </Button>
@@ -53,7 +53,7 @@ export function ConfirmDialog({
               onConfirm()
               onClose()
             }}
-            className={variant === "default" ? "bg-violet-600 hover:bg-violet-500 text-white" : ""}
+            className={variant === "default" ? "bg-primary hover:bg-primary/90 text-primary-foreground" : ""}
           >
             {confirmText}
           </Button>

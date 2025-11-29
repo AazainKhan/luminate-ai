@@ -78,71 +78,71 @@
   :root {
     --font-sans: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
     
-    /* Light Theme (Default) */
-    --background: oklch(0.98 0.01 260);
-    --foreground: oklch(0.12 0.03 260);
+    /* Light Theme (Warm & Airy) */
+    --background: #ffffff; /* Main Content Background */
+    --sidebar: #f1f5f9; /* App Background (Sidebar) */
+    --foreground: #1e293b; /* Primary Text */
 
-    --card: oklch(1 0 0);
-    --card-foreground: oklch(0.12 0.03 260);
+    --card: #ffffff;
+    --card-foreground: #1e293b;
 
-    --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.12 0.03 260);
+    --popover: #ffffff;
+    --popover-foreground: #1e293b;
 
-    --primary: oklch(0.6 0.2 280); /* Purple accent #7c3aed */
-    --primary-foreground: oklch(0.98 0 0);
+    --primary: #7c3aed; /* Deep Purple */
+    --primary-foreground: #ffffff;
 
-    --secondary: oklch(0.96 0.01 260);
-    --secondary-foreground: oklch(0.12 0.03 260);
+    --secondary: #f1f5f9;
+    --secondary-foreground: #1e293b;
 
-    --muted: oklch(0.96 0.01 260);
-    --muted-foreground: oklch(0.4 0.02 260);
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b; /* Secondary Text */
 
-    --accent: oklch(0.96 0.01 260);
-    --accent-foreground: oklch(0.12 0.03 260);
+    --accent: #f1f5f9;
+    --accent-foreground: #1e293b;
 
-    --destructive: oklch(0.6 0.2 20);
-    --destructive-foreground: oklch(0.98 0 0);
+    --destructive: #ef4444;
+    --destructive-foreground: #ffffff;
 
-    --border: oklch(0.92 0.01 260);
-    --input: oklch(0.92 0.01 260);
-    --ring: oklch(0.6 0.2 280);
+    --border: #e2e8f0; /* Subtle border for light mode */
+    --input: #ffffff;
+    --ring: #7c3aed;
 
     --radius: 0.75rem;
   }
 
   .dark {
-    /* Deep dark theme base from inspo */
-    --background: oklch(0.08 0.02 260); /* Deeper black #0a0a0f */
-    --foreground: oklch(0.98 0.01 260);
+    /* Dark Theme (Elevated) */
+    --background: #16191D; /* Main Chat Area (Level 1) */
+    --sidebar: #0F1115; /* Sidebar (Level 0) */
+    --foreground: #e6edf3; /* Primary Text */
 
-    --card: oklch(0.12 0.03 260); /* Slightly lighter */
-    --card-foreground: oklch(0.98 0.01 260);
+    --card: #1F2329; /* Input Box / Cards (Level 2) */
+    --card-foreground: #e6edf3;
 
-    --popover: oklch(0.12 0.03 260);
-    --popover-foreground: oklch(0.98 0.01 260);
+    --popover: #1F2329;
+    --popover-foreground: #e6edf3;
 
-    --primary: oklch(0.6 0.2 280); /* Purple accent #7c3aed */
-    --primary-foreground: oklch(0.98 0 0);
+    --primary: #8b5cf6; /* Vibrant Purple */
+    --primary-foreground: #ffffff;
 
-    --secondary: oklch(0.2 0.04 260);
-    --secondary-foreground: oklch(0.98 0.01 260);
+    --secondary: #21262d;
+    --secondary-foreground: #e6edf3;
 
-    --muted: oklch(0.2 0.02 260);
-    --muted-foreground: oklch(0.6 0.01 260);
+    --muted: #21262d;
+    --muted-foreground: #8b949e; /* Secondary Text */
 
-    --accent: oklch(0.25 0.05 260);
-    --accent-foreground: oklch(0.98 0.01 260);
+    --accent: #21262d;
+    --accent-foreground: #e6edf3;
 
-    --destructive: oklch(0.4 0.2 20);
-    --destructive-foreground: oklch(0.98 0 0);
+    --destructive: #7f1d1d;
+    --destructive-foreground: #fecaca;
 
-    --border: oklch(0.2 0.04 260);
-    --input: oklch(0.2 0.04 260);
-    --ring: oklch(0.6 0.2 280);
+    --border: #21262d; /* Dark border, almost invisible against bg */
+    --input: #1F2329;
+    --ring: #8b5cf6;
   }
 }
-
-
 
 @layer base {
   * {

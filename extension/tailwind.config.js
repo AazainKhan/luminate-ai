@@ -20,6 +20,7 @@ export default {
         input: "var(--input)",
         ring: "var(--ring)",
         background: "var(--background)",
+        sidebar: "var(--sidebar)",
         foreground: "var(--foreground)",
         primary: {
           DEFAULT: "var(--primary)",

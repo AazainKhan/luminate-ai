@@ -89,7 +89,7 @@ function MessageContent({ message, copied, handleCopy, isUser }: { message: Mess
       )}
     >
       {!isUser && (
-        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full bg-violet-500/30 text-violet-300 ring-1 ring-violet-500/20">
+        <div className="flex h-8 w-8 shrink-0 select-none items-center justify-center rounded-full bg-violet-500/20 text-violet-300 ring-1 ring-violet-500/30">
           <span className="text-xs font-bold">L</span>
         </div>
       )}
@@ -100,7 +100,7 @@ function MessageContent({ message, copied, handleCopy, isUser }: { message: Mess
             "relative",
             isUser 
               ? "bg-violet-600 text-white px-4 py-3 rounded-2xl rounded-tr-sm shadow-md" 
-              : "bg-slate-900/50 border border-slate-800/50 backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-3 text-slate-100 shadow-sm",
+              : "bg-muted/50 border border-border backdrop-blur-sm rounded-2xl rounded-tl-sm px-4 py-3 text-foreground shadow-sm",
           )}
         >
           {!isUser && message.reasoning && (
@@ -187,12 +187,12 @@ function MessageContent({ message, copied, handleCopy, isUser }: { message: Mess
             <Button
               variant="ghost"
               size="icon"
-              className="h-6 w-6 text-muted-foreground hover:text-white"
+              className="h-6 w-6 text-muted-foreground hover:text-foreground"
               onClick={handleCopy}
             >
               {copied ? <Check className="w-3 h-3" /> : <Copy className="w-3 h-3" />}
             </Button>
-            <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-white">
+            <Button variant="ghost" size="icon" className="h-6 w-6 text-muted-foreground hover:text-foreground">
               <Pencil className="w-3 h-3" />
             </Button>
           </div>
@@ -202,14 +202,14 @@ function MessageContent({ message, copied, handleCopy, isUser }: { message: Mess
           <div className="flex items-center gap-1 pt-1 transition-opacity">
             {/* Feedback row with Was this helpful? */}
             <div className="flex items-center gap-2">
-              <span className="text-xs text-slate-500">Was this helpful?</span>
+              <span className="text-xs text-muted-foreground">Was this helpful?</span>
               <div className="flex gap-1">
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-slate-500 hover:text-green-400 hover:bg-green-400/10"
+                      className="h-7 w-7 text-muted-foreground hover:text-green-500 hover:bg-green-500/10"
                     >
                       <ThumbsUp className="h-3.5 w-3.5" />
                     </Button>
@@ -221,7 +221,7 @@ function MessageContent({ message, copied, handleCopy, isUser }: { message: Mess
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-slate-500 hover:text-red-400 hover:bg-red-400/10"
+                      className="h-7 w-7 text-muted-foreground hover:text-red-500 hover:bg-red-500/10"
                     >
                       <ThumbsDown className="h-3.5 w-3.5" />
                     </Button>
@@ -238,7 +238,7 @@ function MessageContent({ message, copied, handleCopy, isUser }: { message: Mess
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-7 w-7 text-slate-500 hover:text-slate-300"
+                  className="h-7 w-7 text-muted-foreground hover:text-foreground"
                   onClick={handleCopy}
                 >
                   {copied ? <Check className="h-3.5 w-3.5" /> : <Copy className="h-3.5 w-3.5" />}
@@ -248,7 +248,7 @@ function MessageContent({ message, copied, handleCopy, isUser }: { message: Mess
             </Tooltip>
             <Tooltip>
               <TooltipTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-500 hover:text-slate-300">
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-muted-foreground hover:text-foreground">
                   <RotateCcw className="h-3.5 w-3.5" />
                 </Button>
               </TooltipTrigger>
@@ -262,7 +262,7 @@ function MessageContent({ message, copied, handleCopy, isUser }: { message: Mess
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="h-7 w-7 text-slate-500 hover:text-slate-300"
+                      className="h-7 w-7 text-muted-foreground hover:text-foreground"
                     >
                       <MoreHorizontal className="h-3.5 w-3.5" />
                     </Button>
@@ -270,12 +270,12 @@ function MessageContent({ message, copied, handleCopy, isUser }: { message: Mess
                 </TooltipTrigger>
                 <TooltipContent>More options</TooltipContent>
               </Tooltip>
-              <DropdownMenuContent align="start" className="w-48 bg-slate-900 border-slate-800">
-                <DropdownMenuItem className="cursor-pointer text-slate-200 focus:bg-slate-800 focus:text-slate-50">
+              <DropdownMenuContent align="start" className="w-48 bg-popover border-border">
+                <DropdownMenuItem className="cursor-pointer text-popover-foreground focus:bg-muted focus:text-foreground">
                   <Flag className="w-4 h-4 mr-2" />
                   Report Message
                 </DropdownMenuItem>
-                <DropdownMenuItem className="cursor-pointer text-slate-200 focus:bg-slate-800 focus:text-slate-50">
+                <DropdownMenuItem className="cursor-pointer text-popover-foreground focus:bg-muted focus:text-foreground">
                   <Volume2 className="w-4 h-4 mr-2" />
                   Read Aloud
                 </DropdownMenuItem>
@@ -287,4 +287,3 @@ function MessageContent({ message, copied, handleCopy, isUser }: { message: Mess
     </div>
   )
 }
-

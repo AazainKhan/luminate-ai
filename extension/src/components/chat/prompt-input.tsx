@@ -56,7 +56,6 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
     }
   }
 
-  // No more manual intent toggles - the system auto-detects
   // Dynamic placeholder
   const getPlaceholder = () => {
     return "Ask anything about COMP 237..."
@@ -67,10 +66,10 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
       <div className="relative z-10 max-w-3xl mx-auto w-full">
         <form
           onSubmit={handleSubmit}
-          className="relative bg-slate-900 rounded-2xl border border-slate-800 shadow-lg overflow-hidden"
+          className="relative bg-card rounded-2xl border-0 shadow-lg overflow-hidden"
         >
           {/* Header - Simplified toolbar */}
-          <div className="flex items-center justify-between px-3 py-2 border-b border-slate-800 bg-slate-900/90">
+          <div className="flex items-center justify-between px-3 py-2 border-b border-border/50 bg-card/90">
             <div className="flex items-center gap-1.5 w-full">
               {/* Options Popover */}
               <Popover>
@@ -81,7 +80,7 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
                         type="button"
                         variant="ghost"
                         size="icon"
-                        className="h-7 w-7 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg"
+                        className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
                       >
                         <SlidersHorizontal className="w-3.5 h-3.5" />
                       </Button>
@@ -89,15 +88,15 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
                   </TooltipTrigger>
                   <TooltipContent side="bottom">Options</TooltipContent>
                 </Tooltip>
-                <PopoverContent align="start" side="top" sideOffset={10} className="w-72 bg-slate-900 border-slate-800 p-4 mb-2">
+                <PopoverContent align="start" side="top" sideOffset={10} className="w-72 bg-popover border-border p-4 mb-2">
                   <div className="space-y-4">
                     <div>
-                      <h3 className="text-sm font-semibold text-slate-100 mb-3">Response Options</h3>
+                      <h3 className="text-sm font-semibold text-popover-foreground mb-3">Response Options</h3>
                       <div className="space-y-3">
                         <div className="flex items-center justify-between">
                           <div className="flex items-center gap-2">
                             <FileText className="w-3.5 h-3.5 text-blue-400" />
-                            <Label htmlFor="show-sources" className="text-sm text-slate-200">
+                            <Label htmlFor="show-sources" className="text-sm text-popover-foreground">
                               Show Sources
                             </Label>
                           </div>
@@ -108,14 +107,14 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
                             className="data-[state=checked]:bg-blue-500"
                           />
                         </div>
-                        <p className="text-[10px] text-slate-500 pl-5">
+                        <p className="text-[10px] text-muted-foreground pl-5">
                           Display course materials used in answers
                         </p>
                         
                         <div className="flex items-center justify-between pt-2">
                           <div className="flex items-center gap-2">
                             <Terminal className="w-3.5 h-3.5 text-emerald-400" />
-                            <Label htmlFor="code-exec" className="text-sm text-slate-200">
+                            <Label htmlFor="code-exec" className="text-sm text-popover-foreground">
                               Run Code
                             </Label>
                           </div>
@@ -126,7 +125,7 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
                             className="data-[state=checked]:bg-emerald-500"
                           />
                         </div>
-                        <p className="text-[10px] text-slate-500 pl-5">
+                        <p className="text-[10px] text-muted-foreground pl-5">
                           Execute Python code in secure sandbox
                         </p>
                       </div>
@@ -135,7 +134,7 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
                 </PopoverContent>
               </Popover>
 
-              <div className="h-4 w-px bg-slate-700 mx-1" />
+              <div className="h-4 w-px bg-border mx-1" />
 
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -143,7 +142,7 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-7 w-7 text-slate-400 hover:text-slate-200 hover:bg-slate-800 rounded-lg"
+                    className="h-7 w-7 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg"
                   >
                     <AppWindow className="w-3.5 h-3.5" />
                   </Button>
@@ -162,8 +161,8 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
                     className={cn(
                       "h-7 w-7 rounded-lg",
                       hasMessages 
-                        ? "text-slate-400 hover:text-slate-200 hover:bg-slate-800" 
-                        : "text-slate-600 cursor-not-allowed"
+                        ? "text-muted-foreground hover:text-foreground hover:bg-muted" 
+                        : "text-muted-foreground/50 cursor-not-allowed"
                     )}
                   >
                     <Share className="w-3.5 h-3.5" />
@@ -180,7 +179,7 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
                     type="button"
                     variant="ghost"
                     size="icon"
-                    className="h-7 w-7 bg-violet-600 hover:bg-violet-500 text-white rounded-lg"
+                    className="h-7 w-7 bg-primary hover:bg-primary/90 text-primary-foreground rounded-lg"
                   >
                     <Plus className="w-3.5 h-3.5" />
                   </Button>
@@ -191,13 +190,13 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
           </div>
 
           {/* Body - Text Area */}
-          <div className="px-3 py-2">
+          <div className="px-3 py-2 relative">
             <Textarea
               ref={textareaRef}
               value={input}
               onChange={(e) => setInput(e.target.value)}
               placeholder={getPlaceholder()}
-              className="min-h-[44px] max-h-[180px] w-full resize-none bg-transparent border-none p-0 text-sm text-slate-100 placeholder:text-slate-500 focus-visible:ring-0 focus-visible:ring-offset-0 leading-relaxed"
+              className="min-h-[44px] max-h-[180px] w-full resize-none bg-transparent border-none p-0 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 leading-relaxed pr-24"
               rows={1}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {
@@ -206,41 +205,34 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
                 }
               }}
             />
-          </div>
+            
+            {/* Floating Send Button & Tags */}
+            <div className="absolute bottom-2 right-2 flex items-center gap-2">
+               {/* Auto-detect tags - faded until active or hover? For now just small text */}
+               <div className="hidden sm:flex items-center gap-1.5 pointer-events-none opacity-50">
+                  <span className="text-[10px] text-muted-foreground">
+                    auto-detects
+                  </span>
+               </div>
 
-          {/* Footer - Submit button (intent detection is automatic) */}
-          <div className="px-3 pb-3 flex items-center justify-between border-t border-slate-800 pt-2">
-            <div className="flex items-center gap-1.5">
-              <span className="text-[10px] text-slate-500">
-                AI auto-detects: tutor • math • code • syllabus
-              </span>
-            </div>
-
-            <div className="flex items-center gap-2.5">
               <Button
                 type="button"
                 onClick={handleSubmit}
                 disabled={!input.trim() && !isLoading}
                 size="sm"
                 className={cn(
-                  "h-8 px-4 rounded-full transition-all duration-200 gap-2",
+                  "h-8 w-8 p-0 rounded-full transition-all duration-200",
                   isLoading
-                    ? "bg-red-600 hover:bg-red-700 text-white"
+                    ? "bg-destructive hover:bg-destructive/90 text-destructive-foreground"
                     : input.trim()
-                      ? "bg-violet-600 text-white hover:bg-violet-500"
-                      : "bg-slate-800 text-slate-500 cursor-not-allowed opacity-50",
+                      ? "bg-primary text-primary-foreground hover:bg-primary/90"
+                      : "bg-muted text-muted-foreground cursor-not-allowed opacity-50",
                 )}
               >
                 {isLoading ? (
-                  <>
                     <Square className="w-3 h-3 fill-current" />
-                    Stop
-                  </>
                 ) : (
-                  <>
-                    <Send className="w-3.5 h-3.5" />
-                    Send
-                  </>
+                    <Send className="w-3.5 h-3.5 ml-0.5" />
                 )}
               </Button>
             </div>

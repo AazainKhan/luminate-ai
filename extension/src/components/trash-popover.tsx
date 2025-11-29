@@ -92,26 +92,26 @@ export function TrashDialog({ isOpen, onClose }: TrashDialogProps) {
   return (
     <>
       <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-        <DialogContent className="sm:max-w-[500px] bg-slate-900 border-slate-800 text-slate-200 z-[150]">
+        <DialogContent className="sm:max-w-[500px] bg-popover border-border text-popover-foreground z-[150]">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-slate-100">
-              <Trash2 className="w-5 h-5 text-red-400" />
+            <DialogTitle className="flex items-center gap-2 text-foreground">
+              <Trash2 className="w-5 h-5 text-destructive" />
               Trash
             </DialogTitle>
-            <DialogDescription className="text-slate-400">
+            <DialogDescription className="text-muted-foreground">
               Items are automatically deleted after 30 days.
             </DialogDescription>
           </DialogHeader>
           
           <ScrollArea className="h-[300px] mt-4 pr-4">
             {isLoading ? (
-              <div className="flex items-center justify-center h-full text-slate-500">Loading...</div>
+              <div className="flex items-center justify-center h-full text-muted-foreground">Loading...</div>
             ) : items.length > 0 ? (
               <div className="space-y-2">
                 {items.map(item => (
-                  <div key={item.id} className="flex items-center justify-between p-3 rounded-lg bg-slate-800/30 hover:bg-slate-800/50 transition-colors group border border-slate-800/50">
+                  <div key={item.id} className="flex items-center justify-between p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors group border border-border/50">
                     <div className="flex items-center gap-3 overflow-hidden">
-                      <div className="p-2 rounded-md bg-slate-800 text-slate-400">
+                      <div className="p-2 rounded-md bg-background text-muted-foreground">
                         {item.type === 'folder' ? (
                           <Folder className="w-4 h-4" />
                         ) : (
@@ -119,8 +119,8 @@ export function TrashDialog({ isOpen, onClose }: TrashDialogProps) {
                         )}
                       </div>
                       <div className="flex flex-col min-w-0">
-                        <span className="text-sm font-medium text-slate-200 truncate">{item.name}</span>
-                        <span className="text-[10px] text-slate-500">
+                        <span className="text-sm font-medium text-foreground truncate">{item.name}</span>
+                        <span className="text-[10px] text-muted-foreground">
                           Deleted {formatDistanceToNow(new Date(item.deletedAt))} ago
                         </span>
                       </div>
@@ -129,7 +129,7 @@ export function TrashDialog({ isOpen, onClose }: TrashDialogProps) {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 w-8 p-0 text-slate-400 hover:text-emerald-400 hover:bg-emerald-400/10"
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-emerald-500 hover:bg-emerald-500/10"
                         onClick={() => handleRestore(item.id, item.type)}
                         title="Restore"
                       >
@@ -138,7 +138,7 @@ export function TrashDialog({ isOpen, onClose }: TrashDialogProps) {
                       <Button
                         size="sm"
                         variant="ghost"
-                        className="h-8 w-8 p-0 text-slate-400 hover:text-red-400 hover:bg-red-400/10"
+                        className="h-8 w-8 p-0 text-muted-foreground hover:text-destructive hover:bg-destructive/10"
                         onClick={() => setItemToDelete({ id: item.id, type: item.type })}
                         title="Delete Forever"
                       >
@@ -149,7 +149,7 @@ export function TrashDialog({ isOpen, onClose }: TrashDialogProps) {
                 ))}
               </div>
             ) : (
-              <div className="flex flex-col items-center justify-center h-full text-slate-500 gap-2">
+              <div className="flex flex-col items-center justify-center h-full text-muted-foreground gap-2">
                 <Trash2 className="w-10 h-10 opacity-20" />
                 <span className="text-sm">Trash is empty</span>
               </div>
