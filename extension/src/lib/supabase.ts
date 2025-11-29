@@ -19,16 +19,6 @@ if (supabaseUrl && !supabaseUrl.startsWith("http")) {
 // Remove trailing slash if present
 supabaseUrl = supabaseUrl.replace(/\/$/, "")
 
-if (isDevelopment) {
-  console.log("🔍 Supabase Config Check:", {
-    url: supabaseUrl || "❌ EMPTY",
-    urlLength: supabaseUrl.length,
-    hasKey: supabaseAnonKey ? "✅" : "❌",
-    urlHasProtocol: supabaseUrl.startsWith("https://") ? "✅" : "❌",
-    urlEndsWithSlash: supabaseUrl.endsWith("/") ? "⚠️ YES" : "✅ NO",
-  })
-}
-
 if (!supabaseUrl || !supabaseAnonKey) {
   console.error("❌ Supabase credentials not configured!")
   console.error("PLASMO_PUBLIC_SUPABASE_URL:", supabaseUrl || "MISSING")
@@ -51,10 +41,6 @@ try {
 } catch (e) {
   console.error("❌ Invalid Supabase URL format:", supabaseUrl)
   throw new Error(`Invalid Supabase URL: ${supabaseUrl}`)
-}
-
-if (isDevelopment) {
-  console.log("✅ Creating Supabase client with URL:", supabaseUrl)
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey, {

@@ -11,7 +11,8 @@ import type { User, Session } from "@supabase/supabase-js"
 import "./style.css"
 
 function AuthenticatedChatView({ user, session }: { user: User; session: Session }) {
-  const { messages, append, isLoading } = useChat(session)
+  const [activeChatId, setActiveChatId] = useState<string | undefined>(undefined)
+  const { messages, append, isLoading } = useChat({ session, chatId: activeChatId })
   const [input, setInput] = useState("")
 
   const handleSendMessage = async (content: string, attachments?: File[]) => {
@@ -63,7 +64,7 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
   }
 
   return (
-    <div className="relative flex h-screen w-full bg-slate-950 text-slate-50 overflow-hidden font-sans antialiased transition-colors duration-300">
+    <div className="relative flex h-screen w-full bg-background text-foreground overflow-hidden font-sans antialiased transition-colors duration-300">
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0 relative pr-[54px]">
         {/* Conversation Area */}
@@ -77,41 +78,15 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
                   </div>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-semibold text-slate-50 mb-2 tracking-tight">
+                  <h1 className="text-2xl font-semibold text-foreground mb-2 tracking-tight">
                     Hi, {user.user_metadata?.full_name?.split(' ')[0] || user.email?.split('@')[0]}
                   </h1>
-                  <p className="text-sm text-slate-400 leading-relaxed">
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     Ask anything about your courses, assignments, or learning materials
                   </p>
                 </div>
                 
-                {/* Suggestion Chips */}
-                <div className="flex flex-wrap gap-2 justify-center pt-4">
-                  <button
-                    onClick={() => handleSendMessage("Review my Linear Algebra quiz")}
-                    className="px-3 py-2 text-xs font-medium text-slate-300 bg-slate-900/80 border border-slate-800 rounded-full hover:bg-slate-800/80 hover:text-slate-100 transition-colors"
-                  >
-                    Review my Linear Algebra quiz
-                  </button>
-                  <button
-                    onClick={() => handleSendMessage("Explain gradient descent with examples")}
-                    className="px-3 py-2 text-xs font-medium text-slate-300 bg-slate-900/80 border border-slate-800 rounded-full hover:bg-slate-800/80 hover:text-slate-100 transition-colors"
-                  >
-                    Explain gradient descent with examples
-                  </button>
-                  <button
-                    onClick={() => handleSendMessage("Create flashcards for COMP 237")}
-                    className="px-3 py-2 text-xs font-medium text-slate-300 bg-slate-900/80 border border-slate-800 rounded-full hover:bg-slate-800/80 hover:text-slate-100 transition-colors"
-                  >
-                    Create flashcards for COMP 237
-                  </button>
-                  <button
-                    onClick={() => handleSendMessage("Debug this Python ML code")}
-                    className="px-3 py-2 text-xs font-medium text-slate-300 bg-slate-900/80 border border-slate-800 rounded-full hover:bg-slate-800/80 hover:text-slate-100 transition-colors"
-                  >
-                    Debug this Python ML code
-                  </button>
-                </div>
+                {/* Suggestion Chips removed */}
               </div>
             </div>
           ) : (
@@ -120,7 +95,7 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
         </div>
 
         {/* Input Area - Sticky Bottom */}
-        <div className="shrink-0 w-full bg-gradient-to-t from-slate-950 via-slate-950 to-transparent pt-16 pb-10 px-6">
+        <div className="shrink-0 w-full bg-gradient-to-t from-background via-background to-transparent pt-16 pb-10 px-6">
           <PromptInput
             input={input}
             setInput={setInput}
@@ -133,7 +108,7 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
       </div>
 
       {/* Right Navigation Rail */}
-      <NavRail />
+      <NavRail onSelectChat={setActiveChatId} activeChatId={activeChatId} />
     </div>
   )
 }
@@ -188,7 +163,7 @@ function IndexSidepanel() {
   }
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={false}>
+    <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true}>
       <AuthenticatedChatView user={user} session={session} />
     </ThemeProvider>
   )

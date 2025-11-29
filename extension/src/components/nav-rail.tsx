@@ -1,8 +1,9 @@
 "use client"
 
-import type React from "react"
-
-import { useState, useRef } from "react"
+import React, { useState, useRef } from "react"
+import { TrashDialog } from "./trash-popover"
+import { ConfirmDialog } from "./confirm-dialog"
+import { RenameDialog } from "./rename-dialog"
 import {
   Settings,
   Plus,
@@ -26,7 +27,7 @@ import {
   Shield,
   FolderPlus,
   MessageSquarePlus,
-  GripVertical
+  Trash2
 } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
@@ -43,35 +44,21 @@ import {
   DropdownMenuSub,
   DropdownMenuSubTrigger,
   DropdownMenuSubContent,
+  DropdownMenuPortal,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
 } from "@/components/ui/dropdown-menu"
 import { useTheme } from "next-themes"
 import { useAuth } from "~/hooks/useAuth"
 import { useClickOutside } from "~/hooks/use-click-outside"
+import { useHistory, type HistoryItem } from "~/hooks/use-history"
+import { MoveItemPopover } from "./move-item-dialog"
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip"
-import {
-  DndContext,
-  closestCenter,
-  KeyboardSensor,
-  PointerSensor,
-  useSensor,
-  useSensors,
-  DragEndEvent,
-} from "@dnd-kit/core"
-import {
-  arrayMove,
-  SortableContext,
-  sortableKeyboardCoordinates,
-  useSortable,
-  verticalListSortingStrategy,
-} from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
 
 type ChatItem = {
   id: string
@@ -81,16 +68,23 @@ type ChatItem = {
   hasChildren?: boolean
   createdAt: Date
   editedAt: Date
+  folderId?: string | null
+  parentId?: string | null
 }
 
 type SortOption = "date-created" | "date-edited" | "name"
 
-export function NavRail() {
+export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId: string) => void, activeChatId?: string | null }) {
   const [isExpanded, setIsExpanded] = useState(false)
   const { theme, setTheme } = useTheme()
   const currentTheme = (theme as string) || "system"
   const { user, signOut } = useAuth()
   const sidebarRef = useRef<HTMLDivElement>(null)
+  const userMenuTriggerRef = useRef<HTMLButtonElement>(null)
+  const [showTrash, setShowTrash] = useState(false)
+  const [deleteConfirmation, setDeleteConfirmation] = useState<{ isOpen: boolean, id: string, type: "chat" | "folder" } | null>(null)
+  const [renameDialog, setRenameDialog] = useState<{ isOpen: boolean, id: string, type: "chat" | "folder", initialValue: string } | null>(null)
+  const [isAnyMenuOpen, setIsAnyMenuOpen] = useState(false)
 
   const fullName = user?.user_metadata?.full_name || "User"
   const email = user?.email || ""
@@ -106,9 +100,9 @@ export function NavRail() {
 
   // Tree View State
   const [sections, setSections] = useState({
-    starred: true,
+    starred: false,
     recent: true,
-    university: true
+    folders: false
   })
   
   // Search state
@@ -117,28 +111,64 @@ export function NavRail() {
   // Sort option
   const [sortBy, setSortBy] = useState<SortOption>("date-edited")
   
-  // Chat items state (with mock data)
-  const [starredChats, setStarredChats] = useState<ChatItem[]>([
-    { id: "linear-algebra", label: "Linear Algebra Review", icon: MessageSquare, type: "chat", createdAt: new Date("2024-11-20"), editedAt: new Date("2024-11-23") },
-    { id: "spanish-practice", label: "Spanish Practice", icon: MessageSquare, type: "chat", createdAt: new Date("2024-11-19"), editedAt: new Date("2024-11-22") },
-  ])
+  const { items, createFolder, createChat, deleteItem, updateFolder, updateChat, toggleStar: toggleStarApi, moveItem } = useHistory()
+
+  // Chat items state
+  const [starredChats, setStarredChats] = useState<ChatItem[]>([])
+  const [recentChats, setRecentChats] = useState<ChatItem[]>([])
+  const [folderItems, setFolderItems] = useState<ChatItem[]>([])
   
-  const [recentChats, setRecentChats] = useState<ChatItem[]>([
-    { id: "essay", label: "Essay Brainstorming", icon: MessageSquare, type: "chat", createdAt: new Date("2024-11-21"), editedAt: new Date("2024-11-23") },
-    { id: "react", label: "React Components", icon: MessageSquare, type: "chat", createdAt: new Date("2024-11-20"), editedAt: new Date("2024-11-22") },
-    { id: "physics", label: "Physics Lab Report", icon: MessageSquare, type: "chat", createdAt: new Date("2024-11-18"), editedAt: new Date("2024-11-21") },
-  ])
+  const [starredItems, setStarredItems] = useState<Set<string>>(new Set())
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editValue, setEditValue] = useState("")
+  const searchInputRef = useRef<HTMLInputElement>(null)
   
-  const [folderItems, setFolderItems] = useState<ChatItem[]>([
-    { id: "cs101", label: "CS 101", icon: Folder, type: "folder", hasChildren: true, createdAt: new Date("2024-11-15"), editedAt: new Date("2024-11-22") },
-    { id: "math202", label: "MATH 202", icon: Folder, type: "folder", hasChildren: true, createdAt: new Date("2024-11-10"), editedAt: new Date("2024-11-20") },
-  ])
-  
-  const [starredItems, setStarredItems] = useState<Set<string>>(new Set(["linear-algebra", "spanish-practice"]))
+  // Expanded folders state
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set())
+
+  // Sync with backend data
+  React.useEffect(() => {
+    if (!items) return
+
+    const chats = items.filter(i => i.type === "chat" && !i.folderId).map(i => ({
+      ...i,
+      icon: MessageSquare,
+      folderId: i.folderId
+    })) as ChatItem[]
+    
+    const folders = items.filter(i => i.type === "folder").map(i => ({
+      ...i,
+      icon: Folder,
+      parentId: i.parentId
+    })) as ChatItem[]
+
+    setRecentChats(chats)
+    setFolderItems(folders)
+    
+    // Sync starred items from backend
+    const starredSet = new Set<string>()
+    items.forEach(i => {
+      if (i.isStarred) starredSet.add(i.id)
+    })
+    setStarredItems(starredSet)
+    
+    // For starred, we filter from all items based on starredItems set
+    const starred = items.filter(i => i.isStarred).map(i => ({
+      ...i,
+      icon: i.type === "folder" ? Folder : MessageSquare,
+      folderId: i.folderId,
+      parentId: i.parentId
+    })) as ChatItem[]
+    setStarredChats(starred)
+
+  }, [items])
+
+  // Check for test mode to disable auto-closing
+  const isTestMode = typeof window !== 'undefined' && document.body.classList.contains('test-mode')
 
   // Close sidebar on outside click
   useClickOutside(sidebarRef, () => {
-    if (isExpanded) {
+    if (isExpanded && !isTestMode && !isAnyMenuOpen) {
       setIsExpanded(false)
     }
   })
@@ -147,41 +177,66 @@ export function NavRail() {
     setSections(prev => ({ ...prev, [section]: !prev[section] }))
   }
   
-  const toggleStar = (itemId: string) => {
-    setStarredItems(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(itemId)) {
-        newSet.delete(itemId)
-      } else {
-        newSet.add(itemId)
-      }
-      return newSet
+  const toggleFolder = (folderId: string) => {
+    setExpandedFolders(prev => {
+      const next = new Set(prev)
+      if (next.has(folderId)) next.delete(folderId)
+      else next.add(folderId)
+      return next
     })
   }
-
-  const handleNewChat = () => {
-    const newChat: ChatItem = {
-      id: `chat-${Date.now()}`,
-      label: "New chat",
-      icon: MessageSquare,
-      type: "chat",
-      createdAt: new Date(),
-      editedAt: new Date()
+  
+  const toggleStar = async (itemId: string) => {
+    const item = items.find(i => i.id === itemId)
+    if (item) {
+      await toggleStarApi(itemId, item.type, !item.isStarred)
     }
-    setRecentChats(prev => [newChat, ...prev])
   }
 
-  const handleNewFolder = () => {
-    const newFolder: ChatItem = {
-      id: `folder-${Date.now()}`,
-      label: "New folder",
-      icon: Folder,
-      type: "folder",
-      hasChildren: true,
-      createdAt: new Date(),
-      editedAt: new Date()
+  const handleNewChat = async () => {
+    await createChat("New chat")
+    // State will update via useEffect
+  }
+
+  const handleNewFolder = async () => {
+    await createFolder("New folder")
+    // State will update via useEffect
+  }
+
+  const handleRename = async (id: string, type: "chat" | "folder", newName: string) => {
+    if (type === "chat") {
+      await updateChat(id, { title: newName })
+    } else {
+      await updateFolder(id, { name: newName })
     }
-    setFolderItems(prev => [newFolder, ...prev])
+    setEditingId(null)
+  }
+
+  const handleRenameClick = (id: string, type: "chat" | "folder", currentName: string) => {
+    setRenameDialog({ isOpen: true, id, type, initialValue: currentName })
+  }
+
+  const handleRenameConfirm = async (newName: string) => {
+    if (renameDialog && newName !== renameDialog.initialValue) {
+      await handleRename(renameDialog.id, renameDialog.type, newName)
+    }
+    setRenameDialog(null)
+  }
+
+  const handleDelete = async (id: string, type: "chat" | "folder") => {
+    setDeleteConfirmation({ isOpen: true, id, type })
+  }
+
+  const confirmDelete = async () => {
+    if (deleteConfirmation) {
+      await deleteItem(deleteConfirmation.id, deleteConfirmation.type)
+      setDeleteConfirmation(null)
+    }
+  }
+
+  const handleMoveItem = async (itemId: string, itemType: "chat" | "folder", targetFolderId: string | null) => {
+    const targetType = targetFolderId ? "folder" : "root"
+    await moveItem(itemId, itemType, targetFolderId, targetType)
   }
 
   const sortItems = (items: ChatItem[]) => {
@@ -198,24 +253,78 @@ export function NavRail() {
     }
   }
 
-  // Drag and drop handlers
-  const sensors = useSensors(
-    useSensor(PointerSensor),
-    useSensor(KeyboardSensor, {
-      coordinateGetter: sortableKeyboardCoordinates,
-    })
-  )
-
-  const handleDragEnd = (event: DragEndEvent, items: ChatItem[], setItems: React.Dispatch<React.SetStateAction<ChatItem[]>>) => {
-    const { active, over } = event
-
-    if (over && active.id !== over.id) {
-      setItems((items) => {
-        const oldIndex = items.findIndex((item) => item.id === active.id)
-        const newIndex = items.findIndex((item) => item.id === over.id)
-        return arrayMove(items, oldIndex, newIndex)
-      })
+  const filterItems = (items: ChatItem[], excludeStarred = false) => {
+    let filtered = items
+    if (searchQuery) {
+      filtered = filtered.filter(item => item.label.toLowerCase().includes(searchQuery.toLowerCase()))
     }
+    if (excludeStarred) {
+      filtered = filtered.filter(item => !starredItems.has(item.id))
+    }
+    return filtered
+  }
+
+  const allFolders = folderItems.map(f => ({ id: f.id, label: f.label, parentId: f.parentId }))
+
+  // Recursive Folder Component
+  const RecursiveFolder = ({ item, depth = 0 }: { item: ChatItem, depth?: number }) => {
+    const children = items.filter(i => i.folderId === item.id || i.parentId === item.id)
+    const isFolderExpanded = expandedFolders.has(item.id)
+    
+    // Sort children
+    const sortedChildren = sortItems(children as ChatItem[])
+
+    return (
+      <div key={item.id}>
+        <TreeItem
+          id={item.id}
+          icon={item.icon}
+          label={item.label}
+          hasChildren={true}
+          itemId={item.id}
+          active={item.id === activeChatId}
+          isStarred={starredItems.has(item.id)}
+          onToggleStar={toggleStar}
+          onClick={() => toggleFolder(item.id)}
+          onRename={() => handleRenameClick(item.id, item.type, item.label)}
+          onDelete={() => handleDelete(item.id, item.type)}
+          onMove={(targetId) => handleMoveItem(item.id, item.type, targetId)}
+          folders={allFolders}
+          isExpanded={isFolderExpanded}
+          onMenuOpenChange={setIsAnyMenuOpen}
+        />
+        {isFolderExpanded && (
+          <div className="ml-4 border-l border-border pl-2">
+            {sortedChildren.length > 0 ? (
+              sortedChildren.map(child => (
+                child.type === 'folder' ? (
+                  <RecursiveFolder key={child.id} item={child} depth={depth + 1} />
+                ) : (
+                  <TreeItem 
+                    key={child.id}
+                    itemId={child.id}
+                    icon={MessageSquare}
+                    label={child.label}
+                    active={child.id === activeChatId}
+                    isStarred={starredItems.has(child.id)}
+                    onToggleStar={toggleStar}
+                    onClick={() => onSelectChat?.(child.id)}
+                    hasChildren={false}
+                    onRename={() => handleRenameClick(child.id, child.type, child.label)}
+                    onDelete={() => handleDelete(child.id, child.type)}
+                    onMove={(targetId) => handleMoveItem(child.id, child.type, targetId)}
+                    folders={allFolders}
+                    onMenuOpenChange={setIsAnyMenuOpen}
+                  />
+                )
+              ))
+            ) : (
+              <div className="text-[10px] text-muted-foreground py-1 px-2 italic">Empty folder</div>
+            )}
+          </div>
+        )}
+      </div>
+    )
   }
 
   return (
@@ -223,13 +332,15 @@ export function NavRail() {
       <div className="absolute top-0 right-0 h-screen z-50 flex">
         <div
           ref={sidebarRef}
+          data-testid="nav-rail"
+          onMouseDown={(e) => e.stopPropagation()}
           className={cn(
-            "h-full bg-slate-950/90 text-slate-200 flex flex-col border-l border-r border-slate-800 shadow-xl transition-all duration-300 ease-in-out",
+            "h-full bg-background text-foreground flex flex-col border-l border-r border-border shadow-xl transition-all duration-500 ease-smooth overflow-hidden",
             isExpanded ? "w-[260px]" : "w-[54px]",
           )}
         >
           {/* Header with Logo & Title */}
-          <div className="border-b border-slate-800 shrink-0">
+          <div className="border-b border-border shrink-0">
             {isExpanded ? (
               <div className="p-3 space-y-3">
                 <div className="flex items-center justify-between mb-1">
@@ -237,9 +348,15 @@ export function NavRail() {
                     <div className="h-6 w-6 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center text-white font-bold text-xs shadow-lg">
                       L
                     </div>
-                    <span className="text-sm font-bold text-slate-50 tracking-tight">Luminate AI</span>
+                    <span className="text-sm font-bold text-foreground tracking-tight">Luminate AI</span>
                   </div>
-                  <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-slate-100" onClick={() => setIsExpanded(false)}>
+                  <Button 
+                    variant="ghost" 
+                    size="icon" 
+                    className="h-6 w-6 text-muted-foreground hover:text-foreground" 
+                    onClick={() => setIsExpanded(false)}
+                    data-testid="nav-rail-collapse"
+                  >
                     <PanelLeftClose className="w-3.5 h-3.5" />
                   </Button>
                 </div>
@@ -247,31 +364,45 @@ export function NavRail() {
                 {/* Search Bar */}
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
-                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500" />
+                    <Search className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-muted-foreground" />
                     <Input
+                      ref={searchInputRef}
                       placeholder="Search..."
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
-                      className="h-7 pl-8 bg-slate-900/50 border-slate-800 text-xs text-slate-200 placeholder:text-slate-500 focus:bg-slate-900 focus:border-slate-700"
+                      className="h-7 pl-8 bg-muted/50 border-border text-xs text-foreground placeholder:text-muted-foreground focus:bg-muted focus:border-ring"
                     />
                   </div>
-                  <DropdownMenu>
+                  <DropdownMenu onOpenChange={setIsAnyMenuOpen}>
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
-                          <Button size="icon" variant="ghost" className="h-7 w-7 bg-violet-600 hover:bg-violet-500 text-white shrink-0">
+                          <Button 
+                            size="icon" 
+                            variant="ghost" 
+                            className="h-7 w-7 bg-violet-600 hover:bg-violet-500 text-white shrink-0"
+                            data-testid="new-button"
+                          >
                             <Plus className="w-3.5 h-3.5" />
                           </Button>
                         </DropdownMenuTrigger>
                       </TooltipTrigger>
                       <TooltipContent side="right">New</TooltipContent>
                     </Tooltip>
-                    <DropdownMenuContent align="end" className="w-40 bg-slate-900 border-slate-800">
-                      <DropdownMenuItem onClick={handleNewChat} className="cursor-pointer text-slate-200 focus:bg-slate-800 focus:text-slate-50">
+                    <DropdownMenuContent align="end" className="w-40 bg-popover border-border" data-testid="new-menu-content">
+                      <DropdownMenuItem 
+                        onClick={handleNewChat} 
+                        className="cursor-pointer text-popover-foreground focus:bg-accent focus:text-accent-foreground"
+                        data-testid="new-chat-item"
+                      >
                         <MessageSquarePlus className="w-4 h-4 mr-2" />
                         New chat
                       </DropdownMenuItem>
-                      <DropdownMenuItem onClick={handleNewFolder} className="cursor-pointer text-slate-200 focus:bg-slate-800 focus:text-slate-50">
+                      <DropdownMenuItem 
+                        onClick={handleNewFolder} 
+                        className="cursor-pointer text-popover-foreground focus:bg-accent focus:text-accent-foreground"
+                        data-testid="new-folder-item"
+                      >
                         <FolderPlus className="w-4 h-4 mr-2" />
                         New folder
                       </DropdownMenuItem>
@@ -284,60 +415,71 @@ export function NavRail() {
                 <div className="h-8 w-8 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg">
                   L
                 </div>
-                <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-slate-100" onClick={() => setIsExpanded(true)}>
+                <Button 
+                  variant="ghost" 
+                  size="icon" 
+                  className="h-6 w-6 text-muted-foreground hover:text-foreground" 
+                  onClick={() => setIsExpanded(true)}
+                  data-testid="nav-rail-expand"
+                >
                   <PanelLeftOpen className="w-3.5 h-3.5" />
                 </Button>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-slate-100">
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                      onClick={() => {
+                        setIsExpanded(true)
+                        setTimeout(() => searchInputRef.current?.focus(), 100)
+                      }}
+                    >
                       <Search className="w-3.5 h-3.5" />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="right">Search</TooltipContent>
                 </Tooltip>
-                <DropdownMenu>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-6 w-6 text-slate-400 hover:text-slate-100">
-                          <Plus className="w-3.5 h-3.5" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                    </TooltipTrigger>
-                    <TooltipContent side="right">New</TooltipContent>
-                  </Tooltip>
-                  <DropdownMenuContent side="right" className="w-40 bg-slate-900 border-slate-800">
-                    <DropdownMenuItem onClick={handleNewChat} className="cursor-pointer text-slate-200 focus:bg-slate-800 focus:text-slate-50">
-                      <MessageSquarePlus className="w-4 h-4 mr-2" />
-                      New chat
-                    </DropdownMenuItem>
-                    <DropdownMenuItem onClick={handleNewFolder} className="cursor-pointer text-slate-200 focus:bg-slate-800 focus:text-slate-50">
-                      <FolderPlus className="w-4 h-4 mr-2" />
-                      New folder
-                    </DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      className="h-6 w-6 text-muted-foreground hover:text-foreground"
+                      onClick={handleNewChat}
+                    >
+                      <Plus className="w-3.5 h-3.5" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent side="right">New Chat</TooltipContent>
+                </Tooltip>
               </div>
             )}
           </div>
 
           {/* Tree View Content - Law of Proximity: Group related items */}
-          <ScrollArea className="flex-1">
+          <ScrollArea className="flex-1 w-full min-h-0">
           <div className="py-3 px-2">
             {isExpanded ? (
               <div className="space-y-3">
                 {/* Sort By Control */}
-                <div className="px-2">
-                  <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)}>
-                    <SelectTrigger className="h-7 text-xs bg-slate-900/50 border-slate-800 text-slate-300">
-                      <SelectValue placeholder="Sort by..." />
-                    </SelectTrigger>
-                    <SelectContent className="bg-slate-900 border-slate-800 text-slate-200">
-                      <SelectItem value="date-edited" className="text-xs">Date edited</SelectItem>
-                      <SelectItem value="date-created" className="text-xs">Date created</SelectItem>
-                      <SelectItem value="name" className="text-xs">Name</SelectItem>
-                    </SelectContent>
-                  </Select>
+                <div className="px-2 flex items-center gap-2">
+                  <div 
+                    onClick={(e) => e.stopPropagation()} 
+                    onMouseDown={(e) => e.stopPropagation()}
+                    className="flex-1"
+                  >
+                    <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)} onOpenChange={setIsAnyMenuOpen}>
+                      <SelectTrigger className="h-7 text-xs bg-muted/50 border-border text-foreground w-full">
+                        <SelectValue placeholder="Sort by..." />
+                      </SelectTrigger>
+                      <SelectContent className="bg-popover border-border text-popover-foreground z-[110]">
+                        <SelectItem value="date-edited" className="text-xs">Date edited</SelectItem>
+                        <SelectItem value="date-created" className="text-xs">Date created</SelectItem>
+                        <SelectItem value="name" className="text-xs">Name</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
 
                 {/* Starred Section */}
@@ -345,32 +487,32 @@ export function NavRail() {
                   label="STARRED" 
                   isOpen={sections.starred} 
                   onToggle={() => toggleSection('starred')}
-                  count={starredChats.length}
+                  count={filterItems(starredChats).length}
                 >
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={(event) => handleDragEnd(event, starredChats, setStarredChats)}
-                  >
-                    <SortableContext
-                      items={sortItems(starredChats).map(item => item.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      {sortItems(starredChats).map((item) => (
-                        <SortableTreeItem
-                          key={item.id}
-                          id={item.id}
-                          icon={item.icon}
-                          label={item.label}
-                          active={item.id === "linear-algebra"}
-                          itemId={item.id}
-                          isStarred={starredItems.has(item.id)}
-                          onToggleStar={toggleStar}
-                          hasChildren={item.hasChildren}
-                        />
-                      ))}
-                    </SortableContext>
-                  </DndContext>
+                      {sortItems(filterItems(starredChats)).map((item) => {
+                        if (item.type === 'folder') {
+                          return <RecursiveFolder key={item.id} item={item} />
+                        }
+                        return (
+                          <TreeItem
+                            key={item.id}
+                            id={item.id}
+                            icon={item.icon}
+                            label={item.label}
+                            active={item.id === activeChatId}
+                            itemId={item.id}
+                            isStarred={starredItems.has(item.id)}
+                            onToggleStar={toggleStar}
+                            hasChildren={item.hasChildren}
+                            onClick={() => onSelectChat?.(item.id)}
+                            onRename={() => handleRenameClick(item.id, item.type, item.label)}
+                            onDelete={() => handleDelete(item.id, item.type)}
+                            onMove={(targetId) => handleMoveItem(item.id, item.type, targetId)}
+                            folders={allFolders}
+                            onMenuOpenChange={setIsAnyMenuOpen}
+                          />
+                        )
+                      })}
                 </CollapsibleSection>
 
                 {/* Recent Section - Hick's Law: Limit visible options */}
@@ -378,114 +520,71 @@ export function NavRail() {
                   label="RECENT" 
                   isOpen={sections.recent} 
                   onToggle={() => toggleSection('recent')}
-                  count={recentChats.length}
+                  count={filterItems(recentChats, true).length}
                 >
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={(event) => handleDragEnd(event, recentChats, setRecentChats)}
-                  >
-                    <SortableContext
-                      items={sortItems(recentChats).map(item => item.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      {sortItems(recentChats).map((item) => (
-                        <SortableTreeItem
+                      {sortItems(filterItems(recentChats, true)).map((item) => (
+                        <TreeItem
                           key={item.id}
                           id={item.id}
                           icon={item.icon}
                           label={item.label}
                           itemId={item.id}
+                          active={item.id === activeChatId}
                           isStarred={starredItems.has(item.id)}
                           onToggleStar={toggleStar}
                           hasChildren={item.hasChildren}
+                          onClick={() => onSelectChat?.(item.id)}
+                          onRename={() => handleRenameClick(item.id, item.type, item.label)}
+                          onDelete={() => handleDelete(item.id, item.type)}
+                          onMove={(targetId) => handleMoveItem(item.id, item.type, targetId)}
+                          folders={allFolders}
+                          onMenuOpenChange={setIsAnyMenuOpen}
                         />
                       ))}
-                    </SortableContext>
-                  </DndContext>
                 </CollapsibleSection>
                 
                 {/* Folders - Law of Similarity: Consistent styling */}
                 <CollapsibleSection 
-                  label="UNIVERSITY" 
-                  isOpen={sections.university} 
-                  onToggle={() => toggleSection('university')}
-                  count={folderItems.length}
+                  label="FOLDERS" 
+                  isOpen={sections.folders} 
+                  onToggle={() => toggleSection('folders')}
+                  count={filterItems(folderItems.filter(f => !f.parentId), true).length}
                 >
-                  <DndContext
-                    sensors={sensors}
-                    collisionDetection={closestCenter}
-                    onDragEnd={(event) => handleDragEnd(event, folderItems, setFolderItems)}
-                  >
-                    <SortableContext
-                      items={sortItems(folderItems).map(item => item.id)}
-                      strategy={verticalListSortingStrategy}
-                    >
-                      {sortItems(folderItems).map((item) => (
-                        <SortableTreeItem
-                          key={item.id}
-                          id={item.id}
-                          icon={item.icon}
-                          label={item.label}
-                          hasChildren={item.hasChildren}
-                          itemId={item.id}
-                          isStarred={starredItems.has(item.id)}
-                          onToggleStar={toggleStar}
-                        />
+                      {sortItems(filterItems(folderItems.filter(f => !f.parentId), true)).map((item) => (
+                        <RecursiveFolder key={item.id} item={item} />
                       ))}
-                    </SortableContext>
-                  </DndContext>
                 </CollapsibleSection>
               </div>
             ) : (
                <div className="flex flex-col items-center gap-2 pt-2">
-                  <Tooltip>
-                     <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-slate-100 hover:bg-slate-900/40">
-                           <Star className="w-3.5 h-3.5" />
-                        </Button>
-                     </TooltipTrigger>
-                     <TooltipContent side="right">Starred</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                     <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-slate-100 hover:bg-slate-900/40">
-                           <MessageSquare className="w-3.5 h-3.5" />
-                        </Button>
-                     </TooltipTrigger>
-                     <TooltipContent side="right">Chats</TooltipContent>
-                  </Tooltip>
-                  <Tooltip>
-                     <TooltipTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-7 w-7 text-slate-400 hover:text-slate-100 hover:bg-slate-900/40">
-                           <Folder className="w-3.5 h-3.5" />
-                        </Button>
-                     </TooltipTrigger>
-                     <TooltipContent side="right">Folders</TooltipContent>
-                  </Tooltip>
+                  {/* Icons hidden in collapsed state as requested */}
                </div>
             )}
           </div>
           </ScrollArea>
 
           {/* User Profile Footer - Fitts's Law: Large clickable area */}
-          <div className="p-2 border-t border-slate-800 bg-slate-950">
-            <DropdownMenu>
+          <div className="p-2 border-t border-border bg-background">
+            <DropdownMenu onOpenChange={setIsAnyMenuOpen}>
               <DropdownMenuTrigger asChild>
-                <button className={cn(
-                  "flex items-center gap-2 w-full p-2 rounded-lg hover:bg-slate-900/40 transition-colors group outline-none",
-                  !isExpanded && "justify-center px-0"
-                )}>
+                <button 
+                  ref={userMenuTriggerRef}
+                  className={cn(
+                    "flex items-center gap-2 w-full p-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors group outline-none",
+                    !isExpanded && "justify-center px-0"
+                  )}
+                  data-testid="user-profile-trigger"
+                >
                   <div className="relative shrink-0">
-                    <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white font-medium text-xs shadow-lg ring-2 ring-slate-950">
+                    <div className="w-8 h-8 rounded-full bg-emerald-600 flex items-center justify-center text-white font-medium text-xs shadow-lg ring-2 ring-background">
                       {initials}
                     </div>
-                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-slate-950 rounded-full"></div>
+                    <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></div>
                   </div>
                   
                   {isExpanded && (
                     <div className="flex-1 text-left overflow-hidden">
-                      <div className="text-sm font-medium text-slate-200 truncate">{fullName}</div>
+                      <div className="text-sm font-medium text-foreground truncate">{fullName}</div>
                       <div className="flex items-center gap-1.5 text-xs text-emerald-500 font-medium">
                         <GraduationCap className="w-3 h-3" />
                         {role}
@@ -494,59 +593,100 @@ export function NavRail() {
                   )}
                   
                   {isExpanded && (
-                     <Settings className="w-4 h-4 text-slate-500 group-hover:text-slate-300 transition-colors" />
+                     <Settings className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                   )}
                 </button>
               </DropdownMenuTrigger>
-              <DropdownMenuContent align="start" side={isExpanded ? "top" : "right"} className="w-64 bg-slate-900 border-slate-800 ml-2 mb-2 text-slate-200">
-                <div className="flex items-center gap-3 p-3 bg-slate-800/50 mb-1">
+              <DropdownMenuContent align="start" side={isExpanded ? "top" : "right"} className="w-64 bg-popover border-border ml-2 mb-2 text-popover-foreground z-[100]" data-testid="user-profile-menu">
+                <div className="flex items-center gap-3 p-3 bg-muted/50 mb-1">
                   <div className="w-10 h-10 rounded-full bg-emerald-600 flex items-center justify-center text-white font-semibold text-sm shrink-0">
                     {initials}
                   </div>
                   <div className="flex flex-col overflow-hidden">
-                    <span className="text-sm font-medium text-slate-50 truncate">{fullName}</span>
-                    <span className="text-xs text-slate-400 truncate">{email}</span>
+                    <span className="text-sm font-medium text-foreground truncate">{fullName}</span>
+                    <span className="text-xs text-muted-foreground truncate">{email}</span>
                   </div>
                 </div>
                 
-                <DropdownMenuSeparator className="bg-slate-800" />
+                <DropdownMenuSeparator className="bg-border" />
                 
                 <DropdownMenuSub>
-                  <DropdownMenuSubTrigger className="focus:bg-slate-800 focus:text-slate-50 cursor-pointer">
+                  <DropdownMenuSubTrigger className="focus:bg-accent focus:text-accent-foreground cursor-pointer" data-testid="theme-submenu-trigger">
                     {currentTheme === "light" ? <Sun className="w-4 h-4 mr-2" /> : currentTheme === "dark" ? <Moon className="w-4 h-4 mr-2" /> : <Laptop className="w-4 h-4 mr-2" />}
                     Theme
                   </DropdownMenuSubTrigger>
-                  <DropdownMenuSubContent className="bg-slate-900 border-slate-800 text-slate-200">
-                    <DropdownMenuRadioGroup value={currentTheme} onValueChange={(value) => setTheme(value)}>
-                      <DropdownMenuRadioItem value="light" className="focus:bg-slate-800 focus:text-slate-50 cursor-pointer">
-                        <Sun className="w-4 h-4 mr-2" /> Light
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="dark" className="focus:bg-slate-800 focus:text-slate-50 cursor-pointer">
-                        <Moon className="w-4 h-4 mr-2" /> Dark
-                      </DropdownMenuRadioItem>
-                      <DropdownMenuRadioItem value="system" className="focus:bg-slate-800 focus:text-slate-50 cursor-pointer">
-                        <Laptop className="w-4 h-4 mr-2" /> System
-                      </DropdownMenuRadioItem>
-                    </DropdownMenuRadioGroup>
-                  </DropdownMenuSubContent>
+                  <DropdownMenuPortal>
+                    <DropdownMenuSubContent className="bg-popover border-border text-popover-foreground z-[100]" data-testid="theme-submenu-content">
+                      <DropdownMenuRadioGroup value={currentTheme} onValueChange={(value) => setTheme(value)}>
+                        <DropdownMenuRadioItem value="light" className="focus:bg-accent focus:text-accent-foreground cursor-pointer" data-testid="theme-light">
+                          <Sun className="w-4 h-4 mr-2" /> Light
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="dark" className="focus:bg-accent focus:text-accent-foreground cursor-pointer" data-testid="theme-dark">
+                          <Moon className="w-4 h-4 mr-2" /> Dark
+                        </DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="system" className="focus:bg-accent focus:text-accent-foreground cursor-pointer" data-testid="theme-system">
+                          <Laptop className="w-4 h-4 mr-2" /> System
+                        </DropdownMenuRadioItem>
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuSubContent>
+                  </DropdownMenuPortal>
                 </DropdownMenuSub>
 
-                <DropdownMenuItem className="focus:bg-slate-800 focus:text-slate-50">
+                <DropdownMenuItem className="focus:bg-accent focus:text-accent-foreground" data-testid="settings-item">
                   <Settings className="w-4 h-4 mr-2" />
                   Settings
                 </DropdownMenuItem>
+
+                <DropdownMenuItem 
+                  className="focus:bg-accent focus:text-accent-foreground cursor-pointer" 
+                  onSelect={(e) => {
+                    e.preventDefault()
+                    setShowTrash(true)
+                  }}
+                >
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Trash
+                </DropdownMenuItem>
                 
-                <DropdownMenuSeparator className="bg-slate-800" />
+                <DropdownMenuSeparator className="bg-border" />
                 
                 <DropdownMenuItem 
-                  className="text-red-400 focus:bg-red-500/10 focus:text-red-400"
+                  className="text-destructive focus:bg-destructive/10 focus:text-destructive"
                   onClick={() => signOut()}
+                  data-testid="logout-item"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
                   Log out
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
+            
+            <TrashDialog 
+              isOpen={showTrash} 
+              onClose={() => setShowTrash(false)} 
+            />
+            
+            {deleteConfirmation && (
+              <ConfirmDialog
+                isOpen={deleteConfirmation.isOpen}
+                onClose={() => setDeleteConfirmation(null)}
+                onConfirm={confirmDelete}
+                title="Delete Item?"
+                description="Are you sure you want to delete this item? It will be moved to trash."
+                confirmText="Delete"
+                variant="destructive"
+              />
+            )}
+
+            {renameDialog && (
+              <RenameDialog
+                isOpen={renameDialog.isOpen}
+                onClose={() => setRenameDialog(null)}
+                onRename={handleRenameConfirm}
+                initialValue={renameDialog.initialValue}
+                title={`Rename ${renameDialog.type === 'chat' ? 'Chat' : 'Folder'}`}
+              />
+            )}
           </div>
         </div>
       </div>
@@ -559,16 +699,17 @@ function CollapsibleSection({ label, isOpen, onToggle, children, count }: { labe
       <div className="mb-2">
          <button 
             onClick={onToggle}
-            className="w-full flex items-center gap-1.5 px-2 py-2 text-slate-500 hover:text-slate-200 hover:bg-slate-900/40 rounded transition-colors group"
+            className="w-full flex items-center gap-1.5 px-2 py-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors group"
+            data-testid={`section-header-${label}`}
          >
             <ChevronRight className={cn("w-3 h-3 transition-transform duration-200 shrink-0", isOpen && "rotate-90")} />
-            <span className="text-[11px] font-bold tracking-wider uppercase group-hover:text-slate-200 flex-1 text-left">{label}</span>
+            <span className="text-[11px] font-bold tracking-wider uppercase group-hover:text-foreground flex-1 text-left">{label}</span>
             {count !== undefined && (
-              <span className="text-[10px] text-slate-500 font-medium">{count}</span>
+              <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
             )}
          </button>
          {isOpen && (
-            <div className="mt-1 space-y-1">
+            <div className="mt-1 space-y-1" data-testid={`section-content-${label}`}>
                {children}
             </div>
          )}
@@ -576,86 +717,132 @@ function CollapsibleSection({ label, isOpen, onToggle, children, count }: { labe
    )
 }
 
-function TreeItem({ icon: Icon, label, active, hasChildren, itemId, isStarred, onToggleStar }: { icon: any, label: string, active?: boolean, hasChildren?: boolean, itemId: string, isStarred: boolean, onToggleStar: (id: string) => void }) {
+function TreeItem({ 
+  icon: Icon, 
+  label, 
+  active, 
+  hasChildren, 
+  itemId, 
+  isStarred, 
+  onToggleStar, 
+  onClick,
+  onRename,
+  onDelete,
+  onMove,
+  folders = [],
+  isExpanded,
+  onMenuOpenChange
+}: { 
+  icon: any, 
+  label: string, 
+  active?: boolean, 
+  hasChildren?: boolean, 
+  itemId: string, 
+  isStarred: boolean, 
+  onToggleStar: (id: string) => void, 
+  onClick?: () => void,
+  onRename?: () => void,
+  onDelete?: () => void,
+  onMove?: (targetId: string) => void,
+  folders?: { id: string; label: string; parentId?: string | null }[],
+  isExpanded?: boolean,
+  onMenuOpenChange?: (open: boolean) => void
+}) {
+   const [showMove, setShowMove] = useState(false)
+   const itemRef = useRef<HTMLDivElement>(null)
+   const isMovingRef = useRef(false)
+
    return (
-      <div className={cn(
-         "flex items-center gap-2 px-2 py-2 cursor-pointer border-l-2 border-transparent hover:bg-slate-900/40 rounded transition-colors group relative",
-         active ? "bg-slate-900/70 border-l-2 border-violet-500 text-slate-100" : "text-slate-400 hover:text-slate-200"
-      )}>
+      <div 
+         ref={itemRef}
+         className={cn(
+            "flex items-center gap-2 px-2 py-2 cursor-pointer border-l-2 border-transparent hover:bg-accent rounded transition-colors group relative pr-8",
+            active ? "bg-accent/70 border-l-2 border-violet-500 text-foreground" : "text-muted-foreground hover:text-foreground"
+         )}
+         data-testid={`tree-item-${itemId}`}
+         onClick={onClick}
+      >
+         {showMove && (
+            <MoveItemPopover 
+               isOpen={showMove}
+               onClose={() => {
+                 setShowMove(false)
+                 isMovingRef.current = false
+               }}
+               onMove={(targetId) => {
+                  onMove?.(targetId)
+                  setShowMove(false)
+                  isMovingRef.current = false
+               }}
+               folders={folders}
+               itemId={itemId}
+               anchorRef={itemRef}
+            />
+         )}
          {hasChildren ? (
-            <ChevronRight className="w-3 h-3 text-slate-500 shrink-0" />
+            <ChevronRight className={cn("w-3 h-3 text-muted-foreground shrink-0 transition-transform duration-200", isExpanded && "rotate-90")} />
          ) : (
             <div className="w-3 shrink-0" /> 
          )}
-         <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "text-violet-400" : "text-slate-400")} />
+         <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "text-violet-400" : "text-muted-foreground")} />
          <span className="text-xs truncate leading-none flex-1">{label}</span>
-         <button
-           onClick={(e) => {
-             e.stopPropagation()
-             onToggleStar(itemId)
-           }}
-           className={cn(
-             "opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-slate-800/50 rounded shrink-0",
-             isStarred && "opacity-100"
-           )}
-         >
-           <Star className={cn(
-             "w-3 h-3",
-             isStarred ? "fill-yellow-500 text-yellow-500" : "text-slate-500"
-           )} />
-         </button>
+         
+         <div className="flex items-center gap-1 absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+           <button
+             onClick={(e) => {
+               e.stopPropagation()
+               onToggleStar(itemId)
+             }}
+             className={cn(
+               "p-0.5 hover:bg-accent rounded shrink-0",
+               isStarred && "opacity-100 block"
+             )}
+             data-testid={`star-button-${itemId}`}
+           >
+             <Star className={cn(
+               "w-3 h-3",
+               isStarred ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"
+             )} />
+           </button>
+
+           <DropdownMenu onOpenChange={onMenuOpenChange}>
+            <DropdownMenuTrigger asChild>
+              <Button 
+                variant="ghost" 
+                className="h-6 w-6 p-0 hover:bg-accent"
+                onClick={(e) => e.stopPropagation()}
+                data-testid={`menu-button-${itemId}`}
+              >
+                <MoreHorizontal className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent 
+              align="end" 
+              className="bg-popover border-border z-[60]"
+              onCloseAutoFocus={(e) => {
+                if (isMovingRef.current) {
+                  e.preventDefault()
+                }
+              }}
+            >
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRename?.() }} className="text-popover-foreground focus:bg-accent cursor-pointer">
+                Rename
+              </DropdownMenuItem>
+              <DropdownMenuItem 
+                onSelect={(e) => { 
+                   isMovingRef.current = true
+                   setShowMove(true)
+                }} 
+                className="text-popover-foreground focus:bg-accent cursor-pointer"
+              >
+                Move to...
+              </DropdownMenuItem>
+              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete?.() }} className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
+                Delete
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+         </div>
       </div>
    )
-}
-
-function SortableTreeItem({ id, icon: Icon, label, active, hasChildren, itemId, isStarred, onToggleStar }: { id: string, icon: any, label: string, active?: boolean, hasChildren?: boolean, itemId: string, isStarred: boolean, onToggleStar: (id: string) => void }) {
-  const {
-    attributes,
-    listeners,
-    setNodeRef,
-    transform,
-    transition,
-    isDragging,
-  } = useSortable({ id })
-
-  const style = {
-    transform: CSS.Transform.toString(transform),
-    transition,
-    opacity: isDragging ? 0.5 : 1,
-  }
-
-  return (
-    <div ref={setNodeRef} style={style} className="relative">
-      <div className={cn(
-        "flex items-center gap-2 px-2 py-2 cursor-pointer border-l-2 border-transparent hover:bg-slate-900/40 rounded transition-colors group relative",
-        active ? "bg-slate-900/70 border-l-2 border-violet-500 text-slate-100" : "text-slate-400 hover:text-slate-200"
-      )}>
-        <div {...attributes} {...listeners} className="cursor-grab active:cursor-grabbing shrink-0 text-slate-500 hover:text-slate-300 -ml-1">
-          <GripVertical className="w-3 h-3" />
-        </div>
-        {hasChildren ? (
-          <ChevronRight className="w-3 h-3 text-slate-500 shrink-0" />
-        ) : (
-          <div className="w-3 shrink-0" /> 
-        )}
-        <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "text-violet-400" : "text-slate-400")} />
-        <span className="text-xs truncate leading-none flex-1">{label}</span>
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onToggleStar(itemId)
-          }}
-          className={cn(
-            "opacity-0 group-hover:opacity-100 transition-opacity p-0.5 hover:bg-slate-800/50 rounded shrink-0",
-            isStarred && "opacity-100"
-          )}
-        >
-          <Star className={cn(
-            "w-3 h-3",
-            isStarred ? "fill-yellow-500 text-yellow-500" : "text-slate-500"
-          )} />
-        </button>
-      </div>
-    </div>
-  )
 }

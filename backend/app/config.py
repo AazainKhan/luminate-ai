@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     # Environment
     environment: str = "development"
     
+    # Dev auth bypass for E2E testing
+    dev_auth_bypass: bool = False
+    
     # Supabase
     supabase_url: str = ""
     supabase_anon_key: str = ""

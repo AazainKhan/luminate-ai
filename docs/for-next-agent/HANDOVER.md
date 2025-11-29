@@ -1,182 +1,138 @@
-# Agent Handover Notes
+# Agent Handover Document
 
-## Session Summary (November 27, 2025)
+## Session Summary (November 28, 2025 - Session 3)
 
-This document captures the work completed in this session and what the next agent should focus on.
+This document provides a complete handover for the next agent working on Luminate AI.
 
 ---
 
-## Completed Work This Session
+## 🎯 What Was Accomplished This Session
 
-### 1. E2E Testing Migration ✅
-**From:** WebdriverIO (deprecated CDP API issues)
-**To:** Playwright (official Chrome extension support)
+### History CRUD Implementation (Rename/Update)
+- **Backend**: Added `PATCH` endpoints for folders and chats in `backend/app/api/routes/history.py`.
+- **Frontend**: Updated `use-history.ts` and `nav-rail.tsx` to support renaming via a new "More" (...) dropdown menu.
+- **Verification**: Created and passed a new E2E test `extension/test/e2e/history-crud.spec.ts`.
 
-**Files:**
-- `extension/playwright.config.ts` - Test configuration
-- `extension/test/e2e/fixtures.ts` - Extension loading with `launchPersistentContext`
-- `extension/test/e2e/auth.spec.ts` - Authentication tests
-- `extension/test/e2e/chat.spec.ts` - Chat UI tests
+### Test Suite Status
+- **Total Tests**: 321 (320 previous + 1 new)
+- **New Test**: `history-crud.spec.ts` (1/1 passed)
+- **Infrastructure/Backend**: 100% Pass
+- **UI/Sidebar**: ~75% Pass (Known Radix UI issues persist)
 
-**Test Commands:**
-```bash
-cd extension
-npm run test:e2e           # Run all (8 tests, ~25s)
-npm run test:e2e:headed    # Visible browser
-npm run test:e2e:debug     # Step-through debugging
+---
+
+## 🔧 Current System State
+
+### Backend
+- **Healthy**: All endpoints operational.
+- **New Capabilities**: `PATCH` support for history items.
+- **Auth**: Dev bypass enabled for testing (`DEV_AUTH_BYPASS=true`).
+
+### Frontend (Extension)
+- **Build Status**: Builds successfully (`pnpm build`).
+- **UI**: Sidebar now includes a "More" menu on hover for history items.
+- **Known Issue**: Some UI tests fail due to Radix UI portal timing (click-outside behavior).
+
+### Docker Services
+- All 8 services running and healthy.
+
+---
+
+## 🚀 Suggested Work for Next Agent
+
+### Priority 1: Fix UI Sidebar Tests (Medium Effort)
+The 48 failing tests in `new-items.spec.ts`, `folders.spec.ts`, etc., are due to Radix UI dropdowns closing prematurely during tests.
+- **Strategy**: Implement `forceExpandNavRail` or disable click-outside handlers during testing mode.
+
+### Priority 2: Drag-and-Drop Persistence (High Value)
+The UI supports dragging items, but the new order is **not persisted** to the backend.
+- **Task**: Add `sort_order` column to `folders` and `chats` tables.
+- **Task**: Implement `PUT /api/history/reorder` endpoint.
+- **Task**: Connect frontend `onDragEnd` to this endpoint.
+
+### Priority 3: "Starring" Persistence
+Starring items is currently local-only state in `nav-rail.tsx`.
+- **Task**: Add `is_starred` column to database.
+- **Task**: Update `PATCH` endpoints to handle `is_starred` updates.
+
+### Priority 4: Production Deployment Prep
+- Verify real Supabase OTP flow (disable dev bypass).
+- Test with production ChromaDB data.
+
+---
+
+## 📁 Key File Locations
+
+### History CRUD
+- `backend/app/api/routes/history.py`: API endpoints.
+- `extension/src/hooks/use-history.ts`: Frontend logic.
+- `extension/src/components/nav-rail.tsx`: UI components.
+- `extension/test/e2e/history-crud.spec.ts`: Verification test.
+
+### Backend
+```
+backend/
+├── app/
+│   ├── agents/
+│   │   ├── tutor_agent.py    # LangGraph entry point
+│   │   └── governor.py       # Policy enforcement
+│   ├── api/
+│   │   └── routes/chat.py    # Chat streaming
+│   └── main.py               # FastAPI app
 ```
 
-### 2. Dev Auth Bypass ✅
-**File:** `extension/src/hooks/useAuth.ts`
-
-- Environment variable: `PLASMO_PUBLIC_DEV_AUTH_BYPASS=true`
-- Skips Supabase authentication in development
-- Uses mock user: `dev@my.centennialcollege.ca` (student role)
-- Allows E2E tests to access chat UI directly
-
-### 3. Infrastructure Fixes ✅
-- **ChromaDB connection**: Fixed `CHROMADB_HOST` from Docker internal (`memory_store`) to `localhost`
-- **Data ingestion**: Re-ingested 219 documents into Docker ChromaDB
-- **Database migration**: Applied agent tracking columns via Supabase
-
-### 4. Git Cleanup ✅
-- Removed deprecated backend scripts
-- Removed unused shader-gradient-component
-- Updated .gitignore for generated files
-- 11 commits pushed to main
-
----
-
-## Outstanding Work
-
-### 1. Update CI/CD Workflow 🔴 PRIORITY
-**Location:** `.github/workflows/e2e-tests.yml`
-
-The workflow still references WebdriverIO. Update to Playwright:
-
-```yaml
-- name: Install Playwright
-  run: |
-    cd extension
-    npm install
-    npx playwright install chromium
-
-- name: Run E2E tests
-  run: |
-    cd extension
-    npm run test:e2e
-```
-
-Note: Playwright requires headed mode for extensions. Use `xvfb-run` on Linux CI.
-
-### 2. Production Build Testing 🟡
-- Current tests use `chrome-mv3-prod` build with auth bypass
-- Test with `PLASMO_PUBLIC_DEV_AUTH_BYPASS=false` for production parity
-- Verify real Supabase OTP flow works
-
-### 3. Additional E2E Test Coverage 🟢
-Current tests are basic. Add:
-- Message sending and response streaming
-- Code execution (E2B sandbox)
-- Export chat as markdown
-- Error state handling
-
----
-
-## Architecture Decisions
-
-### Why Playwright Over WebdriverIO?
-
-| Aspect | Playwright | WebdriverIO |
-|--------|-----------|-------------|
-| Extension Support | Official docs | Workarounds |
-| Manifest V3 | Built-in SW support | CDP deprecated |
-| Setup | 2 args | Complex config |
-| Maintenance | Microsoft | Community |
-
-### Why Dev Auth Bypass?
-
-- E2E tests need authenticated state
-- Real Supabase OTP requires email verification
-- Mock user simulates authenticated state
-- Production remains secure (bypass disabled)
-
----
-
-## File Map (Key Files)
-
+### Extension
 ```
 extension/
-├── playwright.config.ts       # E2E config
-├── test/e2e/
-│   ├── fixtures.ts            # Extension loading
-│   ├── auth.spec.ts           # Auth tests
-│   └── chat.spec.ts           # Chat tests
-├── src/hooks/useAuth.ts       # Auth bypass logic
-├── .env.local                 # Dev env vars (gitignored)
-└── build/chrome-mv3-prod/     # Built extension
-
-backend/
-├── .env                       # CHROMADB_HOST=localhost
-└── app/agents/tutor_agent.py  # Agent entry point
-
-docs/
-├── agent-chain/
-│   ├── CURRENT_STATUS.md      # Live status
-│   ├── COMPLETED_WORK.md      # Work log
-│   └── KNOWN_ISSUES.md        # Issue tracker
-└── for-next-agent/
-    ├── HANDOVER.md            # This file
-    └── E2E_TESTING.md         # Testing guide
+├── src/
+│   ├── sidepanel.tsx         # Main UI
+│   └── components/nav-rail.tsx # Sidebar
+├── test/e2e/                 # All test files
+└── .env.local                # Env vars
 ```
 
 ---
 
-## Quick Verification Commands
+## 🔑 Quick Commands
 
+### Start Everything
 ```bash
-# Verify E2E tests pass
-cd extension && npm run test:e2e
+# Terminal 1: Docker
+docker compose up -d
 
-# Verify backend works
-cd backend && source venv/bin/activate
-python -c "from app.agents.tutor_agent import run_agent; print(run_agent('What is gradient descent?'))"
+# Terminal 2: Backend
+cd backend
+source venv/bin/activate
+uvicorn main:app --reload
 
-# Verify Docker services
-docker-compose ps  # Should show memory_store, redis, langfuse
+# Terminal 3: Extension
+cd extension
+pnpm dev
+```
 
-# Verify ChromaDB has data
-curl http://localhost:8001/api/v2/collections | jq '.[] | {name, count}'
+### Run Tests
+```bash
+cd extension
+
+# Run the new History CRUD test
+npx playwright test test/e2e/history-crud.spec.ts
+
+# Run all backend tests
+npx playwright test infrastructure.spec.ts backend-integration.spec.ts
 ```
 
 ---
 
-## Priority Order for Next Agent
+## ⚠️ Known Issues
 
-1. **Update CI/CD workflow** - Replace WebdriverIO with Playwright
-2. **Test production build** - Disable auth bypass, test real flow
-3. **Add more E2E tests** - Message flow, code execution
-4. **Prepare for demo** - End-to-end user journey
-
----
-
-## Known Issues
-
-See `docs/agent-chain/KNOWN_ISSUES.md`
-
-**Active:**
-- CI/CD workflow uses WebdriverIO (needs update)
-- langchain-chroma deprecation warning (minor)
-
-**Resolved:**
-- ChromaDB connection fixed
-- WebdriverIO CDP issues (migrated to Playwright)
-- Auth bypass for E2E tests
+1. **UI Sidebar Tests Flaky**: Radix UI portal click-outside issue causes ~48 tests to fail.
+2. **Drag & Drop Not Persisted**: Reordering items in the sidebar is visual-only and resets on reload.
+3. **Starring Not Persisted**: Starred items are not saved to the database.
 
 ---
 
-## Contacts & Resources
+## 🎯 Success Criteria for Next Session
 
-- [Playwright Chrome Extensions](https://playwright.dev/docs/chrome-extensions)
-- [Project Status](../agent-chain/CURRENT_STATUS.md)
-- [Coding Guidelines](../../.github/copilot-instructions.md)
+1. **Fix UI Tests**: Resolve the Radix UI portal testing issues.
+2. **Persist Sort Order**: Implement backend support for saving drag-and-drop order.
+3. **Persist Stars**: Save starred status to the database.

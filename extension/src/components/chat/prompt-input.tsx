@@ -38,8 +38,13 @@ export function PromptInput({ input, setInput, onSend, isLoading, onExport, hasM
 
   React.useEffect(() => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = "auto"
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
+      // Reset height - important to shrink when deleting text
+      textareaRef.current.style.height = "44px"
+      // Set to scrollHeight but cap at max height
+      const scrollHeight = textareaRef.current.scrollHeight
+      if (input) {
+        textareaRef.current.style.height = `${scrollHeight}px`
+      }
     }
   }, [input])
 

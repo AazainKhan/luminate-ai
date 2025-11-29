@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useAuth } from "./useAuth"
 import type { Message } from "../types"
 import type { Session } from "@supabase/supabase-js"
@@ -6,11 +6,41 @@ import type { Session } from "@supabase/supabase-js"
 const API_BASE_URL = process.env.PLASMO_PUBLIC_API_URL || "http://localhost:8000"
 const isDevelopment = process.env.NODE_ENV !== "production"
 
-export default function useChat(providedSession?: Session | null) {
+export default function useChat(options?: { session?: Session | null, chatId?: string }) {
   const { session: internalSession } = useAuth()
-  const session = providedSession ?? internalSession
+  const session = options?.session ?? internalSession
+  const chatId = options?.chatId
   const [messages, setMessages] = useState<Message[]>([])
   const [isLoading, setIsLoading] = useState(false)
+
+  // Fetch messages when chatId changes
+  useEffect(() => {
+    if (!chatId || !session?.access_token) {
+      setMessages([])
+      return
+    }
+
+    const fetchMessages = async () => {
+      try {
+        setIsLoading(true)
+        const res = await fetch(`${API_BASE_URL}/api/history/messages/${chatId}`, {
+          headers: {
+            Authorization: `Bearer ${session.access_token}`,
+          },
+        })
+        if (res.ok) {
+          const data = await res.json()
+          setMessages(data)
+        }
+      } catch (e) {
+        console.error("Error fetching messages:", e)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    fetchMessages()
+  }, [chatId, session])
 
   const append = useCallback(async (message: { role: "user"; content: string; attachments?: File[] }) => {
     setIsLoading(true)
@@ -46,7 +76,8 @@ export default function useChat(providedSession?: Session | null) {
         },
         body: JSON.stringify({
           messages: [...messages, userMessage].map(m => ({ role: m.role, content: m.content })),
-          stream: true
+          stream: true,
+          chat_id: chatId
         }),
       })
 

@@ -12,11 +12,7 @@ _None currently_
 
 ## 🟡 Medium Priority
 
-### Issue: CI/CD Workflow Still Uses WebdriverIO
-**Area:** Infra
-**Description:** `.github/workflows/e2e-tests.yml` still references WebdriverIO commands
-**Workaround:** E2E tests run locally with Playwright
-**TODO:** Update workflow to use `npm run test:e2e` (Playwright)
+_None currently_
 
 ---
 
@@ -49,6 +45,10 @@ _None currently_
 ---
 
 ## ✅ Resolved Issues
+
+### ~~Issue: CI/CD Workflow Used WebdriverIO~~
+**Resolved:** 2025-11-27
+**Solution:** Updated `.github/workflows/e2e-tests.yml` to use Playwright with xvfb-run
 
 ### ~~Issue: ChromaDB Using Docker Internal Hostname~~
 **Resolved:** 2025-11-27

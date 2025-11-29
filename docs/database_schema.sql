@@ -97,3 +97,55 @@ CREATE POLICY "Admins can view all interactions"
     )
   );
 
+-- Chat History Tables (Added Dec 2025)
+
+-- Folders for organizing chats
+CREATE TABLE IF NOT EXISTS folders (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  parent_id UUID REFERENCES folders(id) ON DELETE CASCADE,
+  is_starred BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Chats
+CREATE TABLE IF NOT EXISTS chats (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+  folder_id UUID REFERENCES folders(id) ON DELETE SET NULL,
+  title TEXT NOT NULL DEFAULT 'New Chat',
+  is_starred BOOLEAN DEFAULT FALSE,
+  created_at TIMESTAMP DEFAULT NOW(),
+  updated_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Messages
+CREATE TABLE IF NOT EXISTS messages (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  chat_id UUID REFERENCES chats(id) ON DELETE CASCADE,
+  role TEXT NOT NULL CHECK (role IN ('user', 'assistant', 'system')),
+  content TEXT NOT NULL,
+  metadata JSONB, -- For attachments, tool calls, etc.
+  created_at TIMESTAMP DEFAULT NOW()
+);
+
+-- Indexes
+CREATE INDEX IF NOT EXISTS idx_folders_user_id ON folders(user_id);
+CREATE INDEX IF NOT EXISTS idx_chats_user_id ON chats(user_id);
+CREATE INDEX IF NOT EXISTS idx_chats_folder_id ON chats(folder_id);
+CREATE INDEX IF NOT EXISTS idx_messages_chat_id ON messages(chat_id);
+
+-- RLS
+ALTER TABLE folders ENABLE ROW LEVEL SECURITY;
+ALTER TABLE chats ENABLE ROW LEVEL SECURITY;
+ALTER TABLE messages ENABLE ROW LEVEL SECURITY;
+
+-- Policies
+CREATE POLICY "Users can manage own folders" ON folders FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Users can manage own chats" ON chats FOR ALL USING (auth.uid() = user_id);
+CREATE POLICY "Users can manage own messages" ON messages FOR ALL USING (
+  EXISTS (SELECT 1 FROM chats WHERE chats.id = messages.chat_id AND chats.user_id = auth.uid())
+);
+

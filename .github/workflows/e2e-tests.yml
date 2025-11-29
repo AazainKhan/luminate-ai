@@ -49,35 +49,52 @@ jobs:
           cd extension
           pnpm install
 
-      - name: Build extension
+      - name: Install Playwright browsers
         run: |
           cd extension
-          pnpm build
+          npx playwright install chromium --with-deps
+
+      - name: Build extension (dev mode)
+        run: |
+          cd extension
+          # Start dev server in background
+          pnpm dev &
+          DEV_PID=$!
+          # Wait for initial build to complete (watch for the dev folder)
+          echo "Waiting for dev build..."
+          for i in {1..60}; do
+            if [ -d "build/chrome-mv3-dev" ] && [ -f "build/chrome-mv3-dev/manifest.json" ]; then
+              echo "Dev build ready!"
+              break
+            fi
+            sleep 1
+          done
+          # Kill the dev server
+          kill $DEV_PID 2>/dev/null || true
+          # Verify build exists
+          ls -la build/chrome-mv3-dev/
         env:
           PLASMO_PUBLIC_SUPABASE_URL: ${{ secrets.PLASMO_PUBLIC_SUPABASE_URL }}
           PLASMO_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.PLASMO_PUBLIC_SUPABASE_ANON_KEY }}
           PLASMO_PUBLIC_API_URL: ${{ secrets.PLASMO_PUBLIC_API_URL }}
-
-      - name: Setup Chrome
-        uses: browser-actions/setup-chrome@v1
-        with:
-          chrome-version: stable
+          PLASMO_PUBLIC_DEV_AUTH_BYPASS: 'true'
 
       - name: Create test output directory
-        run: mkdir -p extension/test-output/screenshots
+        run: mkdir -p extension/test-output/results
 
       - name: Run E2E tests
         run: |
           cd extension
-          pnpm test:e2e
-        continue-on-error: true
+          xvfb-run --auto-servernum --server-args="-screen 0 1280x720x24" pnpm test:e2e
+        env:
+          CI: true
 
-      - name: Upload test screenshots
+      - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
         with:
-          name: e2e-screenshots
-          path: extension/test-output/screenshots/
+          name: playwright-report
+          path: extension/test-output/playwright-report/
           retention-days: 7
 
       - name: Upload test results
@@ -85,5 +102,5 @@ jobs:
         if: always()
         with:
           name: e2e-results
-          path: extension/wdio-logs/
+          path: extension/test-output/results/
           retention-days: 7

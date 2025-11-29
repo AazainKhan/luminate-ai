@@ -13,12 +13,12 @@ import fs from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Path to the built extension - prefer prod build (has auth bypass baked in)
-const EXTENSION_PATH_PROD = path.join(__dirname, '..', '..', 'build', 'chrome-mv3-prod');
+// Path to the built extension - use dev build for testing
 const EXTENSION_PATH_DEV = path.join(__dirname, '..', '..', 'build', 'chrome-mv3-dev');
+const EXTENSION_PATH_PROD = path.join(__dirname, '..', '..', 'build', 'chrome-mv3-prod');
 
-// Use prod build if it exists, otherwise fall back to dev
-const EXTENSION_PATH = fs.existsSync(EXTENSION_PATH_PROD) ? EXTENSION_PATH_PROD : EXTENSION_PATH_DEV;
+// Use dev build for testing (matches `pnpm dev` output), fall back to prod
+const EXTENSION_PATH = fs.existsSync(EXTENSION_PATH_DEV) ? EXTENSION_PATH_DEV : EXTENSION_PATH_PROD;
 
 export const test = base.extend<{
   context: BrowserContext;

@@ -43,15 +43,8 @@ export function useAuth() {
   })
 
   useEffect(() => {
-    // Log bypass status for debugging
-    console.log("🔐 Auth bypass check:", { 
-      DEV_AUTH_BYPASS, 
-      envVar: process.env.PLASMO_PUBLIC_DEV_AUTH_BYPASS 
-    })
-
     // Dev bypass - skip Supabase auth entirely
     if (DEV_AUTH_BYPASS) {
-      console.log("🔓 DEV AUTH BYPASS ENABLED - Using mock user")
       setAuthState({
         user: DEV_MOCK_USER,
         session: DEV_MOCK_SESSION,

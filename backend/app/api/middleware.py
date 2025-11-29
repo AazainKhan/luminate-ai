@@ -21,6 +21,13 @@ logger = logging.getLogger(__name__)
 # Cache for JWK client (Supabase public keys)
 _jwk_client: Optional[PyJWKClient] = None
 
+# Dev bypass mock user for E2E testing
+DEV_MOCK_USER = {
+    "user_id": "557c3ac3-e6a9-4b2b-95eb-b7f57961024b",
+    "email": "dev-test-user@my.centennialcollege.ca",
+    "role": "student",
+}
+
 
 def get_jwk_client() -> PyJWKClient:
     """Get or create JWK client for Supabase"""
@@ -40,6 +47,15 @@ def verify_token(credentials: HTTPAuthorizationCredentials = Security(security))
     Raises HTTPException if token is invalid
     """
     token = credentials.credentials
+    
+    # Dev auth bypass for E2E testing
+    if settings.dev_auth_bypass and token == "dev-access-token":
+        logger.info("🔓 DEV AUTH BYPASS - Using mock user for E2E testing")
+        return {
+            "sub": DEV_MOCK_USER["user_id"],
+            "email": DEV_MOCK_USER["email"],
+            "aud": "authenticated",
+        }
     
     last_error: Optional[Exception] = None
 

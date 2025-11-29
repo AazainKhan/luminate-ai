@@ -12,12 +12,38 @@ import asyncio
 from app.api.middleware import require_student
 from app.agents.tutor_agent import run_agent
 from app.observability import get_langfuse_client
+from app.config import settings
+from supabase import create_client, Client
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
+# Supabase client
+supabase_client: Optional[Client] = None
+
+def get_supabase_client() -> Client:
+    """Get Supabase client for database operations"""
+    global supabase_client
+    if supabase_client is None:
+        if not settings.supabase_service_role_key:
+            raise ValueError("SUPABASE_SERVICE_ROLE_KEY not configured")
+        supabase_client = create_client(settings.supabase_url, settings.supabase_service_role_key)
+    return supabase_client
+
+async def save_message(chat_id: str, role: str, content: str):
+    """Save message to database"""
+    if not chat_id: return
+    try:
+        supabase = get_supabase_client()
+        supabase.table("messages").insert({
+            "chat_id": chat_id,
+            "role": role,
+            "content": content
+        }).execute()
+    except Exception as e:
+        logger.error(f"Error saving message: {e}")
 
 class ScoreRequest(BaseModel):
     trace_id: str = Field(..., description="Trace ID to attach score to")
@@ -65,6 +91,7 @@ class ChatRequest(BaseModel):
     messages: List[ChatMessage] = Field(..., min_length=1, description="List of chat messages")
     stream: bool = Field(default=True, description="Whether to stream the response")
     session_id: Optional[str] = Field(default=None, description="Session ID for observability")
+    chat_id: Optional[str] = Field(default=None, description="Chat ID for persistence")
 
 
 @router.post("/stream")
@@ -79,6 +106,10 @@ async def stream_chat(
     user_message = request.messages[-1].content if request.messages else ""
     logger.info(f"Received chat request for user {user_info.get('email')}: '{user_message}'")
 
+    # Save user message if chat_id is present
+    if request.chat_id:
+        await save_message(request.chat_id, "user", user_message)
+
     async def generate_stream():
         """
         Async generator that streams responses in AI SDK v5 format.
@@ -87,6 +118,8 @@ async def stream_chat(
         if not user_message:
             yield f'data: {json.dumps({"type": "finish"})}\n\n'
             return
+
+        full_response = ""
 
         try:
             from app.agents.tutor_agent import astream_agent
@@ -98,7 +131,13 @@ async def stream_chat(
                 user_info.get("email"),
                 request.session_id
             ):
+                if event.get("type") == "text-delta":
+                    full_response += event.get("textDelta", "")
                 yield f'data: {json.dumps(event)}\n\n'
+
+            # Save assistant message if chat_id is present
+            if request.chat_id:
+                await save_message(request.chat_id, "assistant", full_response)
 
             # Signal completion
             yield f'data: {json.dumps({"type": "finish"})}\n\n'
