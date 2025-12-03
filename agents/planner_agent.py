@@ -6,7 +6,11 @@ import re
 from typing import Any, Dict, List, Optional
 
 from dotenv import load_dotenv
-from langchain_google_genai import ChatGoogleGenerativeAI
+try:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+except Exception as e:
+    print(f"[WARNING] Could not import langchain_google_genai in planner_agent: {e}. LLM features will be disabled for PlannerAgent.")
+    ChatGoogleGenerativeAI = None
 from langchain_core.prompts import ChatPromptTemplate  
 
 from agents.planner_heuristics import heuristic_route
@@ -155,7 +159,7 @@ class PlannerAgent:
     # Core LLM planning
     # ------------------------------------------------------------------
 
-    def _llm_plan_raw(self, query: str) -> Dict[str, Any]:
+    def _llm_plan_raw(self, query: str, context_str: str = "") -> Dict[str, Any]:
         """
         Call Gemini via LangChain Chat model with the planner prompt.
         Returns a raw dict (NOT yet Pydantic).
@@ -168,11 +172,19 @@ class PlannerAgent:
                 "\n================================================================================"
             )
             print(f"[PlannerAgent] _llm_plan_raw called with query: {query}")
+            if context_str:
+                print(f"[PlannerAgent] Context provided:\n{context_str[:300]}...")
             print(f"[PlannerAgent] LLM type: {type(self.llm).__name__}\n")
             print("[PlannerAgent] Formatting prompt...")
 
+        # Build the full query with context if available
+        if context_str:
+            full_query = f"{context_str}\n\nCurrent student message: {query}"
+        else:
+            full_query = query
+
         # format **messages**
-        messages = self.prompt.format_messages(query=query)
+        messages = self.prompt.format_messages(query=full_query)
         self._debug_print_messages(messages)
 
         # Call LLM
@@ -268,10 +280,10 @@ class PlannerAgent:
     # Public API
     # ------------------------------------------------------------------
 
-    def plan(self, query: str) -> PlannerPlan:
+    def plan(self, query: str, conversation_history: list = None) -> PlannerPlan:
         """
         FIXED EXECUTION ORDER:
-        1. Try LLM plan FIRST
+        1. Try LLM plan FIRST (with conversation context)
         2. If LLM fails → try heuristics
         3. If heuristics fail → reject
         """
@@ -279,6 +291,12 @@ class PlannerAgent:
         print(f"[PlannerAgent] Planning for query: {query}")
         enable_llm = self.enable_llm
         force_llm = self.force_llm
+        
+        # Build context string from conversation history
+        context_str = ""
+        if conversation_history and len(conversation_history) > 0:
+            context_str = self._build_context_string(conversation_history)
+            print(f"[PlannerAgent] Using conversation context ({len(conversation_history)} messages)")
 
         # -------------------------------
         # STEP 1 — LLM PLAN FIRST
@@ -286,7 +304,7 @@ class PlannerAgent:
         if enable_llm:
             try:
                 print("[PlannerAgent] Trying LLM-first planning...")
-                llm_raw = self._llm_plan_raw(query)
+                llm_raw = self._llm_plan_raw(query, context_str)
                 llm_plan = self._parse_llm_plan(llm_raw)
 
                 if llm_plan:
@@ -328,3 +346,24 @@ class PlannerAgent:
             rules_triggered=["planner_error"],
             llm_used=False
         )
+    
+    def _build_context_string(self, conversation_history: list) -> str:
+        """Build a context string from conversation history for the planner."""
+        if not conversation_history:
+            return ""
+        
+        lines = ["Recent conversation context:"]
+        # Only use last few messages for context
+        recent = conversation_history[-6:] if len(conversation_history) > 6 else conversation_history
+        
+        for msg in recent:
+            role = msg.get("role", "unknown")
+            content = msg.get("content", "")
+            if role == "student":
+                lines.append(f"Student: {content}")
+            elif role == "assistant":
+                # Truncate long assistant responses
+                content_short = content[:200] + "..." if len(content) > 200 else content
+                lines.append(f"Tutor: {content_short}")
+        
+        return "\n".join(lines)

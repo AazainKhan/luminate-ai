@@ -30,13 +30,16 @@ def planner_node(state: Dict[str, Any], planner) -> Dict[str, Any]:
 
     q = (state.get("user_query") or state.get("student_input") or "").strip()
     state["student_input"] = q
+    
+    # Get conversation history for context-aware planning
+    conversation_history = state.get("conversation_history", [])
 
     # Ensure outputs list exists
     if "outputs" not in state or state["outputs"] is None:
         state["outputs"] = []
 
     try:
-        plan_obj = planner.plan(q)
+        plan_obj = planner.plan(q, conversation_history=conversation_history)
         plan = _to_dict(plan_obj)
 
         routes = []

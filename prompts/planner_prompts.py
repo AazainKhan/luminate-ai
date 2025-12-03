@@ -10,28 +10,32 @@ Task types:
 - "reject": for off-topic queries not related to COMP237 course content or general education topics
 
 IMPORTANT RULES:
-1. **CONVERSATION CONTEXT**: Short responses like "yes", "no", "I think...", "maybe", or brief answers are ALWAYS follow-up responses to previous tutoring questions. These should ALWAYS be classified as "explain" to continue the teaching conversation.
+1. **CONVERSATION CONTEXT**: Short responses or student answers are ALWAYS follow-up responses to previous tutoring questions. These should ALWAYS be classified as "explain" to continue the teaching conversation.
 
-2. If the query is about cooking, recipes, food, entertainment, sports, weather, news, or other non-educational topics, you MUST use the "reject" task type.
+2. **STUDENT ANSWERS**: When a student provides an answer or attempt (like "whatever line captures the most data points", "I think it uses a queue", "maybe it's O(n)"), this is a VALID follow-up! Classify as "explain" to continue teaching.
 
-3. For "explain": 
+3. If the query is about cooking, recipes, food, entertainment, sports, weather, news, or other non-educational topics, you MUST use the "reject" task type.
+
+4. For "explain": 
    - payload = {{"topic": "<clean topic>"}}
-   - For follow-up responses (short answers like "i will search in depth", "yes", "no", etc.), extract the IMPLIED topic from the response
+   - For follow-up responses, extract the IMPLIED topic from the response
    - Example: "i will search in depth" → topic: "depth-first search continuation"
    - Example: "yes" → topic: "continue previous explanation"
+   - Example: "whatever line captures the most data points" → topic: "student attempt at answering regression question"
 
-4. For "solve": payload = {{"problem": "<clean problem statement>"}}.
+5. For "solve": payload = {{"problem": "<clean problem statement>"}}.
 
-5. For "chat": payload = {{"message": "<short reply intent>"}}.
+6. For "chat": payload = {{"message": "<short reply intent>"}}.
 
-6. For "reject": 
+7. For "reject": 
    - payload must be: {{"reason": "<brief explanation of why the query is off-topic>"}}
-   - The reason should be clear and helpful, e.g., "This appears to be about cooking, which is outside the scope of COMP237 course material."
+   - The reason should be clear and helpful
    - DO NOT reject short conversational responses - those are follow-ups!
+   - DO NOT reject student attempts at answering questions!
 
-7. Only include educational content related to COMP237 (AI, Machine Learning, Python programming, etc.) or general computer science topics.
+8. Only include educational content related to COMP237 (AI, Machine Learning, Python programming, etc.) or general computer science topics.
 
-Examples of FOLLOW-UP responses (use "explain" with implied topic):
+Examples of FOLLOW-UP responses (ALWAYS use "explain"):
 - "i will search in depth" → explain: "depth-first search continuation"
 - "yes, that makes sense" → explain: "continue previous explanation"
 - "I think it uses a queue" → explain: "search algorithm data structures"
@@ -40,7 +44,9 @@ Examples of FOLLOW-UP responses (use "explain" with implied topic):
 - "i don't know" → explain: "student needs help with previous topic"
 - "explain it to me" → explain: "student requesting direct explanation"
 - "just tell me" → explain: "student needs clearer explanation"
-- "BFS" or "DFS" (single word, likely referring to previous topic) → explain: "continue explanation of [that topic]"
+- "whatever line captures the most data points" → explain: "student answer about line fitting criteria"
+- "the one with lowest error" → explain: "student answer about regression evaluation"
+- "BFS" or "DFS" (single word) → explain: "continue explanation of [that topic]"
 
 Examples of NEW queries to REJECT:
 - "How do I make pizza?"

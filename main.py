@@ -7,14 +7,17 @@ from pydantic import BaseModel
 from dotenv import load_dotenv
 
 # Agents & tools
-from agents.planner_agent import PlannerAgent
 import agents.tutor_agent as tutor_mod            # state-based tutor module
 from agents.math_agent import MathAgent
 from tools.rag_tool import RagTool
 from tools.math_tool import MathTool
 
 # LLM
-from langchain_google_genai import ChatGoogleGenerativeAI
+try:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+except Exception as e:
+    print(f"[WARNING] Could not import langchain_google_genai: {e}. LLM features will be disabled at runtime.")
+    ChatGoogleGenerativeAI = None
 
 # Feedback + Postgres logging
 from agents.feedback_agent import FeedbackAgent
@@ -32,22 +35,34 @@ conversation_memory: Dict[str, deque] = defaultdict(lambda: deque(maxlen=20))
 # ---------- shared LLM & tools ----------
 
 # main.py
-from langchain_google_genai import ChatGoogleGenerativeAI
 from agents.planner_agent import PlannerAgent
 import os
 
 os.environ.setdefault("GOOGLE_API_KEY", "AIzaSyDldXJV7TQ75UYCIAkg2kIkr7rWETAxMDw")  # or .env
-llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.2, max_output_tokens=1024)
+# Try to initialize the Google Generative LLM. If the underlying library
+# API surface has changed (or credentials are missing), catch the error
+# and fall back to running with `enable_llm=False` so the server still
+# starts and heuristics can be used.
+try:
+    llm = ChatGoogleGenerativeAI(model="gemini-2.0-flash", temperature=0.2, max_output_tokens=1024)
+    _enable_llm = True
+except Exception as e:
+    print(f"[WARNING] Could not initialize ChatGoogleGenerativeAI: {e}. Falling back to disable LLM.")
+    llm = None
+    _enable_llm = False
 
-planner_agent = PlannerAgent(llm=llm, enable_llm=True, force_llm=True)
+planner_agent = PlannerAgent(llm=llm, enable_llm=_enable_llm, force_llm=True)
 
 rag = RagTool(persist_dir="./chroma_db")   # update if your index folder differs
 math_tool = MathTool()
 
 # ---------- agents ----------
 # planner_agent = PlannerAgent(llm, enable_llm=bool(llm))
-planner_agent = PlannerAgent(llm=llm, enable_llm=True, force_llm=True)
 tutor_agent   = tutor_mod                   # module; we call into it from the graph
+# (re)create planner_agent with the same enable flag so downstream code
+# sees a consistent setting. If llm is None and _enable_llm=False, the
+# PlannerAgent will fall back to heuristics when planning.
+planner_agent = PlannerAgent(llm=llm, enable_llm=_enable_llm, force_llm=True)
 math_agent    = MathAgent(rag, math_tool, llm)
 feedback_agent = FeedbackAgent()            # optional for /feedback/run
 
@@ -195,6 +210,14 @@ def ask(body: Ask):
             print(f"[ask] Logged assistant response: {assistant_summary[:100]}...")
         except Exception as e:
             print(f"[WARNING] Could not log to database: {e}")
+        
+        # Also store assistant response in memory for conversation continuity
+        conversation_memory[cid].append({
+            "turn_index": turn + 1,
+            "role": "assistant",
+            "content": assistant_response[:2000]  # Store truncated version
+        })
+        print(f"[ask] Stored assistant response in memory. Total messages for {cid}: {len(conversation_memory[cid])}")
 
         # 5) prepare response - ensure all data is serializable
         response = {
