@@ -2,7 +2,11 @@ from typing import List, Dict, Any, Tuple, Optional
 import re
 
 from pydantic import ValidationError
-from langchain_google_genai import ChatGoogleGenerativeAI
+try:
+    from langchain_google_genai import ChatGoogleGenerativeAI
+except Exception as e:
+    print(f"[WARNING] Could not import langchain_google_genai in math_agent: {e}. LLM features may be degraded.")
+    ChatGoogleGenerativeAI = None
 from langchain_core.prompts import ChatPromptTemplate
 
 from schemas.math import MathTask, MathAgentOutput, Step, Source, ComputationResult
