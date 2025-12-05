@@ -1,19 +1,29 @@
 # Luminate AI Course Marshal - Project Status Report
 
 **Date:** November 27, 2025  
-**Updated:** December 2025 - Pedagogical Agent Enhancements  
-**Status:** ✅ Backend Fully Operational - All Agent Tests Passing
+**Updated:** November 29, 2025 - Observability & Data Quality Fixes  
+**Status:** ✅ Backend Fully Operational - 22/22 Tests Passing
 
 ---
 
 ## Executive Summary
 
-The project backend is **fully operational** with all agent components verified working. Today's comprehensive testing confirmed:
+The project backend is **fully operational** with all agent components verified working. Latest testing (Nov 29) confirmed:
 - ✅ Governor Law 1 (Scope) and Law 2 (Integrity) enforced correctly
-- ✅ Supervisor routing to all 3 model types verified
-- ✅ E2B code execution fixed (SDK v2.x compatibility)
-- ✅ RAG retrieval with 438 documents indexed
-- ✅ 7/7 agent integration tests passing
+- ✅ Supervisor routing to all 5 intents verified (tutor, math, coder, syllabus_query, fast)
+- ✅ Hybrid routing with LLM fallback implemented
+- ✅ RAG retrieval with 21 comprehensive COMP237 documents indexed
+- ✅ 22/22 comprehensive backend tests passing
+- ✅ Langfuse observability with scores & session tracking
+- ✅ Supabase conversation history persistence
+
+**November 29, 2025 Update - Observability & Data Quality:**
+- ✅ **ChromaDB Data Fixed** - Proper Gemini embeddings (768-dim), 21 course documents
+- ✅ **Governor False Positives Fixed** - ML topics now correctly approved
+- ✅ **Langfuse Span Linking Fixed** - Spans properly nested in traces
+- ✅ **Hybrid Routing** - Regex + LLM fallback with 0.6 confidence threshold
+- ✅ **Conversation History** - Supabase persistence + context loading
+- ✅ **Langfuse Scores** - 5 pedagogical quality scores per interaction
 
 **December 2025 Update - Pedagogical Enhancements:**
 - ✅ **Pedagogical Tutor Agent** - Socratic scaffolding with "I Do/We Do/You Do" progression

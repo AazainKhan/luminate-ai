@@ -38,49 +38,76 @@ class Governor:
         Returns:
             Dictionary with approval status and reason
         """
-        query = state.get("query", "")
+        # Use effective_query (contextualized) if available, otherwise original query
+        query = state.get("effective_query") or state.get("query", "")
+        messages = state.get("messages", [])
+
         
-        # Law 1: Scope Check
-        scope_check = self._check_scope(query)
-        if not scope_check["approved"]:
-            return {
-                "approved": False,
-                "reason": scope_check["reason"],
-                "law_violated": "scope",
-            }
+        # Get reasoning output if available
+        reasoning_intent = state.get("reasoning_intent")
+        reasoning_confidence = state.get("reasoning_confidence", 0.0)
+        key_concepts = state.get("key_concepts_detected", [])
         
-        # Law 2: Integrity Check (check if query asks for full solution)
+        # 1. Check Integrity (Academic Honesty) - Critical, always check first
         integrity_check = self._check_integrity(query)
         if not integrity_check["approved"]:
             return {
                 "approved": False,
                 "reason": integrity_check["reason"],
-                "law_violated": "integrity",
+                "law_violated": "integrity"
             }
-        
-        # Law 3: Mastery Check (will be enforced by Evaluator Node in Feature 11)
-        # For now, always approve
-        
+            
+        # 2. Check Scope (Course Relevance)
+        # Use reasoning output to augment vector search
+        scope_check = self._check_scope(query, reasoning_intent, reasoning_confidence, key_concepts)
+        if not scope_check["approved"]:
+            return {
+                "approved": False,
+                "reason": scope_check["reason"],
+                "law_violated": "scope"
+            }
+            
+        # 3. Check Mastery (Pedagogical Appropriateness)
+        # Currently a placeholder for future adaptive learning rules
         return {
             "approved": True,
-            "reason": "All policies satisfied",
-            "law_violated": None,
+            "reason": "All policies passed",
+            "law_violated": None
         }
 
-    def _check_scope(self, query: str) -> Dict[str, any]:
+    def _check_scope(
+        self, 
+        query: str, 
+        reasoning_intent: str = None, 
+        reasoning_confidence: float = 0.0,
+        key_concepts: List[str] = None
+    ) -> Dict[str, any]:
         """
-        Law 1: Check if query is within COMP 237 scope
-        Uses ChromaDB distance scores to determine relevance.
+        Check if query is within COMP 237 scope.
         
-        Note on scoring: ChromaDB returns L2 distance by default.
-        Lower scores = more relevant (closer vectors).
-        - In-scope queries typically score 0.3-0.7
-        - Out-of-scope queries typically score 0.8+
-        
-        Returns:
-            Dictionary with approval status
+        Uses a hybrid approach:
+        1. Reasoning Node: If high confidence (>0.8) that it's a valid intent, ALLOW.
+        2. Vector Search: Fallback to similarity search if reasoning is unsure.
         """
-        # Query vector store to see if relevant content exists
+        # SMART BYPASS: Trust the Reasoning Node if it's confident
+        # If the reasoning node identified it as a valid educational intent with high confidence,
+        # we trust it even if the vector store doesn't have an exact match.
+        valid_intents = ["tutor", "math", "coder", "explain"]
+        if reasoning_intent in valid_intents and reasoning_confidence >= 0.8:
+            logger.info(f"Governor: Reasoning node confident ({reasoning_confidence:.2f}) - bypassing vector check")
+            return {
+                "approved": True,
+                "reason": f"Reasoning node validated {reasoning_intent} intent",
+            }
+
+        # If we have key concepts, we can also be more lenient
+        if key_concepts and len(key_concepts) > 0:
+            # If specific AI concepts were detected, we can relax the threshold
+            logger.info(f"Governor: Key concepts detected {key_concepts} - relaxing threshold")
+            SCOPE_THRESHOLD = 0.85  # More permissive (higher distance allowed)
+        else:
+            SCOPE_THRESHOLD = 0.80  # Strict default
+            
         try:
             results = self.vectorstore.similarity_search_with_score(
                 query=query,
@@ -88,36 +115,34 @@ class Governor:
                 filter={"course_id": self.course_id}
             )
             
-            # If no relevant results, might be out of scope
             if not results:
+                # If no results found (empty DB?), default to safe mode
+                logger.warning("Governor: No documents found in vector store")
                 return {
                     "approved": False,
-                    "reason": "This topic is not covered in COMP 237. Please ask about course content.",
+                    "reason": "I cannot verify if this is part of the course content.",
                 }
-            
-            # Check if results are relevant (lower score = more relevant)
+                
+            # ChromaDB returns distance (lower is better)
+            # 0.0 = exact match, 1.0 = very different
+            # We use the minimum distance (closest match)
             min_score = min(score for _, score in results)
             avg_score = sum(score for _, score in results) / len(results)
             
-            # Threshold tuned based on empirical testing:
-            # - In-scope queries (e.g., "What is backpropagation?"): ~0.60
-            # - Edge case AI queries (e.g., "softmax function"): ~0.77
-            # - Out-of-scope queries (e.g., "What is the capital of France?"): ~0.90
-            # Using 0.80 as threshold to include edge-case AI topics
-            SCOPE_THRESHOLD = 0.80
-            
+            # Check against threshold
             if min_score > SCOPE_THRESHOLD:
                 logger.info(f"❌ Scope check failed (min_score: {min_score:.3f}, avg: {avg_score:.3f}, threshold: {SCOPE_THRESHOLD})")
                 return {
                     "approved": False,
                     "reason": "This topic is not clearly covered in COMP 237. Please ask about course content like machine learning, neural networks, or AI concepts from your course materials.",
                 }
-            
-            logger.info(f"✅ Scope check passed (min_score: {min_score:.3f}, avg: {avg_score:.3f}, threshold: {SCOPE_THRESHOLD})")
+                
+            logger.info(f"✓ Scope check passed (min_score: {min_score:.3f})")
             return {
                 "approved": True,
                 "reason": "Topic is within course scope",
             }
+            
         except Exception as e:
             logger.error(f"❌ Error checking scope: {e}")
             # On error, allow but log
@@ -169,32 +194,23 @@ def governor_node(state: AgentState) -> AgentState:
     logger.info("Governor: Enforcing course policies")
     start_time = time.time()
     
-    # Create guardrail observation if we have a trace context
-    observation = None
-    trace_id = state.get("trace_id")
-    if trace_id:
-        from app.observability.langfuse_client import get_langfuse_client
-        client = get_langfuse_client()
-        if client:
-            try:
-                # Create guardrail observation for policy enforcement linked to the trace
-                observation = client.start_span(
-                    trace_context={"trace_id": trace_id},
-                    name="policy_enforcement_guardrail",
-                    input={
-                        "query": state.get("query"),
-                        "user_context": {
-                            "user_id": state.get("user_id"),
-                            "user_role": state.get("user_role")
-                        }
-                    },
-                    metadata={
-                        "component": "governor",
-                        "policy_framework": "three_laws_compliance"
-                    }
-                )
-            except Exception as e:
-                logger.warning(f"Could not create governor observation: {e}")
+    # Create guardrail observation as child of root trace (v3 pattern)
+    from app.observability.langfuse_client import create_child_span_from_state
+    observation = create_child_span_from_state(
+        state=state,
+        name="policy_enforcement_guardrail",
+        input_data={
+            "query": state.get("query"),
+            "user_context": {
+                "user_id": state.get("user_id"),
+                "user_role": state.get("user_role")
+            }
+        },
+        metadata={
+            "component": "governor",
+            "policy_framework": "three_laws_compliance"
+        }
+    )
     
     governor = Governor()
     policy_check = governor.check_policies(state)

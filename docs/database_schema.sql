@@ -1,16 +1,12 @@
 -- Luminate AI Course Marshal - Database Schema
 -- Run this in Supabase SQL Editor
--- Updated: December 2025 - Added agent tracking fields
+-- Updated: December 2025 - Added agent tracking fields, removed unused concepts table
 
--- Concepts table (static course data)
-CREATE TABLE IF NOT EXISTS concepts (
-  id TEXT PRIMARY KEY,
-  name TEXT NOT NULL,
-  parent_concept_id TEXT REFERENCES concepts(id),
-  prerequisites TEXT[],
-  course_id TEXT DEFAULT 'COMP237',
-  created_at TIMESTAMP DEFAULT NOW()
-);
+-- NOTE: Concept hierarchy is now managed by:
+-- 1. Neo4j/In-Memory Graph (app/rag/graph_rag.py)
+-- 2. In-memory CONCEPT_UNLOCKS/CONCEPT_NAMES (app/agents/knowledge_graph.py)
+-- 3. CONCEPT_PATTERNS for detection (app/agents/evaluator.py)
+-- The old `concepts` table was dropped as it was never queried by application code.
 
 -- Student Mastery table
 CREATE TABLE IF NOT EXISTS student_mastery (

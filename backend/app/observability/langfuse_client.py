@@ -13,8 +13,10 @@ logger = logging.getLogger(__name__)
 
 # Model cost definitions (per 1K tokens) - update these based on current pricing
 MODEL_COSTS = {
-    "gemini-1.5-flash": {"input": 0.000075, "output": 0.0003},
-    "gemini-1.5-pro": {"input": 0.00125, "output": 0.005},
+    "gemini-2.5-flash": {"input": 0.000075, "output": 0.0003},  # Stable: best price-performance
+    "gemini-2.5-flash-lite": {"input": 0.000038, "output": 0.00015},  # Ultra fast, cost-efficient
+    "gemini-2.5-pro": {"input": 0.00125, "output": 0.005},  # Advanced thinking model
+    "gemini-2.0-flash": {"input": 0.000075, "output": 0.0003},  # Previous gen workhorse
     "claude-3-5-sonnet": {"input": 0.003, "output": 0.015},
     "gpt-4o": {"input": 0.005, "output": 0.015},
     "gpt-4o-mini": {"input": 0.00015, "output": 0.0006},
@@ -159,12 +161,6 @@ def create_trace(name: str, user_id: Optional[str] = None, session_id: Optional[
         return None
     
     try:
-        # In v3, create a span (returns the span object directly, not a context manager)
-        span = client.start_span(
-            name=name,
-            input=input_data
-        )
-        
         # Prepare propagated metadata - these will be inherited by child observations
         propagated_metadata = {
             "environment": environment,
@@ -175,12 +171,19 @@ def create_trace(name: str, user_id: Optional[str] = None, session_id: Optional[
             **(metadata or {})
         }
         
+        # In v3, create a span with input data
+        span = client.start_span(
+            name=name,
+            input=input_data  # Set the input data on the span
+        )
+        
         # Update trace attributes with compatible parameters only
         span.update_trace(
             user_id=user_id,
             session_id=session_id,
             metadata=propagated_metadata,  # These propagate to child observations
-            tags=tags or ["tutor-agent", "comp237"]
+            tags=tags or ["tutor-agent", "comp237"],
+            input=input_data  # Also set input at trace level
         )
         
         return span
@@ -227,6 +230,44 @@ def create_observation(parent_span, name: str, observation_type: str, input_data
         return child_span
     except Exception as e:
         logger.error(f"Failed to create {observation_type} observation: {e}")
+        return None
+
+
+def create_child_span_from_state(state: dict, name: str, input_data: Optional[dict] = None,
+                                 metadata: Optional[dict] = None):
+    """
+    Create a child span linked to the root trace using the parent span object from state.
+    
+    This is the CORRECT way to create nested spans in Langfuse v3:
+    - Uses parent_span.start_span() instead of client.start_span(trace_context=...)
+    - Ensures proper parent-child relationship in trace hierarchy
+    
+    Args:
+        state: Agent state containing 'langfuse_root_span' key
+        name: Name for the child span
+        input_data: Input data for the observation
+        metadata: Additional metadata
+        
+    Returns:
+        Child span object that MUST be ended with span.end()
+    """
+    parent_span = state.get("langfuse_root_span")
+    if not parent_span:
+        # Fallback: No parent span available, log warning
+        logger.debug(f"No parent span in state for child span '{name}' - span will be orphaned")
+        return None
+    
+    try:
+        # Use parent_span.start_span() for proper nesting (NOT client.start_span())
+        child_span = parent_span.start_span(
+            name=name,
+            input=input_data,
+            metadata=metadata or {}
+        )
+        
+        return child_span
+    except Exception as e:
+        logger.error(f"Failed to create child span '{name}': {e}")
         return None
 
 

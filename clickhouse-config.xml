@@ -1,0 +1,23 @@
+<?xml version="1.0"?>
+<!--
+  ClickHouse configuration for Luminate AI development environment.
+  Optimized for lower memory usage to prevent OOM errors.
+-->
+<clickhouse>
+    <!-- Server-wide memory limit (3GB max) -->
+    <max_server_memory_usage>3221225472</max_server_memory_usage>
+    
+    <!-- Ratio of RAM to use (70%) -->
+    <max_server_memory_usage_to_ram_ratio>0.7</max_server_memory_usage_to_ram_ratio>
+    
+    <!-- Reduce cache sizes for dev environment -->
+    <mark_cache_size>268435456</mark_cache_size>
+    <uncompressed_cache_size>134217728</uncompressed_cache_size>
+    
+    <!-- Background workers - must be large enough for mutations -->
+    <!-- number_of_free_entries_in_pool_to_execute_mutation defaults to 20 -->
+    <!-- So background_pool_size * concurrency_ratio must be >= 20 -->
+    <background_pool_size>16</background_pool_size>
+    <background_schedule_pool_size>16</background_schedule_pool_size>
+    <background_merges_mutations_concurrency_ratio>2</background_merges_mutations_concurrency_ratio>
+</clickhouse>

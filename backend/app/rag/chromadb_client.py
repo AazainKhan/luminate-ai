@@ -66,14 +66,23 @@ class ChromaDBClient:
     def _ensure_collection(self):
         """Ensure collection exists, create if not"""
         try:
-            self.collection = self.client.get_or_create_collection(
-                name=self.collection_name,
-                metadata={"description": "COMP 237 course materials"},
-                embedding_function=self.embedding_function
-            )
-            logger.info(f"Connected to collection: {self.collection_name}")
+            # First try to get existing collection without specifying embedding function
+            # This avoids conflicts with persisted embedding function
+            try:
+                self.collection = self.client.get_collection(
+                    name=self.collection_name,
+                )
+                logger.info(f"Connected to existing collection: {self.collection_name}")
+            except Exception:
+                # Collection doesn't exist, create it with our embedding function
+                self.collection = self.client.create_collection(
+                    name=self.collection_name,
+                    metadata={"description": "COMP 237 course materials"},
+                    embedding_function=self.embedding_function
+                )
+                logger.info(f"Created new collection: {self.collection_name}")
         except Exception as e:
-            logger.error(f"Error creating collection: {e}")
+            logger.error(f"Error with collection: {e}")
             raise
 
     def add_documents(

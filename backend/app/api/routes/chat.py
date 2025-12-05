@@ -13,37 +13,22 @@ from app.api.middleware import require_student
 from app.agents.tutor_agent import run_agent
 from app.observability import get_langfuse_client
 from app.config import settings
-from supabase import create_client, Client
+from app.api.routes.history import (
+    get_conversation_history,
+    save_message_to_history,
+    get_or_create_chat,
+    update_chat_title_from_query
+)
 
 # Configure logging
 logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/api/chat", tags=["chat"])
 
-# Supabase client
-supabase_client: Optional[Client] = None
 
-def get_supabase_client() -> Client:
-    """Get Supabase client for database operations"""
-    global supabase_client
-    if supabase_client is None:
-        if not settings.supabase_service_role_key:
-            raise ValueError("SUPABASE_SERVICE_ROLE_KEY not configured")
-        supabase_client = create_client(settings.supabase_url, settings.supabase_service_role_key)
-    return supabase_client
-
-async def save_message(chat_id: str, role: str, content: str):
-    """Save message to database"""
-    if not chat_id: return
-    try:
-        supabase = get_supabase_client()
-        supabase.table("messages").insert({
-            "chat_id": chat_id,
-            "role": role,
-            "content": content
-        }).execute()
-    except Exception as e:
-        logger.error(f"Error saving message: {e}")
+async def save_message(chat_id: str, role: str, content: str, metadata: Optional[Dict[str, Any]] = None):
+    """Save message to database (wrapper for history service)"""
+    await save_message_to_history(chat_id, role, content, metadata)
 
 class ScoreRequest(BaseModel):
     trace_id: str = Field(..., description="Trace ID to attach score to")
@@ -92,6 +77,7 @@ class ChatRequest(BaseModel):
     stream: bool = Field(default=True, description="Whether to stream the response")
     session_id: Optional[str] = Field(default=None, description="Session ID for observability")
     chat_id: Optional[str] = Field(default=None, description="Chat ID for persistence")
+    model: Optional[str] = Field(default=None, description="Model to use (e.g., 'gemini-2.0-flash', 'gpt-4.1-mini')")
 
 
 @router.post("/stream")
@@ -104,11 +90,23 @@ async def stream_chat(
     Returns Server-Sent Events (SSE) compatible with AI SDK v5.
     """
     user_message = request.messages[-1].content if request.messages else ""
-    logger.info(f"Received chat request for user {user_info.get('email')}: '{user_message}'")
+    user_id = user_info.get("user_id")
+    user_email = user_info.get("email")
+    logger.info(f"Received chat request for user {user_email}: '{user_message}'")
 
-    # Save user message if chat_id is present
-    if request.chat_id:
-        await save_message(request.chat_id, "user", user_message)
+    # Get or create chat for persistence
+    chat_id = request.chat_id
+    if not chat_id:
+        chat_id = await get_or_create_chat(user_id)
+    
+    # Load conversation history for agent context
+    conversation_history = await get_conversation_history(chat_id, limit=10)
+    
+    # Save user message
+    await save_message(chat_id, "user", user_message)
+    
+    # Auto-title chat from first query
+    await update_chat_title_from_query(chat_id, user_message)
 
     async def generate_stream():
         """
@@ -120,27 +118,67 @@ async def stream_chat(
             return
 
         full_response = ""
+        trace_id = None
+        queue_steps = []  # Collect queue steps for persistence
+        sources = []  # Collect sources for persistence
+        evaluation = None  # Collect evaluation for persistence
 
         try:
             from app.agents.tutor_agent import astream_agent
             
-            # Stream events from the agent
+            # Use chat_id as session_id for Langfuse grouping if not provided
+            effective_session_id = request.session_id or chat_id
+            
+            # Handle "auto" model selection by treating it as None (no override)
+            model_to_use = request.model
+            if model_to_use == "auto":
+                model_to_use = None
+            
+            # Stream events from the agent with conversation history
             async for event in astream_agent(
                 user_message,
-                user_info.get("user_id"),
-                user_info.get("email"),
-                request.session_id
+                user_id,
+                user_email,
+                effective_session_id,
+                chat_id=chat_id,
+                conversation_history=conversation_history,
+                model=model_to_use
             ):
                 if event.get("type") == "text-delta":
                     full_response += event.get("textDelta", "")
+                if event.get("type") == "trace-id":
+                    trace_id = event.get("traceId")
+                # Collect queue events for persistence in message metadata
+                if event.get("type") == "queue-init":
+                    queue_steps = event.get("queue", [])
+                # Collect sources for persistence
+                if event.get("type") == "sources":
+                    sources = event.get("sources", [])
+                # Collect evaluation for persistence
+                if event.get("type") == "evaluation":
+                    evaluation = event.get("evaluation")
+                if event.get("type") == "queue-update":
+                    # Update the status of the matching queue step
+                    # Backend sends queueItemId, match it with step id
+                    step_id = event.get("queueItemId") or event.get("stepId")
+                    status = event.get("status")
+                    for step in queue_steps:
+                        if step.get("id") == step_id:
+                            step["status"] = status
+                            break
                 yield f'data: {json.dumps(event)}\n\n'
 
-            # Save assistant message if chat_id is present
-            if request.chat_id:
-                await save_message(request.chat_id, "assistant", full_response)
+            # Save assistant message with metadata including queue steps, sources, and evaluation
+            metadata = {
+                "trace_id": trace_id,
+                "queue_steps": queue_steps,  # Persist chain of thought steps
+                "sources": sources,  # Persist sources
+                "evaluation": evaluation  # Persist evaluation scores
+            }
+            await save_message(chat_id, "assistant", full_response, metadata)
 
-            # Signal completion
-            yield f'data: {json.dumps({"type": "finish"})}\n\n'
+            # Signal completion with chat_id and trace_id for client reference
+            yield f'data: {json.dumps({"type": "finish", "chatId": chat_id, "traceId": trace_id})}\n\n'
 
         except Exception as e:
             logger.error(f"Error during agent execution: {e}", exc_info=True)

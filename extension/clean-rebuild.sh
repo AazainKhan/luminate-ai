@@ -27,3 +27,11 @@ echo ""
 echo "Now run: npm run dev"
 
 
+
+
+
+
+
+
+
+

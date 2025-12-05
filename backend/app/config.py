@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     # Redis
     redis_host: str = "cache_layer"
     redis_port: int = 6379
+    redis_password: str = "myredissecret"
     
     # Langfuse (optional observability)
     langfuse_public_key: Optional[str] = None

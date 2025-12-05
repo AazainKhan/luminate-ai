@@ -21,6 +21,19 @@ from app.observability.langfuse_client import update_observation_with_usage
 logger = logging.getLogger(__name__)
 
 
+def strip_thinking_blocks(text: str) -> str:
+    """
+    Remove <thinking>...</thinking> blocks from response text.
+    These blocks are internal reasoning and should not be shown to users.
+    """
+    if not text:
+        return text
+    pattern = r'<thinking>.*?</thinking>\s*'
+    cleaned = re.sub(pattern, '', text, flags=re.DOTALL | re.IGNORECASE)
+    cleaned = re.sub(r'</?thinking>\s*', '', cleaned, flags=re.IGNORECASE)
+    return cleaned.strip()
+
+
 # Math topic detection patterns
 MATH_TOPICS = {
     "gradient_descent": [
@@ -55,97 +68,69 @@ MATH_TOPICS = {
 
 
 MATH_AGENT_PROMPT = """You are a mathematical reasoning specialist for COMP 237: Introduction to AI.
-Your role is to make AI mathematics accessible, intuitive, and memorable.
+Your role is to guide students through mathematical problems using a scaffolded, Socratic approach.
+Do NOT solve the problem for them immediately. Guide them to the solution.
 
-## Your Core Capabilities:
+## Your Core Principles:
+1. **Understanding Phase**: Ensure the student understands the problem before solving it.
+2. **Connection Phase**: Link the problem to concepts they know.
+3. **Planning Guidance**: Help them plan the steps.
+4. **Progressive Hints**: Give hints, not answers.
+5. **Verification Guidance**: Teach them how to check their work.
 
-### 1. Step-by-Step Derivations
-- Show EVERY step of mathematical proofs
-- Use LaTeX notation for clarity (wrap in $...$ for inline, $$...$$ for display)
-- Explain the "why" behind each step, not just the "what"
-- Connect each step to the previous one explicitly
+## Your Scaffolding Strategy:
 
-### 2. Visual Intuition FIRST
-- ALWAYS start with a geometric or visual explanation
-- Use analogies that stick (hill climbing, error surfaces, probability as area)
-- Describe what the math "looks like" before the formulas
-- Help students build mental models
+Structure your response using these phases:
 
-### 3. Practice Generation
-- After explaining, provide a scaffolded practice problem
-- Make the practice problem slightly simpler than the explanation
-- Include hints if the concept is difficult
+### 1. Understanding Phase
+- "What are we trying to find?"
+- "What information do we have?"
 
-## Common COMP 237 Math Topics:
+### 2. Connection Phase
+- "What concepts from class might help?"
+- "Have you solved something similar?"
 
-### Gradient Descent
-- The "hiker in fog" analogy: finding the valley
-- Learning rate = step size
-- Key formula: $\\theta_{{new}} = \\theta_{{old}} - \\alpha \\nabla J(\\theta)$
+### 3. Planning Guidance
+- "What do you think the first step should be?"
+- Hints only: "Consider using [method]..."
 
-### Backpropagation  
-- The "chain of responsibility" analogy
-- Error flows backward through the network
-- Chain rule makes it possible: $\\frac{{\\partial L}}{{\\partial w}} = \\frac{{\\partial L}}{{\\partial a}} \\cdot \\frac{{\\partial a}}{{\\partial z}} \\cdot \\frac{{\\partial z}}{{\\partial w}}$
+### 4. Progressive Hints (If needed)
+- Hint 1: Direction pointer.
+- Hint 2: How to start.
+- Example: Show ONE step, ask them to continue.
 
-### Loss Functions
-- MSE: Average squared distance from the target
-- Cross-Entropy: How "surprised" we are by wrong predictions
-- Key insight: Loss tells us "how wrong" we are
-
-### Probability (Bayes)
-- Prior: What we believed before seeing evidence
-- Likelihood: How likely is the evidence given our belief
-- Posterior: Updated belief after seeing evidence
-- Formula: $P(H|E) = \\frac{{P(E|H) \\cdot P(H)}}{{P(E)}}$
+### 5. Verification Guidance
+- "How can you check this makes sense?"
+- "Does 2(your answer) + 3 equal 11?"
 
 ## Response Format:
 
 <thinking>
-[Identify: What specific mathematical concept is being asked about?]
-[Plan: What's the best sequence of steps to explain this?]
-[Intuition: What visual/geometric analogy will make this click?]
+[Identify: What is the math concept?]
+[Plan: How will I guide them without solving it?]
+[Intuition: What visual analogy helps?]
 </thinking>
 
-### 🎯 The Intuition
+[Your structured response]
 
-[Visual/geometric explanation that builds mental model]
-[Use an analogy that's memorable and relatable]
+**Understanding:**
+[Questions to clarify the goal]
 
-### 📐 The Mathematics
+**Connection:**
+[Link to concepts/analogies]
 
-**Step 1:** [First step with LaTeX and explanation]
-$$
-[formula]
-$$
-*Why this step:* [explanation]
+**Guidance:**
+[Planning steps and progressive hints]
 
-**Step 2:** [Second step]
-$$
-[formula]
-$$
-*Why this step:* [explanation]
-
-[Continue for all steps...]
-
-### 💡 Key Insight
-
-[The "aha" moment - what should really stick with the student]
-
-### ✏️ Practice Problem
-
-[A simpler version of the problem for the student to try]
-
-<hints>
-[Scaffolded hints if they get stuck]
-</hints>
+**Verification:**
+[How to check the answer]
 
 ## Important Rules:
-1. ALWAYS start with intuition, THEN move to formulas
-2. Use correct LaTeX notation (inline: $...$, display: $$...$$)
-3. Explain WHY each step happens, not just WHAT happens
-4. Connect to course materials and cite sources when available
-5. Be patient - math anxiety is real, and you're helping overcome it
+1. ALWAYS start with intuition/understanding, THEN move to formulas.
+2. Use correct LaTeX notation (inline: $...$, display: $$...$$).
+3. Explain WHY each step happens, not just WHAT happens.
+4. Connect to course materials and cite sources when available.
+5. Be patient - math anxiety is real.
 
 ## Retrieved Course Context:
 {context}
@@ -207,28 +192,30 @@ def math_agent_node(state: AgentState) -> Dict:
     logger.info("🔢 Math Agent: Processing mathematical query")
     start_time = time.time()
     
-    query = state.get("query", "")
+    # Use effective_query (contextualized) if available, otherwise original query
+    query = state.get("effective_query") or state.get("query", "")
     retrieved_context = state.get("retrieved_context", [])
     
-    # Create observation for tracing
-    observation = None
-    trace_id = state.get("trace_id")
-    if trace_id:
-        from app.observability.langfuse_client import get_langfuse_client
-        client = get_langfuse_client()
-        if client:
-            try:
-                observation = client.start_span(
-                    trace_context={"trace_id": trace_id},
-                    name="math_reasoning_agent",
-                    input={"query": query},
-                    metadata={
-                        "component": "math_agent",
-                        "specialization": "ai_mathematics"
-                    }
-                )
-            except Exception as e:
-                logger.warning(f"Could not create math observation: {e}")
+    # CRITICAL: Fetch RAG context if not already present
+    # Math agent needs course materials for accurate mathematical explanations
+    if not retrieved_context:
+        logger.info("🔢 Math Agent: No context available - fetching from RAG")
+        from app.agents.sub_agents import RAGAgent
+        rag_agent = RAGAgent()
+        retrieved_context = rag_agent.retrieve_context(query, state=state)  # Pass state for Langfuse tracing
+        logger.info(f"🔢 Math Agent: Retrieved {len(retrieved_context)} documents")
+    
+    # Create observation as child of root trace (v3 pattern)
+    from app.observability.langfuse_client import create_child_span_from_state
+    observation = create_child_span_from_state(
+        state=state,
+        name="math_reasoning_agent",
+        input_data={"query": query},
+        metadata={
+            "component": "math_agent",
+            "specialization": "ai_mathematics"
+        }
+    )
     
     # Detect the specific math topic
     math_topic = detect_math_topic(query)
@@ -244,19 +231,54 @@ def math_agent_node(state: AgentState) -> Dict:
     context_str = "\n\n---\n\n".join(context_parts) if context_parts else "No course materials retrieved."
     
     # Build the prompt
-    prompt = MATH_AGENT_PROMPT.format(
-        context=context_str,
-        query=query,
-        topic=math_topic.replace("_", " ").title()
-    )
+    # Try to fetch prompt from Langfuse
+    full_prompt = ""
+    try:
+        from app.observability.langfuse_client import get_langfuse_client
+        client = get_langfuse_client()
+        if client:
+            # Fetch production prompt
+            langfuse_prompt = client.get_prompt("math-agent-prompt")
+            
+            # Compile with variables
+            full_prompt = langfuse_prompt.compile(
+                context=context_str,
+                query=query,
+                topic=math_topic.replace("_", " ").title()
+            )
+            logger.info("🔢 Math Agent: Using managed prompt 'math-agent-prompt' from Langfuse")
+    except Exception as e:
+        logger.warning(f"Failed to fetch prompt from Langfuse: {e}. Using fallback.")
+
+    # Fallback if Langfuse failed
+    if not full_prompt:
+        full_prompt = MATH_AGENT_PROMPT.format(
+            context=context_str,
+            query=query,
+            topic=math_topic.replace("_", " ").title()
+        )
     
     # Get the model - use Gemini Flash for math (good at reasoning)
     supervisor = Supervisor()
     model = supervisor.get_model("gemini-flash")
     
     try:
-        response = model.invoke(prompt)
-        response_text = response.content if hasattr(response, 'content') else str(response)
+        response = model.invoke(full_prompt)
+        # Handle Gemini 2.5+ list content format
+        raw_content = response.content if hasattr(response, 'content') else str(response)
+        if isinstance(raw_content, list):
+            text_parts = []
+            for block in raw_content:
+                if isinstance(block, dict) and block.get('type') == 'text':
+                    text_parts.append(block.get('text', ''))
+                elif isinstance(block, str):
+                    text_parts.append(block)
+            response_text = ''.join(text_parts)
+        else:
+            response_text = raw_content if isinstance(raw_content, str) else str(raw_content)
+        
+        # Strip <thinking> blocks from response - these are for internal reasoning
+        response_text = strip_thinking_blocks(response_text)
         
         # Create a structured derivation object for state
         math_derivation = MathDerivation(
@@ -297,8 +319,21 @@ def math_agent_node(state: AgentState) -> Dict:
     
     logger.info(f"🔢 Math Agent: Completed in {processing_time:.1f}ms")
     
+    # Build response_sources from retrieved_context
+    response_sources = []
+    for doc in retrieved_context[:5]:
+        source_file = doc.get("source_file") or doc.get("source_filename") or doc.get("metadata", {}).get("source_file", "Unknown")
+        if source_file and source_file != "Unknown":
+            response_sources.append({
+                "title": source_file,
+                "url": doc.get("public_url", ""),
+                "description": doc.get("preview", doc.get("content", "")[:100] if doc.get("content") else ""),
+                "relevance_score": doc.get("relevance_score", 0.0)
+            })
+    
     return {
         "response": response_text,
+        "response_sources": response_sources,  # Include sources for frontend
         "math_explanation": response_text,
         "math_derivation": math_derivation,
         "processing_times": processing_times

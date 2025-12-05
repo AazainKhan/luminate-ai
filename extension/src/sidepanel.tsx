@@ -1,8 +1,8 @@
 "use client"
-import { useState } from "react"
+import { useState, useCallback } from "react"
 import { useAuth } from "~/hooks/useAuth"
 import { LoginForm } from "~/components/auth/LoginForm"
-import { Conversation } from "~/components/chat/conversation"
+import { Conversation } from "~/components/chat/Conversation"
 import { PromptInput } from "~/components/chat/prompt-input"
 import { NavRail } from "~/components/nav-rail"
 import useChat from "~/hooks/use-chat"
@@ -12,7 +12,20 @@ import "./style.css"
 
 function AuthenticatedChatView({ user, session }: { user: User; session: Session }) {
   const [activeChatId, setActiveChatId] = useState<string | undefined>(undefined)
-  const { messages, append, isLoading } = useChat({ session, chatId: activeChatId })
+  const [selectedModel, setSelectedModel] = useState<string | undefined>(undefined)
+
+  // Handle when backend creates a new chat - update activeChatId so subsequent messages
+  // are added to the same chat instead of creating new ones
+  const handleChatCreated = useCallback((newChatId: string) => {
+    setActiveChatId(newChatId)
+  }, [])
+
+  const { messages, append, isLoading, stop, regenerate } = useChat({
+    session,
+    chatId: activeChatId,
+    onChatCreated: handleChatCreated,
+    model: selectedModel
+  })
   const [input, setInput] = useState("")
 
   const handleSendMessage = async (content: string, attachments?: File[]) => {
@@ -25,20 +38,20 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
 
   const handleExportChat = () => {
     if (messages.length === 0) return
-    
+
     const now = new Date()
     const dateStr = now.toISOString().split('T')[0]
     const timeStr = now.toTimeString().split(' ')[0].replace(/:/g, '-')
-    
+
     // Build markdown content
     let markdown = `# Chat Export - COMP 237\n`
     markdown += `**Date:** ${now.toLocaleDateString()}\n`
     markdown += `**User:** ${user.email}\n\n---\n\n`
-    
+
     for (const msg of messages) {
       const role = msg.role === 'user' ? '## 👤 You' : '## 🤖 Tutor'
       markdown += `${role}\n\n${msg.content}\n\n`
-      
+
       // Include sources if present
       if (msg.sources && msg.sources.length > 0) {
         markdown += `**Sources:**\n`
@@ -47,10 +60,10 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
         }
         markdown += '\n'
       }
-      
+
       markdown += `---\n\n`
     }
-    
+
     // Download as .md file
     const blob = new Blob([markdown], { type: 'text/markdown' })
     const url = URL.createObjectURL(blob)
@@ -85,12 +98,12 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
                     Ask anything about your courses, assignments, or learning materials
                   </p>
                 </div>
-                
+
                 {/* Suggestion Chips removed */}
               </div>
             </div>
           ) : (
-            <Conversation messages={messages} isLoading={isLoading} />
+            <Conversation messages={messages} isLoading={isLoading} onRegenerate={regenerate} />
           )}
         </div>
 
@@ -101,8 +114,11 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
             setInput={setInput}
             onSend={handleSendMessage}
             isLoading={isLoading}
+            onStop={stop}
             onExport={handleExportChat}
             hasMessages={messages.length > 0}
+            model={selectedModel}
+            onModelChange={setSelectedModel}
           />
         </div>
       </div>
