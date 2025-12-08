@@ -25,7 +25,7 @@ services:
       - NEO4J_PASSWORD=luminate_graph_pass
     volumes:
       - ./backend:/app
-      - backend_data:/app/data
+      - ./backend/data:/app/data  # Bind mount for local data access
     depends_on:
       memory_store:
         condition: service_started
@@ -190,9 +190,9 @@ services:
     deploy:
       resources:
         limits:
-          memory: 4G
+          memory: 8G
         reservations:
-          memory: 1G
+          memory: 2G
     ulimits:
       nofile:
         soft: 262144

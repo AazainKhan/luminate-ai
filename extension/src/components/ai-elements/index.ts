@@ -31,32 +31,6 @@ export {
 } from "./loader"
 
 // ============================================================================
-// Processing Queue / Chain of Thought
-// ============================================================================
-
-export { 
-  Queue, 
-  QueueSection,
-  QueueSectionTrigger,
-  QueueSectionLabel,
-  QueueSectionContent,
-  QueueList,
-  QueueItem,
-  QueueItemIndicator,
-  QueueItemContent,
-  QueueItemDescription,
-  QueueItemActions,
-  QueueItemAction,
-  QueueIndicator,
-  QueueContext,
-  type QueueItemData,
-  type QueueItemStatus,
-  type QueueProps,
-  type QueueSectionProps,
-  type QueueItemProps,
-} from "./queue"
-
-// ============================================================================
 // Reasoning / Chain of Thought
 // ============================================================================
 
@@ -69,6 +43,16 @@ export {
   type ReasoningTriggerProps,
   type ReasoningContentProps,
 } from "./reasoning"
+
+// ============================================================================
+// Thinking Trace (Structured Agent Decisions)
+// ============================================================================
+
+export {
+  ThinkingTrace,
+  type ThinkingStep,
+  type ThinkingStepType,
+} from "./thinking-trace"
 
 // ============================================================================
 // Source Citations

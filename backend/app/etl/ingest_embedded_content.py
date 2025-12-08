@@ -4,8 +4,11 @@ import uuid
 from pathlib import Path
 from typing import List, Dict, Any
 import argparse
+import chromadb
+from chromadb.config import Settings
+from langchain_google_genai import GoogleGenerativeAIEmbeddings
 
-from app.rag.chromadb_client import ChromaDBClient
+from app.config import settings
 
 # Configure logging
 logging.basicConfig(
@@ -15,12 +18,33 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 class EmbeddedContentIngester:
-    """Ingests embedded content from JSON into ChromaDB"""
+    """Ingests embedded content (mediasite links, URLs) from JSON into ChromaDB"""
 
-    def __init__(self, json_path: str, course_id: str = "COMP237"):
+    def __init__(self, json_path: str, course_id: str = "COMP237", collection_name: str = "embedded_resources"):
         self.json_path = Path(json_path)
         self.course_id = course_id
-        self.chromadb = ChromaDBClient()
+        self.collection_name = collection_name
+        
+        # Connect to ChromaDB with Gemini embeddings
+        self.client = chromadb.HttpClient(
+            host=settings.chromadb_host,
+            port=settings.chromadb_port,
+        )
+        self.embeddings = GoogleGenerativeAIEmbeddings(
+            model="models/embedding-001",
+            google_api_key=settings.google_api_key
+        )
+        
+        # Get or create collection with Gemini embeddings
+        try:
+            self.collection = self.client.get_collection(name=self.collection_name)
+            logger.info(f"Connected to existing collection: {self.collection_name}")
+        except:
+            self.collection = self.client.create_collection(
+                name=self.collection_name,
+                metadata={"hnsw:space": "cosine"}
+            )
+            logger.info(f"Created new collection: {self.collection_name}")
 
     def load_content(self) -> List[Dict[str, Any]]:
         """Load embedded content from JSON file."""
@@ -79,13 +103,19 @@ class EmbeddedContentIngester:
                 ids.append(str(uuid.uuid4()))
         
         if documents:
-            logger.info(f"Ingesting {len(documents)} embedded content chunks")
-            self.chromadb.add_documents(
+            logger.info(f"Ingesting {len(documents)} embedded content chunks with Gemini embeddings...")
+            
+            # Generate embeddings using Gemini
+            embeddings_list = self.embeddings.embed_documents(documents)
+            
+            # Add to ChromaDB
+            self.collection.add(
                 documents=documents,
+                embeddings=embeddings_list,
                 metadatas=metadatas,
                 ids=ids
             )
-            logger.info("Ingestion complete")
+            logger.info(f"✅ Ingestion complete: {len(documents)} embedded resources indexed")
         else:
             logger.info("No documents to ingest")
 

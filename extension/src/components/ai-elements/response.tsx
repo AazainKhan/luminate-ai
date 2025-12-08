@@ -1,10 +1,12 @@
 "use client"
-import React, { Component } from "react"
+import React, { Component, useMemo } from "react"
 import type { ErrorInfo, ReactNode } from "react"
-import ReactMarkdown from "react-markdown"
-import remarkGfm from "remark-gfm"
+import { marked } from "marked"
+import katex from "katex"
+import "katex/dist/katex.min.css"
 import { cn } from "@/lib/utils"
 import { CodeBlock, CodeBlockCopyButton } from "@/components/ai-elements/code-block"
+import { QuestionCard, HintCard, OrientationCard, ExampleCard } from "@/components/ai-elements/scaffolding-card"
 
 interface ResponseProps {
   children: string
@@ -12,72 +14,168 @@ interface ResponseProps {
 }
 
 /**
- * Strip problematic content from LLM responses.
- * Removes internal reasoning blocks, malformed HTML-like tags, and JSON analysis blocks.
- * Also fixes incomplete markdown that can crash the parser.
+ * Pre-render LaTeX math with KaTeX before passing to ReactMarkdown.
+ * We then allow raw HTML with rehypeRaw so KaTeX output renders correctly.
  */
-function sanitizeContent(text: string): string {
-  if (!text) return ''
-  
-  let cleaned = text
-  
-  // Remove <thinking>...</thinking> blocks including content
-  cleaned = cleaned.replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
-  
-  // Remove any standalone <thinking> or </thinking> tags
-  cleaned = cleaned.replace(/<\/?thinking>/gi, '')
-  
-  // Remove reasoning JSON blocks that leaked from the reasoning node
-  // Pattern: ```json\n{"perception": ... }``` or raw {"perception": ...}
-  cleaned = cleaned.replace(/```json\s*\{[\s\S]*?"perception"[\s\S]*?"decision"[\s\S]*?\}\s*```/gi, '')
-  cleaned = cleaned.replace(/\{[\s\S]*?"perception"[\s\S]*?"analysis"[\s\S]*?"planning"[\s\S]*?"decision"[\s\S]*?\}/gi, '')
-  
-  // Remove other potentially problematic XML-like tags that aren't standard Markdown
-  // but preserve valid HTML tags like <br>, <hr>, etc.
-  cleaned = cleaned.replace(/<\/?(?:quiz|example|step|hint|activation|exploration|guidance|challenge)[^>]*>/gi, '')
-  
-  // Remove any unclosed or malformed angle bracket sequences that could break the parser
-  // This handles cases like "< thinking" or "< /thinking" with spaces
-  cleaned = cleaned.replace(/<\s*\/?\s*thinking\s*>/gi, '')
-  
-  // Fix incomplete markdown that can crash the parser:
-  
-  // 1. Close any unclosed code blocks (odd number of ```)
-  const codeBlockMatches = cleaned.match(/```/g)
-  if (codeBlockMatches && codeBlockMatches.length % 2 !== 0) {
-    cleaned = cleaned + '\n```'
-  }
-  
-  // 2. Close any unclosed inline code (odd number of single backticks not in code blocks)
-  // This is tricky - we'll just escape trailing backticks that seem unclosed
-  const lines = cleaned.split('\n')
-  cleaned = lines.map(line => {
-    // Skip code block markers
-    if (line.trim().startsWith('```')) return line
-    // Count backticks in line
-    const backticks = (line.match(/`/g) || []).length
-    if (backticks % 2 !== 0) {
-      // Odd number - add closing backtick
-      return line + '`'
+function renderMathWithKatex(text: string): string {
+  if (!text) return ""
+
+  // Protect code blocks from math processing
+  const codeBlocks: string[] = []
+  let processed = text.replace(/```[\s\S]*?```/g, (match) => {
+    codeBlocks.push(match)
+    return `__CODEBLOCK_${codeBlocks.length - 1}__`
+  })
+
+  // Protect inline code from math processing
+  const inlineCodes: string[] = []
+  processed = processed.replace(/`[^`]+`/g, (match) => {
+    inlineCodes.push(match)
+    return `__INLINECODE_${inlineCodes.length - 1}__`
+  })
+
+  // Block math $$...$$
+  processed = processed.replace(/\$\$([\s\S]*?)\$\$/g, (_, math) => {
+    try {
+      const html = katex.renderToString(math.trim(), {
+        throwOnError: false,
+        strict: false,
+        displayMode: true,
+        trust: true,
+        output: "html"
+      })
+      return `<div class="katex-display my-4">${html}</div>`
+    } catch (e) {
+      console.warn("KaTeX block error:", e)
+      return `$$${math}$$`
     }
-    return line
-  }).join('\n')
+  })
+
+  // Inline math $...$ (avoid currency by requiring non-space content)
+  processed = processed.replace(/\$([^\s$][^$]*?[^\s$])\$/g, (_, math) => {
+    try {
+      const html = katex.renderToString(math.trim(), {
+        throwOnError: false,
+        strict: false,
+        displayMode: false,
+        trust: true,
+        output: "html"
+      })
+      return `<span class="katex-inline">${html}</span>`
+    } catch (e) {
+      console.warn("KaTeX inline error:", e)
+      return `$${math}$`
+    }
+  })
+
+  // Single-character math like $x$
+  processed = processed.replace(/\$([^\s$])\$/g, (_, math) => {
+    try {
+      const html = katex.renderToString(math.trim(), {
+        throwOnError: false,
+        strict: false,
+        displayMode: false,
+        trust: true,
+        output: "html"
+      })
+      return `<span class="katex-inline">${html}</span>`
+    } catch (e) {
+      console.warn("KaTeX single char error:", e)
+      return `$${math}$`
+    }
+  })
+
+  // Restore inline code
+  processed = processed.replace(/__INLINECODE_(\d+)__/g, (_, index) => inlineCodes[parseInt(index)])
+
+  // Restore code blocks
+  processed = processed.replace(/__CODEBLOCK_(\d+)__/g, (_, index) => codeBlocks[parseInt(index)])
+
+  return processed
+}
+
+/**
+ * Loosely format common scaffolding markers so the UI doesn't render as a single wall of text.
+ */
+function addScaffoldingSpacing(text: string): string {
+  return text
+    .replace(/\s*\*\*Orientation:\*\*/gi, "\n\n**Orientation:**")
+    .replace(/\s*\*\*Brief Orientation:\*\*/gi, "\n\n**Brief Orientation:**")
+    .replace(/\s*\*\*Brief Explanation:\*\*/gi, "\n\n**Brief Explanation:**")
+    .replace(/\s*\*\*Example:\*\*/gi, "\n\n**Example:**")
+    .replace(/\s*\*\*Worked Example:\*\*/gi, "\n\n**Worked Example:**")
+    .replace(/\s*\*\*Question:\*\*/gi, "\n\n**Question:**")
+    .replace(/\s*\*\*Hints?:\*\*/gi, "\n\n**Hint:**")
+    .replace(/\s*\*\*Self-Check:\*\*/gi, "\n\n**Self-Check:**")
+    .replace(/\s*\*\*Step \d+:\*\*/gi, (match) => `\n\n${match.trim()}`)
+}
+
+/**
+ * Intelligent parsing for streaming markdown.
+ */
+function parseIncompleteMarkdown(markdown: string): string {
+  if (!markdown) return ""
+
+  // 1. Sanitize problematic content first
+  let processed = markdown
+    .replace(/<thinking>[\s\S]*?<\/thinking>/gi, '')
+    .replace(/<\/?thinking>/gi, '')
+    .replace(/```json\s*\{[\s\S]*?"perception"[\s\S]*?"decision"[\s\S]*?\}\s*```/gi, '')
+    .replace(/\{[\s\S]*?"perception"[\s\S]*?"analysis"[\s\S]*?"planning"[\s\S]*?"decision"[\s\S]*?\}/gi, '')
+    .replace(/<\/?(?:quiz|example|step|hint|activation|exploration|guidance|challenge)[^>]*>/gi, '')
+    .replace(/<\s*\/?\s*thinking\s*>/gi, '')
+
+  // 2. Handle code blocks (protect content inside them)
+  const codeBlockRegex = /```[\s\S]*?```/g
+  const codeBlocks: string[] = []
+  let placeholderIndex = 0
   
-  // 3. Fix incomplete bold/italic markers at end of text
-  // Remove trailing ** or * that aren't closed
-  cleaned = cleaned.replace(/\*{1,2}$/, '')
-  cleaned = cleaned.replace(/_{1,2}$/, '')
-  
-  // 4. Fix incomplete links at end of text  
-  // Remove incomplete link syntax like [text or [text](url
-  cleaned = cleaned.replace(/\[[^\]]*$/, '')
-  cleaned = cleaned.replace(/\]\([^)]*$/, '')
-  
-  // 5. Fix incomplete list items that are just numbers or bullets
-  cleaned = cleaned.replace(/\n\d+\.\s*$/, '\n')
-  cleaned = cleaned.replace(/\n[-*+]\s*$/, '\n')
-  
-  return cleaned.trim()
+  processed = processed.replace(codeBlockRegex, (match) => {
+    const placeholder = `__CODE_BLOCK_${placeholderIndex++}__`
+    codeBlocks.push(match)
+    return placeholder
+  })
+
+  const incompleteCodeBlockMatch = processed.match(/```[\s\S]*$/)
+  if (incompleteCodeBlockMatch) {
+    const incompleteBlock = incompleteCodeBlockMatch[0]
+    processed = processed.substring(0, incompleteCodeBlockMatch.index) + `__CODE_BLOCK_${placeholderIndex}__`
+    codeBlocks.push(incompleteBlock + "\n```")
+  }
+
+  // 3. Auto-complete formatting tokens
+  const boldCount = (processed.match(/\*\*/g) || []).length
+  if (boldCount % 2 !== 0) {
+    processed += "**"
+  }
+
+  const backtickCount = (processed.match(/`/g) || []).length
+  if (backtickCount % 2 !== 0) {
+    processed += "`"
+  }
+
+  const strikeCount = (processed.match(/~~/g) || []).length
+  if (strikeCount % 2 !== 0) {
+    processed += "~~"
+  }
+
+  // 4. Hide incomplete links/images
+  processed = processed.replace(/!\[[^\]]*$/, '')
+  processed = processed.replace(/\[[^\]]*$/, '')
+  processed = processed.replace(/\]\([^\)]*$/, '')
+
+  // 5. Remove trailing period after citations
+  processed = processed.replace(/(\[\d+\])\s*\./g, '$1')
+
+  // 6. Restore code blocks
+  processed = processed.replace(/__CODE_BLOCK_(\d+)__/g, (_, index) => {
+    return codeBlocks[parseInt(index)]
+  })
+
+  // 7. Apply scaffolding spacing
+  processed = addScaffoldingSpacing(processed)
+
+  return processed
 }
 
 /**
@@ -103,7 +201,6 @@ class MarkdownErrorBoundary extends Component<{ children: ReactNode; fallback: s
   }
   
   componentDidUpdate(prevProps: { children: ReactNode; fallback: string }) {
-    // Reset error state when content changes (streaming updates)
     if (prevProps.fallback !== this.props.fallback && this.state.hasError) {
       this.setState({ hasError: false, error: undefined })
     }
@@ -111,7 +208,6 @@ class MarkdownErrorBoundary extends Component<{ children: ReactNode; fallback: s
 
   render() {
     if (this.state.hasError) {
-      // Fallback: render as plain text with basic formatting
       return (
         <div className="prose dark:prose-invert max-w-none text-sm leading-7 text-foreground break-words w-full whitespace-pre-wrap">
           {this.props.fallback}
@@ -123,89 +219,37 @@ class MarkdownErrorBoundary extends Component<{ children: ReactNode; fallback: s
 }
 
 export function Response({ children, className }: ResponseProps) {
-  // Clean the content before rendering
-  const cleanedContent = sanitizeContent(children || '')
+  // Handle JSX children (from citations) - pass through without processing
+  if (typeof children !== 'string') {
+    return (
+      <div className={cn("max-w-none text-sm leading-7 break-words w-full", className)}>
+        {children}
+      </div>
+    )
+  }
   
-  // Don't render if empty after cleaning
-  if (!cleanedContent) {
+  // Process content: parse incomplete markdown, then pre-render math to HTML
+  const parsedContent = useMemo(() => {
+    const cleaned = parseIncompleteMarkdown(children || "")
+    return renderMathWithKatex(cleaned)
+  }, [children])
+
+  const htmlContent = useMemo(() => {
+    // marked parses markdown to HTML; GFM enabled by default in marked v12+
+    return marked.parse(parsedContent, { breaks: true }) as string
+  }, [parsedContent])
+  
+  if (!parsedContent) {
     return null
   }
   
   return (
-    <div className={cn("prose dark:prose-invert max-w-none text-sm leading-7 text-foreground break-words w-full", className)}>
-      <MarkdownErrorBoundary fallback={cleanedContent}>
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          components={{
-            // Handle code blocks at the pre level to avoid div-in-p nesting issues
-            // ReactMarkdown renders fenced code as <pre><code>...</code></pre>
-            // By handling pre, we can return our CodeBlock (which contains divs) directly
-            pre: ({ node, children, ...props }: any) => {
-              // Extract the code element from children
-              const codeChild = React.Children.toArray(children).find(
-                (child): child is React.ReactElement => 
-                  React.isValidElement(child) && child.type === 'code'
-              )
-              
-              if (codeChild) {
-                const codeClassName = codeChild.props.className || ""
-                const match = /language-(\w+)/.exec(codeClassName)
-                const language = match ? match[1] : "text"
-                const code = String(codeChild.props.children || "").replace(/\n$/, "")
-                
-                if (code) {
-                  return (
-                    <CodeBlock code={code} language={language} showLineNumbers>
-                      <CodeBlockCopyButton code={code} />
-                    </CodeBlock>
-                  )
-                }
-              }
-              
-              // Fallback for non-code pre elements
-              return <pre {...props}>{children}</pre>
-            },
-            // Handle inline code only (not fenced code blocks)
-            code: ({ node, inline, className: codeClassName, children, ...props }: any) => {
-              // If this is a fenced code block (inside pre), it's handled by pre component
-              // This handler is only for inline code like `code`
-              if (inline) {
-                return (
-                  <code className="px-1.5 py-0.5 rounded-md bg-slate-800/60 font-mono text-sm text-violet-300 ring-1 ring-slate-700/50" {...props}>
-                    {children}
-                  </code>
-                )
-              }
-              
-              // For any other non-inline code not wrapped in pre (shouldn't happen normally)
-              return (
-                <code className="px-1.5 py-0.5 rounded-md bg-slate-800/60 font-mono text-sm text-violet-300 ring-1 ring-slate-700/50" {...props}>
-                  {children}
-                </code>
-              )
-            },
-            a: ({ node, ...props }) => (
-              <a {...props} className="text-violet-400 hover:text-violet-300 hover:underline transition-colors" target="_blank" rel="noopener noreferrer" />
-            ),
-            // Use div for paragraphs when they contain block elements (like code blocks)
-            // This prevents the div-in-p nesting issue
-            p: ({ node, children, ...props }) => {
-              // Check if children contain any block-level elements
-              const hasBlockChild = React.Children.toArray(children).some(
-                (child) => React.isValidElement(child) && 
-                  (child.type === CodeBlock || child.type === 'div' || child.type === 'pre')
-              )
-              
-              if (hasBlockChild) {
-                return <div className="mb-4" {...props}>{children}</div>
-              }
-              
-              return <p {...props}>{children}</p>
-            },
-          }}
-        >
-          {cleanedContent}
-        </ReactMarkdown>
+    <div className={cn("max-w-none text-sm leading-7 break-words w-full", className)}>
+      <MarkdownErrorBoundary fallback={parsedContent}>
+        <div
+          className="prose dark:prose-invert max-w-none text-sm leading-7 text-foreground break-words w-full"
+          dangerouslySetInnerHTML={{ __html: htmlContent }}
+        />
       </MarkdownErrorBoundary>
     </div>
   )

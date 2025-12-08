@@ -10,7 +10,7 @@ from fastapi.responses import JSONResponse
 
 from app.config import settings
 from app.api.middleware import require_auth
-from app.api.routes import chat, admin, execute, mastery, history, models
+from app.api.routes import chat, admin, execute, mastery, history, models, sources
 
 app = FastAPI(
     title="Luminate AI Course Tutor",
@@ -25,6 +25,7 @@ app.include_router(execute.router)
 app.include_router(mastery.router)
 app.include_router(history.router)
 app.include_router(models.router)
+app.include_router(sources.router)
 
 # CORS middleware for Chrome Extension
 app.add_middleware(

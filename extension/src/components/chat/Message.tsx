@@ -2,8 +2,10 @@
 
 import * as React from "react"
 import { Copy, RotateCcw, Check, ThumbsUp, ThumbsDown, MoreHorizontal, Flag, Volume2, Pencil } from "lucide-react"
+import { marked } from "marked"
 import { Button } from "@/components/ui/button"
-import { Sources, SourcesTrigger, SourcesContent, Source } from "@/components/ai-elements/sources"
+import { Sources, SourcesTrigger, SourcesContent } from "@/components/ai-elements/sources"
+import { LazySource } from "@/components/chat/LazySource"
 import { Reasoning, ReasoningTrigger, ReasoningContent } from "@/components/ai-elements/reasoning"
 import { Response } from "@/components/ai-elements/response"
 import { cn } from "@/lib/utils"
@@ -24,7 +26,7 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigge
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip"
 import type { Message as MessageType, ThoughtStep } from "../../types"
 
-import { ChainOfThought } from "./ChainOfThought"
+import { ThinkingTrace } from "@/components/ai-elements/thinking-trace"
 
 // ============================================================================
 // Context
@@ -210,7 +212,7 @@ const MessageContent = React.forwardRef<HTMLDivElement, MessageContentProps>(
             "relative",
             isUser 
               ? "bg-violet-600 text-white px-3 py-2 sm:px-4 sm:py-3 rounded-2xl rounded-tr-sm shadow-md" 
-              : "bg-muted/50 border border-border backdrop-blur-sm rounded-2xl rounded-tl-sm px-3 py-2 sm:px-4 sm:py-3 text-foreground shadow-sm w-full",
+              : "px-0 py-2 sm:py-3 text-foreground w-full",
             isLoading && !isUser && "animate-processing",
           )}
         >
@@ -291,26 +293,6 @@ MessageAction.displayName = "MessageAction"
 // Legacy Message Content (for backwards compatibility)
 // ============================================================================
 
-/**
- * Determines if chain of thought should be displayed.
- * For an educational AI tutor, we ALWAYS show chain of thought if steps exist.
- * This provides transparency and helps students understand the AI's reasoning process.
- */
-function shouldShowChainOfThought(
-  steps: ThoughtStep[] | undefined, 
-  _isStreaming: boolean,
-  _hasContent: boolean,
-  _streamComplete?: boolean
-): boolean {
-  // Simple rule: if there are steps, show them
-  // The ChainOfThought component handles auto-collapse after completion
-  if (!steps || steps.length === 0) return false
-  
-  // Always show chain of thought when there are steps
-  // The component itself will collapse after completion but remain visible
-  return true
-}
-
 interface MessageLegacyContentProps {
   message: MessageType
   copied: boolean
@@ -321,37 +303,86 @@ interface MessageLegacyContentProps {
 }
 
 function MessageLegacyContent({ message, copied, handleCopy, isUser, isLoading, onRegenerate }: MessageLegacyContentProps) {
+  /**
+   * Render content with inline citations while preserving markdown formatting.
+   * 
+   * The key insight: We need to wrap the entire content in Response (for markdown),
+   * but also process citation markers [1], [2] etc. into interactive components.
+   * 
+   * Solution: Render the full content as markdown, but post-process to inject
+   * citation components using a two-pass approach.
+   */
   const renderContentWithCitations = (content: string) => {
     if (!message.citations || message.citations.length === 0) {
-      return content
+      // No citations - render as pure markdown
+      return <Response>{content}</Response>
     }
-    const parts = content.split(/(\[\d+\])/)
+    
+    // Step 1: Move citations to AFTER periods (per user request)
+    // "text [1]." → "text. [1]"
+    let cleanedContent = content
+      .replace(/\s*\[(\d+)\]\.(?!\S)/g, '. [$1]')  // Move citation after period
+      .replace(/\n+\[(\d+)\]/g, ' [$1]')              // Remove newlines before citations
+    
+    // Step 2: Replace citation markers with superscript spans that won't break markdown
+    const citationPattern = /\[(\d+)\]/g
+    const textWithPlaceholders = cleanedContent.replace(citationPattern, (match, num) => {
+      return `__CITATION_${num}__`
+    })
+    
+    // Step 3: Render markdown content with placeholders
+    const htmlContent = marked.parse(textWithPlaceholders, { breaks: true }) as string
+    
+    // Step 4: Replace placeholders with React citation components
+    const parts = htmlContent.split(/(__CITATION_\d+__)/)
+    const elements: React.ReactNode[] = []
+    
+    parts.forEach((part, index) => {
+      const citationMatch = part.match(/__CITATION_(\d+)__/)
+      
+      if (citationMatch) {
+        const citationNumber = citationMatch[1]
+        const citation = message.citations?.find((c) => c.number === citationNumber)
+        
+        if (citation) {
+          elements.push(
+            <InlineCitationCard key={`citation-${index}`}>
+              <InlineCitationCardTrigger 
+                number={citation.number} 
+                url={citation.url}
+                title={citation.title}
+                sourceInfo={{
+                  module: citation.module,
+                  week: citation.week
+                }}
+              />
+              <InlineCitationCardBody>
+                <InlineCitationSource
+                  title={citation.title}
+                  url={citation.url}
+                  description={citation.description}
+                />
+              </InlineCitationCardBody>
+            </InlineCitationCard>
+          )
+        }
+      } else if (part.trim()) {
+        // Render HTML chunk as-is
+        elements.push(
+          <span 
+            key={`html-${index}`}
+            className="prose dark:prose-invert max-w-none text-sm leading-7 inline"
+            dangerouslySetInnerHTML={{ __html: part }}
+          />
+        )
+      }
+    })
+    
+    // Return as inline wrapper to keep everything on same line
     return (
-      <InlineCitation>
-        {parts.map((part, index) => {
-          const match = part.match(/\[(\d+)\]/)
-          if (match) {
-            const citationNumber = match[1]
-            const citation = message.citations?.find((c) => c.number === citationNumber)
-            if (citation) {
-              return (
-                <InlineCitationCard key={index}>
-                  <InlineCitationCardTrigger number={citation.number} url={citation.url} />
-                  <InlineCitationCardBody>
-                    <InlineCitationSource
-                      title={citation.title}
-                      url={citation.url}
-                      description={citation.description}
-                    />
-                    {citation.quote && <InlineCitationQuote>{citation.quote}</InlineCitationQuote>}
-                  </InlineCitationCardBody>
-                </InlineCitationCard>
-              )
-            }
-          }
-          return <InlineCitationText key={index}>{part}</InlineCitationText>
-        })}
-      </InlineCitation>
+      <span className="inline-flex flex-wrap items-baseline gap-0.5">
+        {elements}
+      </span>
     )
   }
 
@@ -384,42 +415,63 @@ function MessageLegacyContent({ message, copied, handleCopy, isUser, isLoading, 
               : "bg-muted/50 border border-border backdrop-blur-sm rounded-2xl rounded-tl-sm px-3 py-2 sm:px-4 sm:py-3 text-foreground shadow-sm w-full",
           )}
         >
-          {/* Reasoning - Model's internal thinking process */}
-          {!isUser && message.reasoning && (
-            <div className="mb-3" data-testid="message-reasoning">
-              <Reasoning 
+          {/* Thinking Trace - Structured agent decisions (scope check, escalation, etc.) */}
+          {/* Render FIRST so it appears before reasoning */}
+          {!isUser && message.thinkingTrace && message.thinkingTrace.length > 0 && (
+            <div className="mb-3" data-testid="thinking-trace-container">
+              <ThinkingTrace
+                steps={message.thinkingTrace}
                 isStreaming={isLoading && !message.streamComplete}
-                isComplete={!!message.streamComplete}
-                collapseDelay={3000}
-                defaultOpen={true}
-              >
-                <ReasoningTrigger showDuration />
-                <ReasoningContent>
-                  {message.reasoning}
-                </ReasoningContent>
-              </Reasoning>
-            </div>
-          )}
-
-          {/* Chain of Thought - Pipeline stages */}
-          {!isUser && message.chainOfThought && message.chainOfThought.length > 0 && 
-           shouldShowChainOfThought(message.chainOfThought, isLoading, !!message.content, message.streamComplete) && (
-            <div className="mb-3" data-testid="chain-of-thought-container">
-              <ChainOfThought 
-                steps={message.chainOfThought}
-                isStreaming={isLoading && !message.streamComplete}
-                collapseDelay={3000}
-                defaultOpen={true}
-                title="Processing"
               />
             </div>
           )}
 
-          {/* Loading state with shimmer - only show if NO chainOfThought steps */}
-          {showLoadingState && !shouldShowChainOfThought(message.chainOfThought, isLoading, false, message.streamComplete) && (
+          {/* Reasoning - Model's internal thinking process */}
+          {/* Render SECOND so it appears after thinking steps */}
+          {!isUser && message.reasoning && (
+            <div className="mb-3" data-testid="message-reasoning">
+              {(() => {
+                // Extract current step from reasoning text for dynamic title
+                const lines = message.reasoning.split('\n');
+                // Find the last line that looks like a header or step
+                const stepLine = [...lines].reverse().find(line => 
+                  line.trim().startsWith('**') || 
+                  line.trim().startsWith('###') ||
+                  line.trim().match(/^Step \d+:/)
+                );
+                
+                let currentStep = undefined;
+                if (stepLine) {
+                  // Clean up markdown
+                  currentStep = stepLine
+                    .replace(/^(\*\*|###\s*|Step\s*\d*:?\s*)/, '')
+                    .replace(/\*\*$/, '')
+                    .trim();
+                  // Truncate if too long
+                  if (currentStep.length > 50) currentStep = currentStep.substring(0, 50) + "...";
+                }
+
+                return (
+                  <Reasoning 
+                    isStreaming={isLoading && !message.streamComplete}
+                    defaultOpen={true}
+                  >
+                    <ReasoningTrigger currentStep={currentStep} />
+                    <ReasoningContent>
+                      {message.reasoning}
+                    </ReasoningContent>
+                  </Reasoning>
+                );
+              })()}
+            </div>
+          )}
+
+          {/* Loading state with shimmer - only show if NO thinkingTrace steps */}
+          {showLoadingState && 
+           !message.thinkingTrace?.length && (
             <div className="space-y-2" data-testid="message-loading">
               <div className="flex items-center gap-2 text-muted-foreground text-sm">
-                <Loader size={16} variant="dots" className="text-violet-500" />
+                <Loader size={16} variant="spinner" className="text-violet-500" />
                 <span className="animate-processing">Connecting...</span>
               </div>
               <Shimmer variant="text" className="w-full" />
@@ -434,9 +486,15 @@ function MessageLegacyContent({ message, copied, handleCopy, isUser, isLoading, 
             </p>
           ) : (
             message.content && (
-              <Response>
-                {message.citations ? String(renderContentWithCitations(message.content)) : message.content}
-              </Response>
+              message.citations && message.citations.length > 0 ? (
+                // Render with inline citations (JSX, not markdown)
+                renderContentWithCitations(message.content)
+              ) : (
+                // Render as markdown
+                <Response>
+                  {message.content}
+                </Response>
+              )
             )
           )}
 
@@ -589,15 +647,22 @@ function MessageLegacyContent({ message, copied, handleCopy, isUser, isLoading, 
                     // Extract page number if available
                     const pageInfo = source.page ? ` (p. ${source.page})` : ''
                     
+                    // Use LazySource for LLM-generated contextual descriptions
                     return (
-                      <Source 
-                        key={source.id || i}
+                      <LazySource
+                        key={`source-${i}-${source.title}`}
                         index={i}
+                        query={message.content || ''}
                         title={formatSourceTitle(source) + pageInfo}
-                        href={source.url || '#'} 
-                        description={source.description || source.content?.substring(0, 150)}
-                        filename={source.source_file}
+                        content={source.content || ''}
+                        href={source.url}
+                        source_file={source.source_file}
+                        module={(source as any).module}
+                        week={typeof (source as any).week === 'number' ? (source as any).week : undefined}
                         page={source.page}
+                        source_type={source.source_type}
+                        link_type={source.link_type}
+                        citation_confidence={source.citation_confidence}
                       />
                     )
                   })}

@@ -104,3 +104,5 @@ credentials/
 *.rar
 raw_data/*.zip
 !raw_data/.gitkeep
+backend/data
+docs/friends-work

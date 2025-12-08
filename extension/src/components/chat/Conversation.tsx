@@ -53,21 +53,19 @@ const Conversation = React.forwardRef<HTMLDivElement, ConversationProps>(
     
     // Composable mode: render children with context
     const scrollRef = React.useRef<HTMLDivElement>(null)
+    const bottomRef = React.useRef<HTMLDivElement>(null)
     const [isAtBottom, setIsAtBottom] = React.useState(true)
 
     const scrollToBottom = React.useCallback(() => {
-      if (scrollRef.current) {
-        scrollRef.current.scrollTop = scrollRef.current.scrollHeight
-      }
+      bottomRef.current?.scrollIntoView({ behavior: "smooth" })
+      setIsAtBottom(true)
     }, [])
 
     // Check if at bottom on scroll
-    const handleScroll = React.useCallback(() => {
-      if (scrollRef.current) {
-        const { scrollTop, scrollHeight, clientHeight } = scrollRef.current
-        const atBottom = scrollHeight - scrollTop - clientHeight < 50
-        setIsAtBottom(atBottom)
-      }
+    const handleScroll = React.useCallback((e: React.UIEvent<HTMLDivElement>) => {
+      const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
+      const atBottom = scrollHeight - scrollTop - clientHeight < 50
+      setIsAtBottom(atBottom)
     }, [])
 
     const contextValue = React.useMemo(() => ({
@@ -87,6 +85,7 @@ const Conversation = React.forwardRef<HTMLDivElement, ConversationProps>(
             <ScrollArea className="h-full" onScroll={handleScroll}>
               <div ref={scrollRef} className="px-4 py-6">
                 {children}
+                <div ref={bottomRef} className="h-px w-full" />
               </div>
             </ScrollArea>
           </Card>
@@ -274,40 +273,57 @@ interface LegacyConversationProps {
  * Internal legacy Conversation component for backwards compatibility
  */
 function LegacyConversationInternal({ messages, isLoading, onRegenerate }: LegacyConversationProps) {
-  const scrollRef = React.useRef<HTMLDivElement>(null)
+  const messagesEndRef = React.useRef<HTMLDivElement>(null)
+  const [isAtBottom, setIsAtBottom] = React.useState(true)
 
+  const scrollToBottom = React.useCallback(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
+    setIsAtBottom(true)
+  }, [])
+
+  // Auto-scroll on new messages if already at bottom
   React.useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight
+    if (isAtBottom) {
+      scrollToBottom()
     }
-  }, [messages, isLoading])
+  }, [messages, isLoading, isAtBottom, scrollToBottom])
+
+  const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const { scrollTop, scrollHeight, clientHeight } = e.currentTarget
+    const atBottom = scrollHeight - scrollTop - clientHeight < 100
+    setIsAtBottom(atBottom)
+  }
 
   return (
-    <div className="h-full relative" data-testid="conversation-container">
-      <Card className="h-full bg-card/80 border-border rounded-2xl shadow-lg mx-4 my-4 overflow-hidden">
-        <ScrollArea className="h-full">
-          <div ref={scrollRef} className="px-4 py-6">
-            <div className="space-y-6 max-w-3xl mx-auto pb-12" data-testid="chat-messages">
-              {messages.map((message, index) => {
-                // Pass isLoading to the last assistant message while streaming
-                const isLastMessage = index === messages.length - 1
-                const isAssistant = message.role === "assistant"
-                const messageIsLoading = isLoading && isLastMessage && isAssistant
-                
-                return (
-                  <Message 
-                    key={message.id} 
-                    message={message} 
-                    isLoading={messageIsLoading}
-                    onRegenerate={isAssistant && onRegenerate ? () => onRegenerate(message.id) : undefined}
-                  />
-                )
-              })}
+    <ConversationContext.Provider value={{ scrollToBottom, isAtBottom }}>
+      <div className="h-full relative" data-testid="conversation-container">
+        <Card className="h-full bg-card/80 border-border rounded-2xl shadow-lg mx-4 my-4 overflow-hidden relative">
+          <ScrollArea className="h-full" onScroll={handleScroll}>
+            <div className="px-4 py-6">
+              <div className="space-y-6 max-w-3xl mx-auto pb-12" data-testid="chat-messages">
+                {messages.map((message, index) => {
+                  // Pass isLoading to the last assistant message while streaming
+                  const isLastMessage = index === messages.length - 1
+                  const isAssistant = message.role === "assistant"
+                  const messageIsLoading = isLoading && isLastMessage && isAssistant
+                  
+                  return (
+                    <Message 
+                      key={message.id} 
+                      message={message} 
+                      isLoading={messageIsLoading}
+                      onRegenerate={isAssistant && onRegenerate ? () => onRegenerate(message.id) : undefined}
+                    />
+                  )
+                })}
+                <div ref={messagesEndRef} className="h-px w-full" />
+              </div>
             </div>
-          </div>
-        </ScrollArea>
-      </Card>
-    </div>
+          </ScrollArea>
+          <ConversationScrollButton />
+        </Card>
+      </div>
+    </ConversationContext.Provider>
   )
 }
 

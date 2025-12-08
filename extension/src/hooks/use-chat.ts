@@ -1,6 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from "react"
 import { useAuth } from "./useAuth"
-import type { Message, ThoughtStep } from "../types"
+import { safeParsePartialJson } from "../lib/partial-json"
+import type { Message, ThoughtStep, ThinkingStep, ThinkingStepType } from "../types"
 import type { Session } from "@supabase/supabase-js"
 
 const API_BASE_URL = process.env.PLASMO_PUBLIC_API_URL || "http://localhost:8000"
@@ -55,6 +56,22 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
   
   // Track the current streaming message ID
   const currentMessageIdRef = useRef<string | null>(null)
+  
+  // Buffer for accumulated content during streaming (prevents race conditions)
+  const streamBufferRef = useRef<{
+    rawContent: string
+    content: string
+    reasoning?: string
+    sources?: any[]
+    citations?: any[]
+    thinkingTrace?: ThinkingStep[]
+    metadata?: Record<string, any>
+    evaluation?: any
+    structuredOutput?: any
+  }>({
+    rawContent: "",
+    content: ""
+  })
 
   // Fetch messages when chatId changes
   useEffect(() => {
@@ -73,17 +90,25 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
         })
         if (res.ok) {
           const data = await res.json()
-          // Restore chain of thought from message metadata
-          const messagesWithChainOfThought = data.map((msg: any) => {
+          // Restore thinking trace, sources, and evaluation from message metadata
+          const messagesWithMetadata = data.map((msg: any) => {
             if (msg.role === "assistant") {
-              // Restore chain of thought from message metadata
-              if (msg.metadata?.queue_steps) {
-                // Convert saved queue_steps back to chainOfThought format
+              // Restore thinking trace from message metadata (new format)
+              if (msg.metadata?.thinking_steps) {
+                msg.thinkingTrace = msg.metadata.thinking_steps.map((step: any) => ({
+                  step: step.step,
+                  status: "completed" as const, // All restored steps are complete
+                  message: step.message,
+                  result: step.result
+                }))
+              }
+              
+              // Legacy: Restore chain of thought from queue_steps (backwards compat)
+              if (msg.metadata?.queue_steps && !msg.thinkingTrace) {
                 const chainOfThought: ThoughtStep[] = msg.metadata.queue_steps.map((step: any) => ({
                   id: step.id,
                   type: "queue" as const,
                   name: step.label || step.name,
-                  // All restored steps should show as completed since message is already done
                   status: "completed" as const,
                 }))
                 msg.chainOfThought = chainOfThought
@@ -92,11 +117,30 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
               // Restore sources from message metadata
               if (msg.metadata?.sources) {
                 msg.sources = msg.metadata.sources
+                // Also restore citations for inline [1], [2] references
+                msg.citations = msg.metadata.sources.map((s: any, idx: number) => ({
+                  id: `cite-${idx + 1}`,
+                  number: String(idx + 1),
+                  text: s.content?.substring(0, 150) || "",
+                  title: s.title || s.source_file || "Source",
+                  description: s.description || s.content?.substring(0, 100),
+                  url: s.url || `#source-${idx + 1}`,
+                  quote: s.content?.substring(0, 200),
+                  source_file: s.source_file,
+                  module: s.module,
+                  week: s.week,
+                  content: s.content?.substring(0, 150)
+                }))
               }
 
               // Restore evaluation from message metadata
               if (msg.metadata?.evaluation) {
                 msg.evaluation = msg.metadata.evaluation
+              }
+              
+              // Restore reasoning (Gemini thought summaries) from message metadata
+              if (msg.metadata?.reasoning) {
+                msg.reasoning = msg.metadata.reasoning
               }
               
               // Mark as complete since it's from history
@@ -105,7 +149,7 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
             }
             return msg
           })
-          setMessages(messagesWithChainOfThought)
+          setMessages(messagesWithMetadata)
         }
       } catch (e) {
         console.error("Error fetching messages:", e)
@@ -149,28 +193,31 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
 
   /**
    * Process SSE events from the stream
+   * Uses streamBufferRef to accumulate content and prevent race conditions
    */
   const processStreamEvent = useCallback((parsed: any, assistantMessageId: string) => {
     setMessages(prev => prev.map(msg => {
       if (msg.id !== assistantMessageId) return msg
 
       const updatedMsg = { ...msg }
+      const buffer = streamBufferRef.current
 
-      // Text streaming
+      // Text streaming - accumulate in buffer to prevent race conditions
       if (parsed.type === "text-delta") {
-        updatedMsg.rawContent = (updatedMsg.rawContent || updatedMsg.content) + parsed.textDelta
+        // Accumulate in buffer (source of truth during streaming)
+        buffer.rawContent = (buffer.rawContent || "") + parsed.textDelta
 
-        let processedContent = updatedMsg.rawContent
+        let processedContent = buffer.rawContent
 
         // Extract XML thinking tags
         const thinkingMatch = processedContent.match(/<thinking>([\s\S]*?)<\/thinking>/)
         const openThinkingMatch = processedContent.match(/<thinking>([\s\S]*)$/)
 
         if (thinkingMatch) {
-          updatedMsg.reasoning = thinkingMatch[1]
+          buffer.reasoning = thinkingMatch[1]
           processedContent = processedContent.replace(/<thinking>[\s\S]*?<\/thinking>/, "")
         } else if (openThinkingMatch) {
-          updatedMsg.reasoning = openThinkingMatch[1]
+          buffer.reasoning = openThinkingMatch[1]
           processedContent = processedContent.replace(/<thinking>[\s\S]*$/, "")
         }
 
@@ -181,23 +228,59 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
         processedContent = processedContent.replace(/```json\n?\s*\{[\s\S]*?"perception"[\s\S]*?\}\s*\n?```/gi, "")
         processedContent = processedContent.replace(/\{[\s\S]*?"perception"\s*:\s*\{[\s\S]*?"query_type"[\s\S]*?\}\s*\}/g, "")
 
-        updatedMsg.content = processedContent
+        // Update buffer and message
+        buffer.content = processedContent
+        updatedMsg.rawContent = buffer.rawContent
+        updatedMsg.content = buffer.content
+        updatedMsg.reasoning = buffer.reasoning
+
+        // Try to parse partial JSON for structured output (Manual Streaming)
+        const partialJson = safeParsePartialJson(buffer.rawContent)
+        if (partialJson && typeof partialJson === 'object') {
+          buffer.structuredOutput = partialJson
+          updatedMsg.structuredOutput = partialJson
+        }
 
       // Reasoning/thinking delta
       } else if (parsed.type === "reasoning-delta") {
-        updatedMsg.reasoning = (updatedMsg.reasoning || "") + parsed.reasoningDelta
+        buffer.reasoning = (buffer.reasoning || "") + parsed.reasoningDelta
+        updatedMsg.reasoning = buffer.reasoning
 
-      // Sources from RAG retrieval
+      // Sources from RAG retrieval - store in buffer for persistence
       } else if (parsed.type === "sources") {
-        updatedMsg.sources = parsed.sources?.map((s: any, idx: number) => ({
+        const sources = parsed.sources?.map((s: any, idx: number) => ({
           id: s.id || `src-${idx}`,
           title: s.title || s.source_file || "Source",
           source_file: s.source_file,
           page: s.page,
           description: s.description || s.content?.substring(0, 100),
           content: s.content,
-          url: s.url
+          url: s.url,
+          module: s.module,
+          week: s.week
         }))
+        
+        // Create numbered citations from sources for inline [1], [2] references
+        const citations = parsed.sources?.map((s: any, idx: number) => ({
+          id: `cite-${idx + 1}`,
+          number: String(idx + 1),  // "1", "2", "3", etc.
+          text: s.content?.substring(0, 150) || "",
+          title: s.title || s.source_file || "Source",
+          description: s.description || s.content?.substring(0, 100),
+          url: s.url || `#source-${idx + 1}`,  // Fallback URL for local sources
+          quote: s.content?.substring(0, 200),
+          source_file: s.source_file,
+          module: s.module,  // Pass module for badge display
+          week: s.week,      // Pass week for badge display
+          content: s.content?.substring(0, 150)  // Content preview
+        }))
+        
+        // Store in buffer for finish handler
+        buffer.sources = sources
+        buffer.citations = citations
+        
+        updatedMsg.sources = sources
+        updatedMsg.citations = citations
 
         // Also add sources to the most recent search step in chain of thought
         if (updatedMsg.chainOfThought) {
@@ -232,24 +315,44 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
             : step
         )
 
-      // Queue initialization - add pipeline steps to chain of thought
-      } else if (parsed.type === "queue-init") {
-        const pipelineSteps: ThoughtStep[] = parsed.queue?.map((q: any) => ({
-          id: q.id,
-          type: "queue" as const,
-          name: q.label || q.name,
-          status: (q.status === "waiting" ? "pending" : q.status || "pending") as ThoughtStep["status"],
-        })) || []
-        updatedMsg.chainOfThought = pipelineSteps
-
-      // Queue item updated - update in chain of thought
-      } else if (parsed.type === "queue-update") {
-        const newStatus = parsed.status === "waiting" ? "pending" : parsed.status
-        updatedMsg.chainOfThought = updatedMsg.chainOfThought?.map(step =>
-          step.id === parsed.queueItemId
-            ? { ...step, status: newStatus as ThoughtStep["status"] }
-            : step
-        )
+      // Structured thinking events from agent pipeline
+      // Shows scope check, classification, escalation decisions, RAG retrieval
+      } else if (parsed.type === "thinking") {
+        const step = parsed.step as ThinkingStepType
+        const status = parsed.status as ThinkingStep["status"]
+        const message = parsed.message || ""
+        const result = parsed.result || {}
+        
+        if (isDevelopment) {
+          console.log("🧠 Thinking step:", step, status, message)
+        }
+        
+        // Initialize thinkingTrace in buffer if not present
+        if (!buffer.thinkingTrace) {
+          buffer.thinkingTrace = []
+        }
+        if (!updatedMsg.thinkingTrace) {
+          updatedMsg.thinkingTrace = []
+        }
+        
+        // Find existing step or add new one
+        const existingStepIndex = buffer.thinkingTrace.findIndex(s => s.step === step)
+        if (existingStepIndex >= 0) {
+          // Update existing step in buffer
+          buffer.thinkingTrace = buffer.thinkingTrace.map((s, i) =>
+            i === existingStepIndex 
+              ? { ...s, status, result, message }
+              : s
+          )
+        } else {
+          // Add new step to buffer
+          buffer.thinkingTrace = [
+            ...buffer.thinkingTrace,
+            { step, status, result, message }
+          ]
+        }
+        // Sync to message
+        updatedMsg.thinkingTrace = [...buffer.thinkingTrace]
 
       // NEW: Chain-of-Thought reasoning steps from backend
       // Based on "Chain-of-Thought Prompting Elicits Reasoning" paper
@@ -318,7 +421,7 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
           }
         }
 
-      // Evaluation scores (agent badge, concept, quality metrics)
+      // Evaluation scores (agent badge, concept, quality metrics) - store in buffer
       } else if (parsed.type === "evaluation") {
         if (isDevelopment) {
           console.log("📊 Received evaluation event:", {
@@ -327,6 +430,13 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
             confidence: parsed.evaluation?.confidence
           })
         }
+        // Store in buffer for finish handler
+        buffer.evaluation = parsed.evaluation
+        buffer.metadata = {
+          ...buffer.metadata,
+          evaluation: parsed.evaluation
+        }
+        
         updatedMsg.evaluation = parsed.evaluation
         // Also update metadata for persistence
         updatedMsg.metadata = {
@@ -334,10 +444,38 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
           evaluation: parsed.evaluation
         }
 
-      // Metadata on finish - mark stream as complete
+      // Metadata on finish - mark stream as complete and preserve buffer content
       } else if (parsed.type === "finish") {
+        const buffer = streamBufferRef.current
+        
+        // CRITICAL: Ensure content from buffer is preserved in final message
+        // This prevents the "disappearing content" issue
+        if (buffer.content) {
+          updatedMsg.content = buffer.content
+          updatedMsg.rawContent = buffer.rawContent
+        }
+        if (buffer.reasoning) {
+          updatedMsg.reasoning = buffer.reasoning
+        }
+        if (buffer.sources && buffer.sources.length > 0) {
+          updatedMsg.sources = buffer.sources
+        }
+        if (buffer.citations && buffer.citations.length > 0) {
+          updatedMsg.citations = buffer.citations
+        }
+        if (buffer.thinkingTrace && buffer.thinkingTrace.length > 0) {
+          updatedMsg.thinkingTrace = buffer.thinkingTrace
+        }
+        if (buffer.evaluation) {
+          updatedMsg.evaluation = buffer.evaluation
+        }
+        if (buffer.structuredOutput) {
+          updatedMsg.structuredOutput = buffer.structuredOutput
+        }
+        
         updatedMsg.metadata = {
           ...updatedMsg.metadata,
+          ...buffer.metadata,
           traceId: parsed.traceId,
           chatId: parsed.chatId
         }
@@ -346,6 +484,12 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
         updatedMsg.status = "complete"
         // Mark any remaining steps as complete
         updatedMsg.chainOfThought = updatedMsg.chainOfThought?.map(step =>
+          step.status === "processing" || step.status === "pending"
+            ? { ...step, status: "completed" as const }
+            : step
+        )
+        // Mark thinkingTrace steps as complete
+        updatedMsg.thinkingTrace = updatedMsg.thinkingTrace?.map(step =>
           step.status === "processing" || step.status === "pending"
             ? { ...step, status: "completed" as const }
             : step
@@ -381,6 +525,19 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
 
     setMessages(prev => [...prev, userMessage])
 
+    // Reset stream buffer for new message (prevents stale data from previous stream)
+    streamBufferRef.current = {
+      rawContent: "",
+      content: "",
+      reasoning: undefined,
+      sources: undefined,
+      citations: undefined,
+      thinkingTrace: undefined,
+      metadata: undefined,
+      evaluation: undefined,
+      structuredOutput: undefined
+    }
+
     // Create placeholder assistant message
     const assistantMessageId = (Date.now() + 1).toString()
     currentMessageIdRef.current = assistantMessageId
@@ -390,7 +547,8 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
       role: "assistant",
       content: "",
       rawContent: "",
-      // Initialize unified chain of thought steps
+      // Initialize for structured thinking display
+      thinkingTrace: [],
       chainOfThought: [],
     }
     setMessages(prev => [...prev, assistantMessage])

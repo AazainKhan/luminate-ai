@@ -1,0 +1,20 @@
+{
+  "comp237_course_id": "_11378_1",
+  "description": "COMP237 Blackboard course ID - Extracted from course export res00001.dat",
+  "instructions": [
+    "1. Course ID found in ExportFile_COMP237/res00001.dat",
+    "2. <COURSE id=\"_11378_1\"> confirmed",
+    "3. COURSEID: COMP237_INP.DEV",
+    "4. Title: Introduction to AI (In Person) Development",
+    "5. Status: CONFIGURED ✅"
+  ],
+  "last_updated": "2024-12-07",
+  "status": "configured",
+  "verification": {
+    "course_id": "_11378_1",
+    "course_code": "COMP237_INP.DEV",
+    "title": "Introduction to AI (In Person) Development",
+    "total_content_items": 403,
+    "blackboard_url_pattern": "https://luminate.centennialcollege.ca/ultra/courses/_11378_1/outline/edit/document/{CONTENT_ID}?courseId=_11378_1&view=content"
+  }
+}

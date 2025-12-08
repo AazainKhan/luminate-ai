@@ -20,7 +20,6 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { Switch } from "@/components/ui/switch"
 import { Label } from "@/components/ui/label"
 import { TooltipProvider, Tooltip, TooltipTrigger, TooltipContent } from "@/components/ui/tooltip"
-import { ModelSelector } from "./model-selector"
 
 // ============================================================================
 // Context
@@ -409,11 +408,9 @@ interface LegacyPromptInputProps {
   onExport?: () => void
   onStop?: () => void
   hasMessages?: boolean
-  model?: string
-  onModelChange?: (model: string) => void
 }
 
-function PromptInput({ input, setInput, onSend, isLoading, onExport, onStop, hasMessages, model, onModelChange }: LegacyPromptInputProps) {
+function PromptInput({ input, setInput, onSend, isLoading, onExport, onStop, hasMessages }: LegacyPromptInputProps) {
   const textareaRef = React.useRef<HTMLTextAreaElement>(null)
 
   // Options that actually affect behavior
@@ -447,21 +444,11 @@ function PromptInput({ input, setInput, onSend, isLoading, onExport, onStop, has
       <div className="relative z-10 max-w-3xl mx-auto w-full">
         <form
           onSubmit={handleSubmit}
-          className="relative bg-card rounded-2xl border-0 shadow-lg overflow-hidden"
+          className="relative bg-card rounded-2xl border border-border/50 shadow-xl overflow-hidden"
         >
           {/* Header - Simplified toolbar */}
-          <div className="flex items-center justify-between px-3 py-2 border-b border-border/50 bg-card/90">
+          <div className="flex items-center justify-between px-3 py-2 bg-card/90">
             <div className="flex items-center gap-1.5 w-full">
-              {/* Model Selector - Leftmost */}
-              <ModelSelector 
-                value={model}
-                onValueChange={onModelChange}
-                size="sm"
-                className="h-7"
-              />
-
-              <div className="h-4 w-px bg-border mx-1" />
-
               {/* Options Popover */}
               <Popover>
                 <Tooltip>
@@ -586,7 +573,7 @@ function PromptInput({ input, setInput, onSend, isLoading, onExport, onStop, has
               onChange={(e) => setInput(e.target.value)}
               placeholder={getPlaceholder()}
               data-testid="prompt-input"
-              className="min-h-[44px] max-h-[180px] w-full resize-none bg-transparent border-none p-0 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 leading-relaxed pr-24"
+              className="min-h-[44px] max-h-[180px] w-full resize-none bg-transparent border-none shadow-none p-0 text-sm text-foreground placeholder:text-muted-foreground focus-visible:ring-0 focus-visible:ring-offset-0 leading-relaxed pr-24"
               rows={1}
               onKeyDown={(e) => {
                 if (e.key === "Enter" && !e.shiftKey) {

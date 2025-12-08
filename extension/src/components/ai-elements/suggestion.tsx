@@ -1,50 +1,113 @@
 "use client"
 
+import * as React from "react"
 import { Sparkles } from "lucide-react"
 import { Button } from "@/components/ui/button"
+import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area"
 import { cn } from "@/lib/utils"
 
-interface SuggestionProps {
-  text: string
-  onSelect?: () => void
+// ============================================================================
+// Suggestions Container (horizontal scrollable)
+// ============================================================================
+
+interface SuggestionsProps {
+  children: React.ReactNode
   className?: string
 }
 
-export function Suggestion({ text, onSelect, className }: SuggestionProps) {
+export function Suggestions({ className, children }: SuggestionsProps) {
+  return (
+    <ScrollArea className="w-full overflow-x-auto whitespace-nowrap">
+      <div className={cn("flex w-max flex-nowrap items-center gap-2 pb-2", className)}>
+        {children}
+      </div>
+      <ScrollBar className="hidden" orientation="horizontal" />
+    </ScrollArea>
+  )
+}
+
+// ============================================================================
+// Individual Suggestion Button
+// ============================================================================
+
+interface SuggestionProps extends Omit<React.ComponentProps<typeof Button>, 'onClick'> {
+  suggestion: string
+  onClick?: (suggestion: string) => void
+  icon?: React.ReactNode
+}
+
+export function Suggestion({ 
+  suggestion, 
+  onClick, 
+  icon,
+  className, 
+  variant = "outline",
+  size = "sm",
+  children,
+  ...props 
+}: SuggestionProps) {
+  const handleClick = () => {
+    onClick?.(suggestion)
+  }
+
   return (
     <Button
-      variant="outline"
-      size="sm"
       className={cn(
-        "bg-muted/50 border-border hover:bg-muted text-foreground text-sm h-auto py-2 px-3 transition-colors",
+        "cursor-pointer rounded-full px-4 h-8",
+        "bg-muted/50 border-border/50 hover:bg-muted hover:border-border",
+        "text-foreground text-sm transition-all duration-200",
+        "hover:shadow-sm",
         className
       )}
-      onClick={onSelect}
+      onClick={handleClick}
+      size={size}
+      type="button"
+      variant={variant}
+      {...props}
     >
-      <Sparkles className="h-3 w-3 mr-1.5 text-violet-400" />
-      {text}
+      {icon || <Sparkles className="h-3 w-3 mr-1.5 text-violet-400" />}
+      {children || suggestion}
     </Button>
   )
 }
 
-interface SuggestionListProps {
-  suggestions: string[]
-  onSelect?: (suggestion: string) => void
+// ============================================================================
+// Smart Suggestions (context-aware suggestions for COMP 237)
+// ============================================================================
+
+interface SmartSuggestionsProps {
+  onSelect: (suggestion: string) => void
+  messageCount?: number
   className?: string
 }
 
-export function SuggestionList({ suggestions, onSelect, className }: SuggestionListProps) {
-  if (!suggestions || suggestions.length === 0) return null
+// Context-aware suggestions based on conversation state
+const INITIAL_SUGGESTIONS = [
+  "Explain backpropagation step by step",
+  "What is gradient descent?",
+  "How do neural networks learn?",
+  "Compare supervised vs unsupervised learning",
+]
+
+const FOLLOW_UP_SUGGESTIONS = [
+  "Can you give me an example?",
+  "Explain this more simply",
+  "How does this apply to the assignment?",
+  "Quiz me on this topic",
+]
+
+export function SmartSuggestions({ onSelect, messageCount = 0, className }: SmartSuggestionsProps) {
+  const suggestions = messageCount === 0 ? INITIAL_SUGGESTIONS : FOLLOW_UP_SUGGESTIONS
   
   return (
-    <div className={cn("flex flex-wrap gap-2", className)}>
-      {suggestions.map((suggestion, index) => (
+    <Suggestions className={className}>
+      {suggestions.map((suggestion) => (
         <Suggestion
-          key={index}
-          text={suggestion}
-          onSelect={() => onSelect?.(suggestion)}
+          key={suggestion}
+          suggestion={suggestion}
+          onClick={onSelect}
         />
       ))}
-    </div>
+    </Suggestions>
   )
 }

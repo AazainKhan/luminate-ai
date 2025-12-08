@@ -1,6 +1,38 @@
 /**
- * Unified thought step for Chain of Thought display
- * Combines queue items, tool calls, and reasoning into a single type
+ * Structured thinking step from agent execution
+ * Matches backend ThinkingStep Pydantic schema
+ * 
+ * Step types:
+ * - scope_check: Verifying question is within COMP237 scope
+ * - integrity_check: Checking for academic integrity violations
+ * - mastery_lookup: Fetching student's current mastery level
+ * - escalation: Deciding scaffolding level (1-4)
+ * - classification: Determining task type (explain/solve/code)
+ * - rag_retrieval: Searching course materials
+ * - strategy: Selecting teaching strategy
+ * - concept_detection: Identifying AI/ML concept in response
+ */
+export type ThinkingStepType = 
+  | "scope_check" 
+  | "integrity_check"
+  | "mastery_lookup"
+  | "escalation"
+  | "classification"
+  | "rag_retrieval"
+  | "strategy"
+  | "concept_detection"
+
+export interface ThinkingStep {
+  step: ThinkingStepType
+  status: "pending" | "processing" | "completed" | "error"
+  result?: Record<string, any>
+  message?: string
+  duration_ms?: number
+}
+
+/**
+ * Legacy ThoughtStep for backwards compatibility
+ * Used by older queue-based UI components
  */
 export interface ThoughtStep {
   id: string
@@ -27,10 +59,20 @@ export interface Message {
     source_file?: string
     page?: number | string
     content?: string
+    // Multi-collection support (from RAG v2)
+    source_type?: "course" | "oer" | "embedded"
+    citation_confidence?: "high" | "medium" | "low"
+    link_type?: "blackboard" | "mediasite" | "generic_url"
   }>
   attachments?: File[]
   
-  // NEW: Unified Chain of Thought (replaces separate queue/tools/tasks)
+  // Structured output parsed from partial JSON (for manual streaming)
+  structuredOutput?: any
+
+  // NEW: Structured thinking steps from agent (replaces chainOfThought)
+  thinkingTrace?: ThinkingStep[]
+  
+  // Legacy: Unified Chain of Thought (for backwards compat)
   chainOfThought?: ThoughtStep[]
   
   // Legacy: Task management (AI SDK task element) - kept for backwards compat
@@ -87,6 +129,12 @@ export interface Message {
     description?: string
     quote?: string
     source_file?: string
+    /** Module name (e.g., "Module 4") */
+    module?: string
+    /** Week number (1-14) */
+    week?: number
+    /** Content snippet for preview */
+    content?: string
   }>
   
   // Chain of thought / reasoning steps (AI SDK reasoning element)
@@ -110,6 +158,7 @@ export interface Message {
     model?: string
     scaffoldingLevel?: string
     executionTimeMs?: number
+    detectedConcepts?: string[]
     evaluation?: {
       confidence: number
       passed: boolean

@@ -6,6 +6,7 @@ from app.observability.langfuse_client import (
     create_trace,
     flush_langfuse,
     create_child_span_from_state,
+    calculate_cost,
 )
 
 __all__ = [
@@ -14,6 +15,7 @@ __all__ = [
     "create_trace",
     "flush_langfuse",
     "create_child_span_from_state",
+    "calculate_cost",
 ]
 
 

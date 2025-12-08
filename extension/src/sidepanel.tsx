@@ -4,6 +4,7 @@ import { useAuth } from "~/hooks/useAuth"
 import { LoginForm } from "~/components/auth/LoginForm"
 import { Conversation } from "~/components/chat/Conversation"
 import { PromptInput } from "~/components/chat/prompt-input"
+import { SmartSuggestions } from "~/components/ai-elements/suggestion"
 import { NavRail } from "~/components/nav-rail"
 import useChat from "~/hooks/use-chat"
 import { ThemeProvider } from "~/components/theme-provider"
@@ -12,7 +13,6 @@ import "./style.css"
 
 function AuthenticatedChatView({ user, session }: { user: User; session: Session }) {
   const [activeChatId, setActiveChatId] = useState<string | undefined>(undefined)
-  const [selectedModel, setSelectedModel] = useState<string | undefined>(undefined)
 
   // Handle when backend creates a new chat - update activeChatId so subsequent messages
   // are added to the same chat instead of creating new ones
@@ -24,7 +24,6 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
     session,
     chatId: activeChatId,
     onChatCreated: handleChatCreated,
-    model: selectedModel
   })
   const [input, setInput] = useState("")
 
@@ -56,7 +55,7 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
       if (msg.sources && msg.sources.length > 0) {
         markdown += `**Sources:**\n`
         for (const source of msg.sources) {
-          markdown += `- ${source.file || source.source || 'Course Material'}\n`
+          markdown += `- ${source.title || source.source_file || 'Course Material'}\n`
         }
         markdown += '\n'
       }
@@ -108,7 +107,17 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
         </div>
 
         {/* Input Area - Sticky Bottom */}
-        <div className="shrink-0 w-full bg-gradient-to-t from-background via-background to-transparent pt-16 pb-10 px-6">
+        <div className="shrink-0 w-full bg-gradient-to-t from-background via-background to-transparent pt-8 pb-10 px-6">
+          {/* Smart Suggestions - Above Input */}
+          <div className="max-w-3xl mx-auto mb-3">
+            <SmartSuggestions 
+              onSelect={(suggestion) => {
+                setInput(suggestion)
+              }}
+              messageCount={messages.length}
+            />
+          </div>
+          
           <PromptInput
             input={input}
             setInput={setInput}
@@ -117,8 +126,6 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
             onStop={stop}
             onExport={handleExportChat}
             hasMessages={messages.length > 0}
-            model={selectedModel}
-            onModelChange={setSelectedModel}
           />
         </div>
       </div>
@@ -180,7 +187,7 @@ function IndexSidepanel() {
 
   return (
     <ThemeProvider attribute="class" defaultTheme="dark" enableSystem={true}>
-      <AuthenticatedChatView user={user} session={session} />
+      <AuthenticatedChatView user={user} session={session!} />
     </ThemeProvider>
   )
 }

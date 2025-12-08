@@ -1,76 +1,34 @@
-/**
- * Playwright Test Fixtures for Chrome Extension Testing
- * 
- * Uses launchPersistentContext with extension loading args
- * per Playwright's official Chrome extension documentation.
- */
-
 import { test as base, chromium, type BrowserContext } from '@playwright/test';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import fs from 'fs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-
-// Path to the built extension - use dev build for testing
-const EXTENSION_PATH_DEV = path.join(__dirname, '..', '..', 'build', 'chrome-mv3-dev');
-const EXTENSION_PATH_PROD = path.join(__dirname, '..', '..', 'build', 'chrome-mv3-prod');
-
-// Use dev build for testing (matches `pnpm dev` output), fall back to prod
-const EXTENSION_PATH = fs.existsSync(EXTENSION_PATH_DEV) ? EXTENSION_PATH_DEV : EXTENSION_PATH_PROD;
 
 export const test = base.extend<{
   context: BrowserContext;
   extensionId: string;
 }>({
-  // Override context to load extension
-  context: async ({}, use) => {
+  context: async ({ }, use) => {
+    const pathToExtension = path.join(__dirname, '../../build/chrome-mv3-prod');
     const context = await chromium.launchPersistentContext('', {
-      headless: false, // Extensions require headed mode
+      headless: false,
       args: [
-        `--disable-extensions-except=${EXTENSION_PATH}`,
-        `--load-extension=${EXTENSION_PATH}`,
-        '--no-first-run',
-        '--no-default-browser-check',
+        `--disable-extensions-except=${pathToExtension}`,
+        `--load-extension=${pathToExtension}`,
       ],
     });
     await use(context);
     await context.close();
   },
-
-  // Get extension ID from service worker
   extensionId: async ({ context }, use) => {
-    // For Manifest V3, we get the extension ID from the service worker
-    let serviceWorker = context.serviceWorkers()[0];
-    
-    if (!serviceWorker) {
-      // Wait for service worker to register
-      serviceWorker = await context.waitForEvent('serviceworker', { timeout: 30000 });
-    }
+    let [background] = context.serviceWorkers();
+    if (!background)
+      background = await context.waitForEvent('serviceworker');
 
-    const extensionId = serviceWorker.url().split('/')[2];
+    const extensionId = background.url().split('/')[2];
     await use(extensionId);
   },
 });
 
-export const expect = test.expect;
-
-// Helper to navigate to extension pages
-export async function navigateToSidePanel(context: BrowserContext, extensionId: string) {
-  const page = await context.newPage();
-  await page.goto(`chrome-extension://${extensionId}/sidepanel.html`);
-  return page;
-}
-
-export async function navigateToPopup(context: BrowserContext, extensionId: string) {
-  const page = await context.newPage();
-  await page.goto(`chrome-extension://${extensionId}/popup.html`);
-  return page;
-}
-
-export async function navigateToOptions(context: BrowserContext, extensionId: string) {
-  const page = await context.newPage();
-  await page.goto(`chrome-extension://${extensionId}/options.html`);
-  return page;
-}
+export const expect = base.expect;

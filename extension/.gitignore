@@ -25,3 +25,7 @@ Thumbs.db
 test-output/*
 !test-output/.gitkeep
 wdio-logs/
+
+.github/
+.gemini/
+.cursorrules

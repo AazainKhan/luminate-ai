@@ -1,8 +1,10 @@
 "use client"
 
 import * as React from "react"
-import { ChevronRight, Link2, ExternalLink, FileText } from "lucide-react"
+import { ChevronRight, Link2, ExternalLink, FileText, Video, BookOpen, Globe, GraduationCap } from "lucide-react"
 import { cn } from "@/lib/utils"
+import { Skeleton } from "@/components/ui/skeleton"
+import { Badge } from "@/components/ui/badge"
 import * as CollapsiblePrimitive from "@radix-ui/react-collapsible"
 
 // Context for sharing state across components
@@ -195,10 +197,17 @@ interface SourceProps extends React.AnchorHTMLAttributes<HTMLAnchorElement> {
   page?: number | string
   /** Index for stagger animation */
   index?: number
+  /** Loading state for skeleton */
+  isLoading?: boolean
+  /** Multi-collection fields (RAG v2) */
+  sourceType?: "course" | "oer" | "embedded"
+  linkType?: "blackboard" | "mediasite" | "generic_url"
+  citationConfidence?: "high" | "medium" | "low"
 }
 
 /**
- * Individual source citation item
+ * Individual source citation item with lazy-loaded contextual descriptions
+ * Enhanced with multi-collection support (course, OER, embedded resources)
  */
 const Source = React.forwardRef<HTMLAnchorElement, SourceProps>(
   ({ 
@@ -210,10 +219,38 @@ const Source = React.forwardRef<HTMLAnchorElement, SourceProps>(
     filename,
     page,
     index = 0,
+    isLoading = false,
+    sourceType = "course",
+    linkType,
+    citationConfidence,
     ...props 
   }, ref) => {
     const hasLink = href && href !== '#'
     const Component = hasLink ? 'a' : 'div'
+    
+    // Icon selection based on source type and link type
+    const Icon = linkType === "blackboard"
+      ? GraduationCap
+      : linkType === "mediasite" 
+        ? Video 
+        : sourceType === "oer" 
+          ? BookOpen 
+          : sourceType === "embedded" 
+            ? Globe 
+            : FileText
+    
+    // Safety check for Icon component
+    if (!Icon) {
+      console.warn('Source icon not found for:', { linkType, sourceType })
+      return null
+    }
+    
+    // Badge color based on source type
+    const badgeVariant = sourceType === "course" 
+      ? "default" 
+      : sourceType === "oer" 
+        ? "secondary" 
+        : "outline"
     
     return (
       <Component
@@ -222,8 +259,9 @@ const Source = React.forwardRef<HTMLAnchorElement, SourceProps>(
         target={hasLink ? "_blank" : undefined}
         rel={hasLink ? "noopener noreferrer" : undefined}
         className={cn(
-          "block rounded-md bg-card/50 p-3 transition-all border border-border/50",
-          hasLink && "hover:bg-muted/50 hover:border-border cursor-pointer",
+          "block rounded-md bg-card/50 p-3 transition-all",
+          "border border-transparent hover:border-blue-500/50",
+          hasLink && "hover:bg-muted/50 cursor-pointer",
           "animate-stagger-in",
           className,
         )}
@@ -231,28 +269,62 @@ const Source = React.forwardRef<HTMLAnchorElement, SourceProps>(
         {...props}
       >
         <div className="flex items-start gap-2">
-          <FileText className="w-4 h-4 text-muted-foreground mt-0.5 shrink-0" />
+          <Icon className={cn(
+            "w-4 h-4 mt-0.5 shrink-0",
+            linkType === "blackboard" ? "text-purple-500" : 
+            linkType === "mediasite" ? "text-blue-500" : "text-muted-foreground"
+          )} />
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2">
-              <span className="text-sm font-medium text-foreground truncate">
-                {title}
-              </span>
-              {hasLink && (
-                <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0" />
-              )}
-            </div>
-            {(filename || page) && (
-              <div className="mt-0.5 text-xs text-muted-foreground truncate">
-                {filename}
-                {filename && page && " • "}
-                {page && `Page ${page}`}
+            <div className="flex items-start gap-2 flex-wrap">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <span className="text-sm font-semibold text-foreground line-clamp-1">
+                    {title}
+                  </span>
+                  {hasLink && (
+                    <ExternalLink className="w-3 h-3 text-muted-foreground shrink-0" />
+                  )}
+                </div>
+                {filename && (
+                  <div className="mt-0.5 text-xs text-muted-foreground/70 line-clamp-1">
+                    {filename}
+                    {page && ` • Page ${page}`}
+                  </div>
+                )}
               </div>
-            )}
-            {description && (
-              <div className="mt-1 text-xs text-muted-foreground/80 line-clamp-2">
+              {/* Badges */}
+              <div className="flex items-center gap-1 shrink-0">
+                {/* Blackboard/Course indicator */}
+                {linkType === "blackboard" && (
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-purple-500 text-purple-500">
+                    COURSE
+                  </Badge>
+                )}
+                {/* Mediasite/Video indicator */}
+                {linkType === "mediasite" && (
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4 border-blue-500 text-blue-500">
+                    VIDEO
+                  </Badge>
+                )}
+                {/* Embedded indicator */}
+                {linkType === "generic_url" && sourceType === "embedded" && (
+                  <Badge variant="outline" className="text-[10px] px-1.5 py-0 h-4">
+                    EMBEDDED
+                  </Badge>
+                )}
+              </div>
+            </div>
+            {/* Description with fade-in animation */}
+            {isLoading ? (
+              <div className="mt-1 space-y-1.5">
+                <Skeleton className="h-3 w-full" />
+                <Skeleton className="h-3 w-4/5" />
+              </div>
+            ) : description ? (
+              <div className="mt-1 text-xs text-muted-foreground/80 line-clamp-2 animate-fade-in">
                 {description}
               </div>
-            )}
+            ) : null}
           </div>
         </div>
         {children}

@@ -1,18 +1,18 @@
 <?xml version="1.0"?>
 <!--
   ClickHouse configuration for Luminate AI development environment.
-  Optimized for lower memory usage to prevent OOM errors.
+  Increased memory for Langfuse trace ingestion.
 -->
 <clickhouse>
-    <!-- Server-wide memory limit (3GB max) -->
-    <max_server_memory_usage>3221225472</max_server_memory_usage>
+    <!-- Server-wide memory limit (6GB max for 8GB Docker limit) -->
+    <max_server_memory_usage>6442450944</max_server_memory_usage>
     
-    <!-- Ratio of RAM to use (70%) -->
-    <max_server_memory_usage_to_ram_ratio>0.7</max_server_memory_usage_to_ram_ratio>
+    <!-- Ratio of RAM to use (80%) -->
+    <max_server_memory_usage_to_ram_ratio>0.8</max_server_memory_usage_to_ram_ratio>
     
-    <!-- Reduce cache sizes for dev environment -->
-    <mark_cache_size>268435456</mark_cache_size>
-    <uncompressed_cache_size>134217728</uncompressed_cache_size>
+    <!-- Increase cache sizes for better performance -->
+    <mark_cache_size>536870912</mark_cache_size>
+    <uncompressed_cache_size>268435456</uncompressed_cache_size>
     
     <!-- Background workers - must be large enough for mutations -->
     <!-- number_of_free_entries_in_pool_to_execute_mutation defaults to 20 -->

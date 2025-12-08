@@ -10,7 +10,7 @@ from typing import List, Dict, Any, Optional
 import asyncio
 
 from app.api.middleware import require_student
-from app.agents.tutor_agent import run_agent
+from app.agent.graph import run_agent, astream_agent  # Use new simplified agent
 from app.observability import get_langfuse_client
 from app.config import settings
 from app.api.routes.history import (
@@ -118,60 +118,65 @@ async def stream_chat(
             return
 
         full_response = ""
+        full_reasoning = ""  # Collect reasoning/thinking for persistence
         trace_id = None
-        queue_steps = []  # Collect queue steps for persistence
+        thinking_steps = []  # Collect thinking trace for persistence
         sources = []  # Collect sources for persistence
         evaluation = None  # Collect evaluation for persistence
 
         try:
-            from app.agents.tutor_agent import astream_agent
-            
-            # Use chat_id as session_id for Langfuse grouping if not provided
-            effective_session_id = request.session_id or chat_id
-            
+            # Use new simplified agent stream
             # Handle "auto" model selection by treating it as None (no override)
             model_to_use = request.model
             if model_to_use == "auto":
                 model_to_use = None
             
-            # Stream events from the agent with conversation history
+            # Use chat_id as session_id for Langfuse grouping if not provided
+            effective_session_id = request.session_id or chat_id
+            
+            # Stream events from the new agent
             async for event in astream_agent(
-                user_message,
-                user_id,
-                user_email,
-                effective_session_id,
+                query=user_message,
+                user_id=user_id,
+                user_email=user_email,
+                session_id=effective_session_id,
                 chat_id=chat_id,
                 conversation_history=conversation_history,
                 model=model_to_use
             ):
                 if event.get("type") == "text-delta":
                     full_response += event.get("textDelta", "")
+                if event.get("type") == "reasoning-delta":
+                    full_reasoning += event.get("reasoningDelta", "")
                 if event.get("type") == "trace-id":
                     trace_id = event.get("traceId")
-                # Collect queue events for persistence in message metadata
-                if event.get("type") == "queue-init":
-                    queue_steps = event.get("queue", [])
+                # Collect thinking events for persistence (replaces queue-init)
+                if event.get("type") == "thinking":
+                    step_data = {
+                        "step": event.get("step"),
+                        "status": event.get("status"),
+                        "message": event.get("message"),
+                        "result": event.get("result")
+                    }
+                    # Update existing step or add new one
+                    existing_idx = next((i for i, s in enumerate(thinking_steps) if s["step"] == step_data["step"]), None)
+                    if existing_idx is not None:
+                        thinking_steps[existing_idx] = step_data
+                    else:
+                        thinking_steps.append(step_data)
                 # Collect sources for persistence
                 if event.get("type") == "sources":
                     sources = event.get("sources", [])
                 # Collect evaluation for persistence
                 if event.get("type") == "evaluation":
                     evaluation = event.get("evaluation")
-                if event.get("type") == "queue-update":
-                    # Update the status of the matching queue step
-                    # Backend sends queueItemId, match it with step id
-                    step_id = event.get("queueItemId") or event.get("stepId")
-                    status = event.get("status")
-                    for step in queue_steps:
-                        if step.get("id") == step_id:
-                            step["status"] = status
-                            break
                 yield f'data: {json.dumps(event)}\n\n'
 
-            # Save assistant message with metadata including queue steps, sources, and evaluation
+            # Save assistant message with metadata including thinking steps, sources, reasoning, and evaluation
             metadata = {
                 "trace_id": trace_id,
-                "queue_steps": queue_steps,  # Persist chain of thought steps
+                "thinking_steps": thinking_steps,  # Persist thinking trace (new)
+                "reasoning": full_reasoning if full_reasoning else None,  # Persist Gemini reasoning
                 "sources": sources,  # Persist sources
                 "evaluation": evaluation  # Persist evaluation scores
             }
