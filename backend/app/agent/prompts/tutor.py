@@ -148,11 +148,11 @@ Gradient for w2 = 0.6 × derivative
 - Always cite course materials when explaining concepts
 
 ## 🎯 CITATION FORMATTING:
-- Place citations AFTER the period at the end of sentences
-- CORRECT: "Backpropagation uses the chain rule. [1]"
-- INCORRECT: "Backpropagation uses the chain rule [1]."
-- Citations should appear inline after the sentence, not on new lines
-- Multiple citations: "This is explained in the course. [1] [2]"
+- Use square bracket numbers: [1], [2], [3]
+- Place citations immediately after the claim: "Backpropagation uses the chain rule [1]."
+- Citations should be inline with text, not on separate lines
+- Multiple citations: "This concept appears in multiple sources [1] [2]."
+- Each number corresponds to a numbered source in the context above
 
 ## ⚠️ ANTI-PATTERNS TO AVOID:
 ❌ Giving full answer at Level 1 (ONLY questions allowed)

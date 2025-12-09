@@ -94,9 +94,9 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
     .join("")
     .toUpperCase()
     .slice(0, 2)
-  
+
   // Mock Role - in real app, get from user metadata
-  const role = "Student" 
+  const role = "Student"
 
   // Tree View State
   const [sections, setSections] = useState({
@@ -104,25 +104,25 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
     recent: true,
     folders: false
   })
-  
+
   // Search state
   const [searchQuery, setSearchQuery] = useState("")
-  
+
   // Sort option
   const [sortBy, setSortBy] = useState<SortOption>("date-edited")
-  
+
   const { items, createFolder, createChat, deleteItem, updateFolder, updateChat, toggleStar: toggleStarApi, moveItem } = useHistory()
 
   // Chat items state
   const [starredChats, setStarredChats] = useState<ChatItem[]>([])
   const [recentChats, setRecentChats] = useState<ChatItem[]>([])
   const [folderItems, setFolderItems] = useState<ChatItem[]>([])
-  
+
   const [starredItems, setStarredItems] = useState<Set<string>>(new Set())
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editValue, setEditValue] = useState("")
   const searchInputRef = useRef<HTMLInputElement>(null)
-  
+
   // Expanded folders state
   const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set())
 
@@ -135,7 +135,7 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
       icon: MessageSquare,
       folderId: i.folderId
     })) as ChatItem[]
-    
+
     const folders = items.filter(i => i.type === "folder").map(i => ({
       ...i,
       icon: Folder,
@@ -144,14 +144,14 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
 
     setRecentChats(chats)
     setFolderItems(folders)
-    
+
     // Sync starred items from backend
     const starredSet = new Set<string>()
     items.forEach(i => {
       if (i.isStarred) starredSet.add(i.id)
     })
     setStarredItems(starredSet)
-    
+
     // For starred, we filter from all items based on starredItems set
     const starred = items.filter(i => i.isStarred).map(i => ({
       ...i,
@@ -176,7 +176,7 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
   const toggleSection = (section: keyof typeof sections) => {
     setSections(prev => ({ ...prev, [section]: !prev[section] }))
   }
-  
+
   const toggleFolder = (folderId: string) => {
     setExpandedFolders(prev => {
       const next = new Set(prev)
@@ -185,7 +185,7 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
       return next
     })
   }
-  
+
   const toggleStar = async (itemId: string) => {
     const item = items.find(i => i.id === itemId)
     if (item) {
@@ -270,7 +270,7 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
   const RecursiveFolder = ({ item, depth = 0 }: { item: ChatItem, depth?: number }) => {
     const children = items.filter(i => i.folderId === item.id || i.parentId === item.id)
     const isFolderExpanded = expandedFolders.has(item.id)
-    
+
     // Sort children
     const sortedChildren = sortItems(children as ChatItem[])
 
@@ -300,7 +300,7 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                 child.type === 'folder' ? (
                   <RecursiveFolder key={child.id} item={child} depth={depth + 1} />
                 ) : (
-                  <TreeItem 
+                  <TreeItem
                     key={child.id}
                     itemId={child.id}
                     icon={MessageSquare}
@@ -351,17 +351,17 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                     </div>
                     <span className="text-sm font-bold text-foreground tracking-tight">Luminate AI</span>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    className="h-6 w-6 text-muted-foreground hover:text-foreground" 
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="h-6 w-6 text-muted-foreground hover:text-foreground"
                     onClick={() => setIsExpanded(false)}
                     data-testid="nav-rail-collapse"
                   >
                     <PanelLeftClose className="w-3.5 h-3.5" />
                   </Button>
                 </div>
-                
+
                 {/* Search Bar */}
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
@@ -378,9 +378,9 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                     <Tooltip>
                       <TooltipTrigger asChild>
                         <DropdownMenuTrigger asChild>
-                          <Button 
-                            size="icon" 
-                            variant="ghost" 
+                          <Button
+                            size="icon"
+                            variant="ghost"
                             className="h-7 w-7 bg-violet-600 hover:bg-violet-500 text-white shrink-0"
                             data-testid="new-button"
                           >
@@ -391,16 +391,16 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                       <TooltipContent side="right">New</TooltipContent>
                     </Tooltip>
                     <DropdownMenuContent align="end" className="w-40 bg-popover border-border" data-testid="new-menu-content">
-                      <DropdownMenuItem 
-                        onClick={handleNewChat} 
+                      <DropdownMenuItem
+                        onClick={handleNewChat}
                         className="cursor-pointer text-popover-foreground focus:bg-accent focus:text-accent-foreground"
                         data-testid="new-chat-item"
                       >
                         <MessageSquarePlus className="w-4 h-4 mr-2" />
                         New chat
                       </DropdownMenuItem>
-                      <DropdownMenuItem 
-                        onClick={handleNewFolder} 
+                      <DropdownMenuItem
+                        onClick={handleNewFolder}
                         className="cursor-pointer text-popover-foreground focus:bg-accent focus:text-accent-foreground"
                         data-testid="new-folder-item"
                       >
@@ -416,10 +416,10 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                 <div className="h-8 w-8 bg-gradient-to-br from-violet-500 to-violet-600 rounded-lg flex items-center justify-center text-white font-bold text-sm shadow-lg">
                   L
                 </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  className="h-6 w-6 text-muted-foreground hover:text-foreground" 
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-6 w-6 text-muted-foreground hover:text-foreground"
                   onClick={() => setIsExpanded(true)}
                   data-testid="nav-rail-expand"
                 >
@@ -427,9 +427,9 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                 </Button>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="h-6 w-6 text-muted-foreground hover:text-foreground"
                       onClick={() => {
                         setIsExpanded(true)
@@ -443,9 +443,9 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                 </Tooltip>
                 <Tooltip>
                   <TooltipTrigger asChild>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="h-6 w-6 text-muted-foreground hover:text-foreground"
                       onClick={handleNewChat}
                     >
@@ -460,77 +460,48 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
 
           {/* Tree View Content - Law of Proximity: Group related items */}
           <ScrollArea className="flex-1 w-full min-h-0">
-          <div className="py-3 px-2">
-            {isExpanded ? (
-              <div className="space-y-3">
-                {/* Sort By Control */}
-                <div className="px-2 flex items-center gap-2">
-                  <div 
-                    onClick={(e) => e.stopPropagation()} 
-                    onMouseDown={(e) => e.stopPropagation()}
-                    className="flex-1"
-                  >
-                    <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)} onOpenChange={setIsAnyMenuOpen}>
-                      <SelectTrigger className="h-7 text-xs bg-muted/50 border-border text-foreground w-full">
-                        <SelectValue placeholder="Sort by..." />
-                      </SelectTrigger>
-                      <SelectContent className="bg-popover border-border text-popover-foreground z-[110]">
-                        <SelectItem value="date-edited" className="text-xs">Date edited</SelectItem>
-                        <SelectItem value="date-created" className="text-xs">Date created</SelectItem>
-                        <SelectItem value="name" className="text-xs">Name</SelectItem>
-                      </SelectContent>
-                    </Select>
+            <div className="py-3 px-2">
+              {isExpanded ? (
+                <div className="space-y-3">
+                  {/* Sort By Control */}
+                  <div className="px-2 flex items-center gap-2">
+                    <div
+                      onClick={(e) => e.stopPropagation()}
+                      onMouseDown={(e) => e.stopPropagation()}
+                      className="flex-1"
+                    >
+                      <Select value={sortBy} onValueChange={(value) => setSortBy(value as SortOption)} onOpenChange={setIsAnyMenuOpen}>
+                        <SelectTrigger className="h-7 text-xs bg-muted/50 border-border text-foreground w-full">
+                          <SelectValue placeholder="Sort by..." />
+                        </SelectTrigger>
+                        <SelectContent className="bg-popover border-border text-popover-foreground z-[110]">
+                          <SelectItem value="date-edited" className="text-xs">Date edited</SelectItem>
+                          <SelectItem value="date-created" className="text-xs">Date created</SelectItem>
+                          <SelectItem value="name" className="text-xs">Name</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
-                </div>
 
-                {/* Starred Section */}
-                <CollapsibleSection 
-                  label="STARRED" 
-                  isOpen={sections.starred} 
-                  onToggle={() => toggleSection('starred')}
-                  count={filterItems(starredChats).length}
-                >
-                      {sortItems(filterItems(starredChats)).map((item) => {
-                        if (item.type === 'folder') {
-                          return <RecursiveFolder key={item.id} item={item} />
-                        }
-                        return (
-                          <TreeItem
-                            key={item.id}
-                            id={item.id}
-                            icon={item.icon}
-                            label={item.label}
-                            active={item.id === activeChatId}
-                            itemId={item.id}
-                            isStarred={starredItems.has(item.id)}
-                            onToggleStar={toggleStar}
-                            hasChildren={item.hasChildren}
-                            onClick={() => onSelectChat?.(item.id)}
-                            onRename={() => handleRenameClick(item.id, item.type, item.label)}
-                            onDelete={() => handleDelete(item.id, item.type)}
-                            onMove={(targetId) => handleMoveItem(item.id, item.type, targetId)}
-                            folders={allFolders}
-                            onMenuOpenChange={setIsAnyMenuOpen}
-                          />
-                        )
-                      })}
-                </CollapsibleSection>
-
-                {/* Recent Section - Hick's Law: Limit visible options */}
-                <CollapsibleSection 
-                  label="RECENT" 
-                  isOpen={sections.recent} 
-                  onToggle={() => toggleSection('recent')}
-                  count={filterItems(recentChats, true).length}
-                >
-                      {sortItems(filterItems(recentChats, true)).map((item) => (
+                  {/* Starred Section */}
+                  <CollapsibleSection
+                    label="STARRED"
+                    isOpen={sections.starred}
+                    onToggle={() => toggleSection('starred')}
+                    count={filterItems(starredChats).length}
+                  >
+                    {sortItems(filterItems(starredChats)).map((item) => {
+                      if (item.type === 'folder') {
+                        return <RecursiveFolder key={item.id} item={item} />
+                      }
+                      return (
                         <TreeItem
                           key={item.id}
                           id={item.id}
                           icon={item.icon}
                           label={item.label}
-                          itemId={item.id}
                           active={item.id === activeChatId}
+                          itemId={item.id}
                           isStarred={starredItems.has(item.id)}
                           onToggleStar={toggleStar}
                           hasChildren={item.hasChildren}
@@ -541,34 +512,63 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                           folders={allFolders}
                           onMenuOpenChange={setIsAnyMenuOpen}
                         />
-                      ))}
-                </CollapsibleSection>
-                
-                {/* Folders - Law of Similarity: Consistent styling */}
-                <CollapsibleSection 
-                  label="FOLDERS" 
-                  isOpen={sections.folders} 
-                  onToggle={() => toggleSection('folders')}
-                  count={filterItems(folderItems.filter(f => !f.parentId), true).length}
-                >
-                      {sortItems(filterItems(folderItems.filter(f => !f.parentId), true)).map((item) => (
-                        <RecursiveFolder key={item.id} item={item} />
-                      ))}
-                </CollapsibleSection>
-              </div>
-            ) : (
-               <div className="flex flex-col items-center gap-2 pt-2">
+                      )
+                    })}
+                  </CollapsibleSection>
+
+                  {/* Recent Section - Hick's Law: Limit visible options */}
+                  <CollapsibleSection
+                    label="RECENT"
+                    isOpen={sections.recent}
+                    onToggle={() => toggleSection('recent')}
+                    count={filterItems(recentChats, true).length}
+                  >
+                    {sortItems(filterItems(recentChats, true)).map((item) => (
+                      <TreeItem
+                        key={item.id}
+                        id={item.id}
+                        icon={item.icon}
+                        label={item.label}
+                        itemId={item.id}
+                        active={item.id === activeChatId}
+                        isStarred={starredItems.has(item.id)}
+                        onToggleStar={toggleStar}
+                        hasChildren={item.hasChildren}
+                        onClick={() => onSelectChat?.(item.id)}
+                        onRename={() => handleRenameClick(item.id, item.type, item.label)}
+                        onDelete={() => handleDelete(item.id, item.type)}
+                        onMove={(targetId) => handleMoveItem(item.id, item.type, targetId)}
+                        folders={allFolders}
+                        onMenuOpenChange={setIsAnyMenuOpen}
+                      />
+                    ))}
+                  </CollapsibleSection>
+
+                  {/* Folders - Law of Similarity: Consistent styling */}
+                  <CollapsibleSection
+                    label="FOLDERS"
+                    isOpen={sections.folders}
+                    onToggle={() => toggleSection('folders')}
+                    count={filterItems(folderItems.filter(f => !f.parentId), true).length}
+                  >
+                    {sortItems(filterItems(folderItems.filter(f => !f.parentId), true)).map((item) => (
+                      <RecursiveFolder key={item.id} item={item} />
+                    ))}
+                  </CollapsibleSection>
+                </div>
+              ) : (
+                <div className="flex flex-col items-center gap-2 pt-2">
                   {/* Icons hidden in collapsed state as requested */}
-               </div>
-            )}
-          </div>
+                </div>
+              )}
+            </div>
           </ScrollArea>
 
           {/* User Profile Footer - Fitts's Law: Large clickable area */}
           <div className="p-2 border-t border-border bg-sidebar">
             <DropdownMenu onOpenChange={setIsAnyMenuOpen}>
               <DropdownMenuTrigger asChild>
-                <button 
+                <button
                   ref={userMenuTriggerRef}
                   className={cn(
                     "flex items-center gap-2 w-full p-2 rounded-lg hover:bg-accent hover:text-accent-foreground transition-colors group outline-none",
@@ -582,7 +582,7 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                     </div>
                     <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-background rounded-full"></div>
                   </div>
-                  
+
                   {isExpanded && (
                     <div className="flex-1 text-left overflow-hidden">
                       <div className="text-sm font-medium text-foreground truncate">{fullName}</div>
@@ -592,9 +592,9 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                       </div>
                     </div>
                   )}
-                  
+
                   {isExpanded && (
-                     <Settings className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
+                    <Settings className="w-4 h-4 text-muted-foreground group-hover:text-foreground transition-colors" />
                   )}
                 </button>
               </DropdownMenuTrigger>
@@ -608,9 +608,9 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                     <span className="text-xs text-muted-foreground truncate">{email}</span>
                   </div>
                 </div>
-                
+
                 <DropdownMenuSeparator className="bg-border" />
-                
+
                 <DropdownMenuSub>
                   <DropdownMenuSubTrigger className="focus:bg-accent focus:text-accent-foreground cursor-pointer" data-testid="theme-submenu-trigger">
                     {currentTheme === "light" ? <Sun className="w-4 h-4 mr-2" /> : currentTheme === "dark" ? <Moon className="w-4 h-4 mr-2" /> : <Laptop className="w-4 h-4 mr-2" />}
@@ -638,8 +638,8 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                   Settings
                 </DropdownMenuItem>
 
-                <DropdownMenuItem 
-                  className="focus:bg-accent focus:text-accent-foreground cursor-pointer" 
+                <DropdownMenuItem
+                  className="focus:bg-accent focus:text-accent-foreground cursor-pointer"
                   onSelect={(e) => {
                     e.preventDefault()
                     setShowTrash(true)
@@ -648,10 +648,10 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                   <Trash2 className="w-4 h-4 mr-2" />
                   Trash
                 </DropdownMenuItem>
-                
+
                 <DropdownMenuSeparator className="bg-border" />
-                
-                <DropdownMenuItem 
+
+                <DropdownMenuItem
                   className="text-foreground hover:text-destructive focus:bg-destructive/10 focus:text-destructive"
                   onClick={() => signOut()}
                   data-testid="logout-item"
@@ -661,12 +661,12 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
-            
-            <TrashDialog 
-              isOpen={showTrash} 
-              onClose={() => setShowTrash(false)} 
+
+            <TrashDialog
+              isOpen={showTrash}
+              onClose={() => setShowTrash(false)}
             />
-            
+
             {deleteConfirmation && (
               <ConfirmDialog
                 isOpen={deleteConfirmation.isOpen}
@@ -696,36 +696,36 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
 }
 
 function CollapsibleSection({ label, isOpen, onToggle, children, count }: { label: string, isOpen: boolean, onToggle: () => void, children: React.ReactNode, count?: number }) {
-   return (
-      <div className="mb-2">
-         <button 
-            onClick={onToggle}
-            className="w-full flex items-center gap-1.5 px-2 py-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors group"
-            data-testid={`section-header-${label}`}
-         >
-            <ChevronRight className={cn("w-3 h-3 transition-transform duration-200 shrink-0", isOpen && "rotate-90")} />
-            <span className="text-[11px] font-bold tracking-wider uppercase group-hover:text-foreground flex-1 text-left">{label}</span>
-            {count !== undefined && (
-              <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
-            )}
-         </button>
-         {isOpen && (
-            <div className="mt-1 space-y-1" data-testid={`section-content-${label}`}>
-               {children}
-            </div>
-         )}
-      </div>
-   )
+  return (
+    <div className="mb-2">
+      <button
+        onClick={onToggle}
+        className="w-full flex items-center gap-1.5 px-2 py-2 text-muted-foreground hover:text-foreground hover:bg-accent rounded transition-colors group"
+        data-testid={`section-header-${label}`}
+      >
+        <ChevronRight className={cn("w-3 h-3 transition-transform duration-200 shrink-0", isOpen && "rotate-90")} />
+        <span className="text-[11px] font-bold tracking-wider uppercase group-hover:text-foreground flex-1 text-left">{label}</span>
+        {count !== undefined && (
+          <span className="text-[10px] text-muted-foreground font-medium">{count}</span>
+        )}
+      </button>
+      {isOpen && (
+        <div className="mt-1 space-y-1" data-testid={`section-content-${label}`}>
+          {children}
+        </div>
+      )}
+    </div>
+  )
 }
 
-function TreeItem({ 
-  icon: Icon, 
-  label, 
-  active, 
-  hasChildren, 
-  itemId, 
-  isStarred, 
-  onToggleStar, 
+function TreeItem({
+  icon: Icon,
+  label,
+  active,
+  hasChildren,
+  itemId,
+  isStarred,
+  onToggleStar,
   onClick,
   onRename,
   onDelete,
@@ -733,14 +733,14 @@ function TreeItem({
   folders = [],
   isExpanded,
   onMenuOpenChange
-}: { 
-  icon: any, 
-  label: string, 
-  active?: boolean, 
-  hasChildren?: boolean, 
-  itemId: string, 
-  isStarred: boolean, 
-  onToggleStar: (id: string) => void, 
+}: {
+  icon: any,
+  label: string,
+  active?: boolean,
+  hasChildren?: boolean,
+  itemId: string,
+  isStarred: boolean,
+  onToggleStar: (id: string) => void,
   onClick?: () => void,
   onRename?: () => void,
   onDelete?: () => void,
@@ -749,101 +749,101 @@ function TreeItem({
   isExpanded?: boolean,
   onMenuOpenChange?: (open: boolean) => void
 }) {
-   const [showMove, setShowMove] = useState(false)
-   const itemRef = useRef<HTMLDivElement>(null)
-   const isMovingRef = useRef(false)
+  const [showMove, setShowMove] = useState(false)
+  const itemRef = useRef<HTMLDivElement>(null)
+  const isMovingRef = useRef(false)
 
-   return (
-      <div 
-         ref={itemRef}
-         className={cn(
-            "flex items-center gap-2 px-2 py-2 cursor-pointer border-l-2 border-transparent hover:bg-accent rounded transition-colors group relative pr-8",
-            active ? "bg-primary/10 border-l-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"
-         )}
-         data-testid={`tree-item-${itemId}`}
-         onClick={onClick}
-      >
-         {showMove && (
-            <MoveItemPopover 
-               isOpen={showMove}
-               onClose={() => {
-                 setShowMove(false)
-                 isMovingRef.current = false
-               }}
-               onMove={(targetId) => {
-                  onMove?.(targetId)
-                  setShowMove(false)
-                  isMovingRef.current = false
-               }}
-               folders={folders}
-               itemId={itemId}
-               anchorRef={itemRef}
-            />
-         )}
-         {hasChildren ? (
-            <ChevronRight className={cn("w-3 h-3 text-muted-foreground shrink-0 transition-transform duration-200", isExpanded && "rotate-90")} />
-         ) : (
-            <div className="w-3 shrink-0" /> 
-         )}
-         <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
-         <span className="text-xs truncate leading-none flex-1">{label}</span>
-         
-         <div className="flex items-center gap-1 absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-           <button
-             onClick={(e) => {
-               e.stopPropagation()
-               onToggleStar(itemId)
-             }}
-             className={cn(
-               "p-0.5 hover:bg-accent rounded shrink-0",
-               isStarred && "opacity-100 block"
-             )}
-             data-testid={`star-button-${itemId}`}
-           >
-             <Star className={cn(
-               "w-3 h-3",
-               isStarred ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"
-             )} />
-           </button>
+  return (
+    <div
+      ref={itemRef}
+      className={cn(
+        "flex items-center gap-2 px-2 py-2 cursor-pointer border-l-2 border-transparent hover:bg-accent rounded transition-colors group relative pr-8",
+        active ? "bg-primary/10 border-l-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"
+      )}
+      data-testid={`tree-item-${itemId}`}
+      onClick={onClick}
+    >
+      {showMove && (
+        <MoveItemPopover
+          isOpen={showMove}
+          onClose={() => {
+            setShowMove(false)
+            isMovingRef.current = false
+          }}
+          onMove={(targetId) => {
+            onMove?.(targetId)
+            setShowMove(false)
+            isMovingRef.current = false
+          }}
+          folders={folders}
+          itemId={itemId}
+          anchorRef={itemRef}
+        />
+      )}
+      {hasChildren ? (
+        <ChevronRight className={cn("w-3 h-3 text-muted-foreground shrink-0 transition-transform duration-200", isExpanded && "rotate-90")} />
+      ) : (
+        <div className="w-3 shrink-0" />
+      )}
+      <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
+      <span className="text-xs truncate leading-none flex-1">{label}</span>
 
-           <DropdownMenu onOpenChange={onMenuOpenChange}>
-            <DropdownMenuTrigger asChild>
-              <Button 
-                variant="ghost" 
-                className="h-6 w-6 p-0 hover:bg-accent"
-                onClick={(e) => e.stopPropagation()}
-                data-testid={`menu-button-${itemId}`}
-              >
-                <MoreHorizontal className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent 
-              align="end" 
-              className="bg-popover border-border z-[60]"
-              onCloseAutoFocus={(e) => {
-                if (isMovingRef.current) {
-                  e.preventDefault()
-                }
-              }}
+      <div className="flex items-center gap-1 absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <button
+          onClick={(e) => {
+            e.stopPropagation()
+            onToggleStar(itemId)
+          }}
+          className={cn(
+            "p-0.5 hover:bg-accent rounded shrink-0",
+            isStarred && "opacity-100 block"
+          )}
+          data-testid={`star-button-${itemId}`}
+        >
+          <Star className={cn(
+            "w-3 h-3",
+            isStarred ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"
+          )} />
+        </button>
+
+        <DropdownMenu onOpenChange={onMenuOpenChange}>
+          <DropdownMenuTrigger asChild>
+            <Button
+              variant="ghost"
+              className="h-6 w-6 p-0 hover:bg-accent"
+              onClick={(e) => e.stopPropagation()}
+              data-testid={`menu-button-${itemId}`}
             >
-              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRename?.() }} className="text-popover-foreground focus:bg-accent cursor-pointer">
-                Rename
-              </DropdownMenuItem>
-              <DropdownMenuItem 
-                onSelect={(e) => { 
-                   isMovingRef.current = true
-                   setShowMove(true)
-                }} 
-                className="text-popover-foreground focus:bg-accent cursor-pointer"
-              >
-                Move to...
-              </DropdownMenuItem>
-              <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete?.() }} className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
-                Delete
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-         </div>
+              <MoreHorizontal className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent
+            align="end"
+            className="bg-popover border-border z-[60]"
+            onCloseAutoFocus={(e) => {
+              if (isMovingRef.current) {
+                e.preventDefault()
+              }
+            }}
+          >
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRename?.() }} className="text-popover-foreground focus:bg-accent cursor-pointer">
+              Rename
+            </DropdownMenuItem>
+            <DropdownMenuItem
+              onSelect={(e) => {
+                isMovingRef.current = true
+                setShowMove(true)
+              }}
+              className="text-popover-foreground focus:bg-accent cursor-pointer"
+            >
+              Move to...
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete?.() }} className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
+              Delete
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
-   )
+    </div>
+  )
 }

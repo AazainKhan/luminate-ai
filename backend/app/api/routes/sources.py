@@ -1,7 +1,7 @@
 """
 API routes for source description generation.
 
-Uses Gemini 2.0 Flash-Lite to generate contextual descriptions for RAG sources.
+Uses Gemini 2.5 Flash-Lite to generate contextual descriptions for RAG sources.
 """
 
 from fastapi import APIRouter, HTTPException
@@ -65,9 +65,9 @@ async def generate_source_description(request: SourceDescriptionRequest):
         
         logger.info(f"Cache miss, generating description for: {request.title[:50]}...")
         
-        # Initialize Gemini 2.0 Flash-Lite (cost-efficient, low latency model)
+        # Initialize Gemini 2.5 Flash-Lite (cost-efficient, low latency model)
         llm = ChatGoogleGenerativeAI(
-            model="gemini-2.0-flash-lite",  # Optimized for cost efficiency and low latency
+            model="gemini-2.5-flash-lite",  # Optimized for cost efficiency and low latency
             temperature=0.3,  # Low temperature for consistent, factual descriptions
             google_api_key=settings.google_api_key,
         )

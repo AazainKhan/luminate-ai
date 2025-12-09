@@ -121,6 +121,8 @@ interface ThinkingTraceProps {
   steps: ThinkingStep[]
   /** Whether the agent is still processing */
   isStreaming?: boolean
+  /** Current phase for collapse control */
+  currentPhase?: "thinking" | "reasoning" | "response"
   className?: string
 }
 
@@ -145,6 +147,7 @@ interface ThinkingTraceProps {
 export function ThinkingTrace({ 
   steps, 
   isStreaming = false,
+  currentPhase = "thinking",
   className 
 }: ThinkingTraceProps) {
   // Don't render if no steps
@@ -156,9 +159,13 @@ export function ThinkingTrace({
   const completedCount = steps.filter(s => s.status === "completed").length
   const processingStep = steps.find(s => s.status === "processing")
   
+  // Manual control: open during thinking phase, closed otherwise
+  const isOpen = currentPhase === "thinking"
+  
   return (
     <Reasoning 
-      isStreaming={isStreaming} 
+      open={isOpen}
+      isStreaming={isStreaming && currentPhase === "thinking"}
       className={className}
     >
       <ReasoningTrigger>

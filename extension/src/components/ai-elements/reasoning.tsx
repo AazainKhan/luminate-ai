@@ -73,20 +73,8 @@ export const Reasoning = memo(
       }
     }, [isStreaming, startTime, setDuration]);
 
-    // Auto-open when streaming starts, auto-close when streaming ends
-    useEffect(() => {
-      if (isStreaming && !isOpen) {
-        // Auto-open when streaming starts
-        setIsOpen(true);
-      } else if (!isStreaming && isOpen && !hasAutoClosedRef) {
-        // Auto-close when streaming completes (with small delay)
-        const timer = setTimeout(() => {
-          setIsOpen(false);
-          setHasAutoClosedRef(true);
-        }, AUTO_CLOSE_DELAY);
-        return () => clearTimeout(timer);
-      }
-    }, [isStreaming, isOpen, setIsOpen, hasAutoClosedRef]);
+    // Controlled open state - no auto-open/close logic
+    // Parent component controls via open prop and phase state
 
     const handleOpenChange = (newOpen: boolean) => {
       setIsOpen(newOpen);
@@ -171,6 +159,7 @@ export const ReasoningContent = memo(
     const contentRef = useRef<HTMLDivElement>(null);
     const { isStreaming } = useReasoning();
     const [isAtBottom, setIsAtBottom] = useState(false);
+    const scrollTimeoutRef = useRef<number | null>(null);
 
     const checkScroll = useCallback(() => {
       if (!contentRef.current) return;
@@ -183,12 +172,31 @@ export const ReasoningContent = memo(
       checkScroll();
     }, [children, checkScroll]);
 
-    // Auto-scroll to bottom when content changes during streaming
+    // Throttled auto-scroll to bottom when content changes during streaming
+    // Max once per 300ms for smooth, natural scrolling
     useEffect(() => {
       if (isStreaming && contentRef.current) {
-        contentRef.current.scrollTop = contentRef.current.scrollHeight;
-        setIsAtBottom(true);
+        if (scrollTimeoutRef.current !== null) {
+          window.clearTimeout(scrollTimeoutRef.current);
+        }
+        
+        scrollTimeoutRef.current = window.setTimeout(() => {
+          if (contentRef.current) {
+            contentRef.current.scrollTo({
+              top: contentRef.current.scrollHeight,
+              behavior: 'smooth'
+            });
+            setIsAtBottom(true);
+          }
+          scrollTimeoutRef.current = null;
+        }, 300);
       }
+      
+      return () => {
+        if (scrollTimeoutRef.current !== null) {
+          window.clearTimeout(scrollTimeoutRef.current);
+        }
+      };
     }, [children, isStreaming]);
 
     // Parse reasoning content into individual steps with titles and paragraphs

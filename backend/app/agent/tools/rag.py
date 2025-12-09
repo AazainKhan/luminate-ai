@@ -486,9 +486,10 @@ class RAGRetriever:
             content = doc.get("content", "").strip()
             score = doc.get("score", 0.0)
             
-            # Use numbered reference that matches the sources array
-            header = f"[{idx}] Source: {source} | Title: {title} (relevance: {score:.2f})"
-            block = f"{header}\n{content}\n"
+            # Use numbered reference [1], [2] that matches citation format
+            header = f"[Source {idx}] {title}"
+            source_info = f"File: {source} | Relevance: {score:.2f}"
+            block = f"{header}\n{source_info}\nContent: {content}\n"
             block_len = len(block)
             
             if total_len + block_len > max_chars:
@@ -511,6 +512,18 @@ class RAGRetriever:
             
             # Generate description from content
             content_clean = content.strip()
+            
+            # CRITICAL FIX: Remove title duplication from description
+            # Many sources start with "Title: [same as title field]" causing hover duplication
+            # Step 1: Remove "Title:" or "Topic:" prefix if present
+            content_clean = re.sub(r'^(Title|Topic):\s*', '', content_clean, flags=re.IGNORECASE)
+            
+            # Step 2: Check if content now starts with the title itself
+            if content_clean.startswith(title):
+                # Strip the title from the start of content
+                content_clean = content_clean[len(title):].lstrip()
+                # Remove any trailing/leading punctuation or whitespace
+                content_clean = content_clean.lstrip(' .,;:')
             
             # Clean up broken starts (from chunking mid-sentence)
             # Run cleanup multiple times to handle cases like ". [Citation]"

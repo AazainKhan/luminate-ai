@@ -67,29 +67,29 @@ interface InlineCitationCardTriggerProps {
 }
 
 export function InlineCitationCardTrigger({ number, url, title, sourceInfo, className }: InlineCitationCardTriggerProps) {
-  // Handle local sources without real URLs
-  const isLocalSource = !url || url.startsWith("#")
-
   return (
     <HoverCardTrigger asChild>
-      <button 
+      <span
         className={cn(
-          "inline-flex items-center gap-1 px-1 py-0 rounded text-[10px] font-medium align-baseline",
-          "bg-violet-500/10 text-violet-600 dark:text-violet-300 hover:bg-violet-500/20",
+          "inline-flex items-center justify-center",
+          "cursor-pointer",
+          "align-super",
+          "text-[10px] font-bold",
+          "h-4 w-4",
+          "rounded-full",
+          "bg-violet-500/10 text-violet-600 dark:text-violet-400",
+          "hover:bg-violet-500/20 hover:text-violet-700 dark:hover:text-violet-300",
           "border border-violet-500/20 hover:border-violet-500/40",
-          "transition-all duration-150 cursor-pointer select-none",
-          "focus:outline-none focus:ring-2 focus:ring-violet-500/50",
-          "relative -top-[0.15em] ml-0.5",
+          "transition-colors",
+          "mx-0.5",
           className
         )}
-        aria-label={`Citation ${number}${sourceInfo?.module ? ` from ${sourceInfo.module}` : ''}`}
+        role="button"
+        tabIndex={0}
+        aria-label={`Citation ${number}${title ? `: ${title}` : ''}${sourceInfo?.module ? ` from ${sourceInfo.module}` : ''}`}
       >
-        {title ? (
-          <span className="max-w-[150px] truncate">{title}</span>
-        ) : (
-          <span>[{number}]</span>
-        )}
-      </button>
+        {number}
+      </span>
     </HoverCardTrigger>
   )
 }

@@ -1,7 +1,3 @@
-# ==========================================
-# Luminate AI - Comprehensive .gitignore
-# ==========================================
-
 # ============ Python ============
 venv/
 .venv/
@@ -47,6 +43,7 @@ pnpm-debug.log*
 .project
 .classpath
 .settings/
+.gemini/
 
 # ============ OS Files ============
 .DS_Store

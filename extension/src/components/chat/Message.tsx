@@ -304,85 +304,90 @@ interface MessageLegacyContentProps {
 
 function MessageLegacyContent({ message, copied, handleCopy, isUser, isLoading, onRegenerate }: MessageLegacyContentProps) {
   /**
-   * Render content with inline citations while preserving markdown formatting.
+   * Render content with inline citations following shadcn pattern.
    * 
-   * The key insight: We need to wrap the entire content in Response (for markdown),
-   * but also process citation markers [1], [2] etc. into interactive components.
-   * 
-   * Solution: Render the full content as markdown, but post-process to inject
-   * citation components using a two-pass approach.
+   * Preserves paragraph formatting while keeping citations inline.
+   * Pattern from docs/inline-citation.md
    */
   const renderContentWithCitations = (content: string) => {
     if (!message.citations || message.citations.length === 0) {
-      // No citations - render as pure markdown
       return <Response>{content}</Response>
     }
+
+    // Check if we have any text content (not just citations)
+    const hasTextContent = content.replace(/\[\d+\]/g, '').trim().length > 0
     
-    // Step 1: Move citations to AFTER periods (per user request)
-    // "text [1]." → "text. [1]"
-    let cleanedContent = content
-      .replace(/\s*\[(\d+)\]\.(?!\S)/g, '. [$1]')  // Move citation after period
-      .replace(/\n+\[(\d+)\]/g, ' [$1]')              // Remove newlines before citations
-    
-    // Step 2: Replace citation markers with superscript spans that won't break markdown
-    const citationPattern = /\[(\d+)\]/g
-    const textWithPlaceholders = cleanedContent.replace(citationPattern, (match, num) => {
-      return `__CITATION_${num}__`
-    })
-    
-    // Step 3: Render markdown content with placeholders
-    const htmlContent = marked.parse(textWithPlaceholders, { breaks: true }) as string
-    
-    // Step 4: Replace placeholders with React citation components
-    const parts = htmlContent.split(/(__CITATION_\d+__)/)
-    const elements: React.ReactNode[] = []
-    
-    parts.forEach((part, index) => {
-      const citationMatch = part.match(/__CITATION_(\d+)__/)
-      
-      if (citationMatch) {
-        const citationNumber = citationMatch[1]
-        const citation = message.citations?.find((c) => c.number === citationNumber)
-        
-        if (citation) {
-          elements.push(
-            <InlineCitationCard key={`citation-${index}`}>
-              <InlineCitationCardTrigger 
-                number={citation.number} 
-                url={citation.url}
-                title={citation.title}
-                sourceInfo={{
-                  module: citation.module,
-                  week: citation.week
-                }}
-              />
-              <InlineCitationCardBody>
-                <InlineCitationSource
-                  title={citation.title}
-                  url={citation.url}
-                  description={citation.description}
-                />
-              </InlineCitationCardBody>
-            </InlineCitationCard>
-          )
-        }
-      } else if (part.trim()) {
-        // Render HTML chunk as-is
-        elements.push(
-          <span 
-            key={`html-${index}`}
-            className="prose dark:prose-invert max-w-none text-sm leading-7 inline"
-            dangerouslySetInnerHTML={{ __html: part }}
-          />
-        )
-      }
-    })
-    
-    // Return as inline wrapper to keep everything on same line
+    // Fallback: If no text content found, render as normal Response
+    if (!hasTextContent) {
+      return <Response>{content}</Response>
+    }
+
+    // Split by double newlines to preserve paragraphs
+    const paragraphs = content.split(/\n\n+/)
+
     return (
-      <span className="inline-flex flex-wrap items-baseline gap-0.5">
-        {elements}
-      </span>
+      <div className="prose prose-sm dark:prose-invert max-w-none text-foreground space-y-4">
+        {paragraphs.map((paragraph, pIndex) => {
+          // Split paragraph by citation pattern [1], [2], etc.
+          const parts = paragraph.split(/(\[\d+\])/g)
+
+          return (
+            <p key={`para-${pIndex}`} className="leading-relaxed">
+              {parts.map((part, index) => {
+                // Check if this part is a citation marker
+                const citationMatch = part.match(/^\[(\d+)\]$/)
+
+                if (citationMatch) {
+                  const number = citationMatch[1]
+                  const citation = message.citations?.find((c) => c.number === number)
+
+                  if (citation) {
+                    return (
+                      <InlineCitationCard key={`citation-${pIndex}-${index}`}>
+                        <InlineCitationCardTrigger
+                          number={citation.number}
+                          url={citation.url}
+                          title={citation.title}
+                          sourceInfo={{
+                            module: citation.module,
+                            week: citation.week,
+                          }}
+                        />
+                        <InlineCitationCardBody>
+                          <InlineCitationSource
+                            title={citation.title}
+                            url={citation.url}
+                            description={citation.description}
+                          />
+                          {citation.content && citation.content.trim() && (
+                            <InlineCitationQuote>
+                              {citation.content}
+                            </InlineCitationQuote>
+                          )}
+                        </InlineCitationCardBody>
+                      </InlineCitationCard>
+                    )
+                  }
+                }
+
+                // Render text part with inline markdown (bold, italic, etc.)
+                if (part) {
+                  const html = marked.parseInline(part)
+                  return (
+                    <span
+                      key={`text-${pIndex}-${index}`}
+                      className="inline"
+                      dangerouslySetInnerHTML={{ __html: html }}
+                    />
+                  )
+                }
+
+                return null
+              })}
+            </p>
+          )
+        })}
+      </div>
     )
   }
 
@@ -422,6 +427,7 @@ function MessageLegacyContent({ message, copied, handleCopy, isUser, isLoading, 
               <ThinkingTrace
                 steps={message.thinkingTrace}
                 isStreaming={isLoading && !message.streamComplete}
+                currentPhase={message.metadata?.currentPhase || "thinking"}
               />
             </div>
           )}
@@ -451,10 +457,14 @@ function MessageLegacyContent({ message, copied, handleCopy, isUser, isLoading, 
                   if (currentStep.length > 50) currentStep = currentStep.substring(0, 50) + "...";
                 }
 
+                // Phase-based control: open during reasoning phase, closed otherwise
+                const currentPhase = message.metadata?.currentPhase || "thinking";
+                const isReasoningPhase = currentPhase === "reasoning";
+
                 return (
                   <Reasoning 
-                    isStreaming={isLoading && !message.streamComplete}
-                    defaultOpen={true}
+                    open={isReasoningPhase}
+                    isStreaming={isLoading && !message.streamComplete && isReasoningPhase}
                   >
                     <ReasoningTrigger currentStep={currentStep} />
                     <ReasoningContent>

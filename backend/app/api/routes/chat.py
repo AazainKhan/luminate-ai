@@ -178,7 +178,8 @@ async def stream_chat(
                 "thinking_steps": thinking_steps,  # Persist thinking trace (new)
                 "reasoning": full_reasoning if full_reasoning else None,  # Persist Gemini reasoning
                 "sources": sources,  # Persist sources
-                "evaluation": evaluation  # Persist evaluation scores
+                "evaluation": evaluation,  # Persist evaluation scores
+                "currentPhase": "response"  # Persist final phase for correct accordion state on restore
             }
             await save_message(chat_id, "assistant", full_response, metadata)
 

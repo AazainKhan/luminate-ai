@@ -57,6 +57,9 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
   // Track the current streaming message ID
   const currentMessageIdRef = useRef<string | null>(null)
   
+  // Track if actively streaming to prevent refetch flash
+  const isStreamingRef = useRef<boolean>(false)
+  
   // Buffer for accumulated content during streaming (prevents race conditions)
   const streamBufferRef = useRef<{
     rawContent: string
@@ -68,13 +71,23 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
     metadata?: Record<string, any>
     evaluation?: any
     structuredOutput?: any
+    currentPhase?: "thinking" | "reasoning" | "response"
   }>({
     rawContent: "",
-    content: ""
+    content: "",
+    currentPhase: "thinking"
   })
 
   // Fetch messages when chatId changes
   useEffect(() => {
+    // Skip refetch if actively streaming to prevent flash
+    if (isStreamingRef.current) {
+      if (isDevelopment) {
+        console.log("⏸️ Skipping history refetch - streaming in progress")
+      }
+      return
+    }
+    
     if (!chatId || !session?.access_token) {
       setMessages([])
       return
@@ -141,6 +154,11 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
               // Restore reasoning (Gemini thought summaries) from message metadata
               if (msg.metadata?.reasoning) {
                 msg.reasoning = msg.metadata.reasoning
+              }
+              
+              // Restore currentPhase from metadata for correct accordion state
+              if (msg.metadata?.currentPhase) {
+                msg.metadata.currentPhase = msg.metadata.currentPhase
               }
               
               // Mark as complete since it's from history
@@ -282,6 +300,11 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
         updatedMsg.sources = sources
         updatedMsg.citations = citations
 
+      // Citations event (separate from sources for inline citation badges)
+      } else if (parsed.type === "citations") {
+        buffer.citations = parsed.citations
+        updatedMsg.citations = buffer.citations
+
         // Also add sources to the most recent search step in chain of thought
         if (updatedMsg.chainOfThought) {
           const searchStep = [...updatedMsg.chainOfThought].reverse().find(s =>
@@ -315,6 +338,22 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
             : step
         )
 
+      // Phase transition events (from backend orchestration)
+      } else if (parsed.type === "phase-transition") {
+        const fromPhase = parsed.from
+        const toPhase = parsed.to
+        
+        if (isDevelopment) {
+          console.log(`📍 Phase transition: ${fromPhase} → ${toPhase}`)
+        }
+        
+        // Update phase in buffer and message
+        buffer.currentPhase = toPhase
+        updatedMsg.metadata = {
+          ...updatedMsg.metadata,
+          currentPhase: toPhase
+        }
+      
       // Structured thinking events from agent pipeline
       // Shows scope check, classification, escalation decisions, RAG retrieval
       } else if (parsed.type === "thinking") {
@@ -473,11 +512,16 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
           updatedMsg.structuredOutput = buffer.structuredOutput
         }
         
+        // Ensure final phase is set to "response" for correct accordion state
+        const finalPhase = parsed.finalPhase || "response"
+        buffer.currentPhase = finalPhase
+        
         updatedMsg.metadata = {
           ...updatedMsg.metadata,
           ...buffer.metadata,
           traceId: parsed.traceId,
-          chatId: parsed.chatId
+          chatId: parsed.chatId,
+          currentPhase: finalPhase
         }
         // Mark stream as complete for UI state management
         updatedMsg.streamComplete = true
@@ -512,6 +556,9 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
     // Create new abort controller
     abortControllerRef.current = new AbortController()
     
+    // Mark as actively streaming to prevent refetch flash
+    isStreamingRef.current = true
+    
     setIsLoading(true)
     setError(null)
 
@@ -535,7 +582,8 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
       thinkingTrace: undefined,
       metadata: undefined,
       evaluation: undefined,
-      structuredOutput: undefined
+      structuredOutput: undefined,
+      currentPhase: "thinking"
     }
 
     // Create placeholder assistant message
@@ -547,6 +595,9 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
       role: "assistant",
       content: "",
       rawContent: "",
+      metadata: {
+        currentPhase: "thinking"
+      },
       // Initialize for structured thinking display
       thinkingTrace: [],
       chainOfThought: [],
@@ -636,6 +687,11 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
       setIsLoading(false)
       currentMessageIdRef.current = null
       abortControllerRef.current = null
+      
+      // Clear streaming flag with delay to prevent immediate refetch
+      setTimeout(() => {
+        isStreamingRef.current = false
+      }, 1000)
     }
   }, [messages, session, chatId, model, onChatCreated, processStreamEvent])
 

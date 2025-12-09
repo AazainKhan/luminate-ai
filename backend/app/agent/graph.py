@@ -11,6 +11,7 @@ import logging
 import json
 import uuid
 import time
+import asyncio
 from typing import Dict, Any, Optional, AsyncGenerator, List
 
 from langgraph.graph import StateGraph, END, START
@@ -352,6 +353,37 @@ async def astream_agent(
                         "status": "processing",
                         "message": "Selecting teaching strategy..."
                     }
+                    # Emit citations after RAG retrieval completes
+                    # FILTER: Only include high/medium confidence sources for inline citations
+                    sources = state.get("sources", [])
+                    if sources:
+                        # Filter sources by citation confidence (exclude 'low' confidence)
+                        high_quality_sources = [
+                            s for s in sources 
+                            if s.get("citation_confidence") in ["high", "medium"]
+                        ]
+                        
+                        # If filtering removed everything, keep top 2 highest scores
+                        if not high_quality_sources and sources:
+                            sorted_sources = sorted(sources, key=lambda x: x.get("score", 0), reverse=True)
+                            high_quality_sources = sorted_sources[:2]
+                        
+                        citations = [
+                            {
+                                "id": f"citation-{i+1}",
+                                "number": str(i + 1),
+                                "title": s.get("title", "Source"),
+                                "url": s.get("url", "#"),
+                                "description": s.get("description", ""),
+                                "content": (s.get("content", "") or "")[:400],  # Increased from 200 to 400
+                                "module": s.get("module"),
+                                "week": s.get("week"),
+                                "source_file": s.get("source_file"),
+                                "confidence": s.get("citation_confidence", "medium"),
+                            }
+                            for i, s in enumerate(high_quality_sources)
+                        ]
+                        yield {"type": "citations", "citations": citations}
                 # reject and evaluator don't need explicit start events
             
             elif event_type == "on_chain_end":
@@ -408,6 +440,7 @@ async def astream_agent(
                             "routing_info": routing_info,
                         }
                     else:
+                        # RAG retrieval processing (step 4 of 5)
                         yield {
                             "type": "thinking",
                             "step": "rag_retrieval",
@@ -427,7 +460,7 @@ async def astream_agent(
                     sources = output.get("sources", [])
                     reasoning = output.get("reasoning", "")
                     
-                    # RAG results
+                    # RAG results (step 4 completion)
                     if sources:
                         yield {
                             "type": "thinking",
@@ -445,32 +478,59 @@ async def astream_agent(
                             "result": {"docs_found": 0},
                             "message": "No specific course materials found"
                         }
+                    await asyncio.sleep(0.25)  # Delay for smooth step display
                     
-                    # Strategy selected (final thinking step)
+                    # Strategy selected (step 5 of 5 - final thinking step)
                     yield {
                         "type": "thinking",
                         "step": "strategy",
                         "status": "completed",
                         "message": "Response generated with scaffolding"
                     }
+                    await asyncio.sleep(0.5)  # Hold before collapsing thinking accordion
                     
                     response = output.get("response", "")
                     
-                    # Stream Gemini's reasoning AFTER all thinking steps complete
-                    # This shows the LLM's internal thought process after planning
+                    # Phase transition: thinking → reasoning
                     if reasoning:
+                        yield {"type": "phase-transition", "from": "thinking", "to": "reasoning"}
+                        await asyncio.sleep(0.4)  # Wait for thinking accordion collapse animation
+                        
                         logger.debug(f"[Stream] Streaming reasoning after thinking steps: {len(reasoning)} chars")
-                        # Stream reasoning in chunks
-                        reasoning_chunk_size = 100
-                        for i in range(0, len(reasoning), reasoning_chunk_size):
-                            chunk = reasoning[i:i + reasoning_chunk_size]
-                            yield {"type": "reasoning-delta", "reasoningDelta": chunk}
+                        # Parse reasoning into blocks (title + paragraph pairs)
+                        reasoning_lines = reasoning.split('\n')
+                        current_block = ""
+                        
+                        for line in reasoning_lines:
+                            current_block += line + '\n'
+                            # Detect block boundaries (header or double newline)
+                            if line.strip().startswith('###') or line.strip().startswith('**'):
+                                if len(current_block.strip()) > 3:
+                                    yield {"type": "reasoning-delta", "reasoningDelta": current_block}
+                                    current_block = ""
+                                    await asyncio.sleep(0.5)  # Delay between reasoning blocks for readability
+                            elif not line.strip() and len(current_block.strip()) > 50:
+                                yield {"type": "reasoning-delta", "reasoningDelta": current_block}
+                                current_block = ""
+                                await asyncio.sleep(0.5)  # Delay between reasoning blocks
+                        
+                        # Flush remaining content
+                        if current_block.strip():
+                            yield {"type": "reasoning-delta", "reasoningDelta": current_block}
+                        
+                        await asyncio.sleep(0.8)  # Hold before collapsing reasoning accordion
+                    
+                    # Phase transition: reasoning → response
+                    yield {"type": "phase-transition", "from": "reasoning" if reasoning else "thinking", "to": "response"}
+                    await asyncio.sleep(0.4)  # Wait for reasoning accordion collapse animation
+                    
                     if response:
-                        # Larger chunks to preserve markdown formatting
-                        chunk_size = 200
+                        # Larger chunks for smoother streaming with natural delays
+                        chunk_size = 350
                         for i in range(0, len(response), chunk_size):
                             chunk = response[i:i + chunk_size]
                             yield {"type": "text-delta", "textDelta": chunk}
+                            await asyncio.sleep(0.12)  # Small delay for natural reading pace
                 
                 elif name == "evaluator":
                     output = event.get("data", {}).get("output", {})
@@ -517,7 +577,7 @@ async def astream_agent(
             
             logger.info(f"[Stream] Closed trace {trace_id} successfully")
         
-        yield {"type": "finish", "chatId": chat_id, "traceId": trace_id}
+        yield {"type": "finish", "chatId": chat_id, "traceId": trace_id, "finalPhase": "response"}
         
     except Exception as e:
         logger.error(f"Stream error: {e}")
