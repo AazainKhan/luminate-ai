@@ -586,9 +586,6 @@ function PromptInput({ input, setInput, onSend, isLoading, onExport, onStop, has
             {/* Floating Send Button */}
             <div className="absolute bottom-2 right-2 flex items-center gap-2">
               <div className="hidden sm:flex items-center gap-1.5 pointer-events-none opacity-50">
-                <span className="text-[10px] text-muted-foreground">
-                  auto-detects
-                </span>
               </div>
 
               <Button

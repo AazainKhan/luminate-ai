@@ -489,7 +489,7 @@ def evaluator_node(state: AgentState) -> AgentState:
         
         logger.info(f"📊 Evaluation complete: concept={concept}, outcome={outcome}, escalation={escalation_level}")
         
-        return state, evaluation
+        return state
     
     # Execute with Langfuse tracing
     if langfuse:
@@ -505,7 +505,8 @@ def evaluator_node(state: AgentState) -> AgentState:
                 input={"query": state.get("query", "")[:100]},
                 metadata={"node": "evaluator", "version": "v3"}
             ) as eval_span:
-                result_state, evaluation = _execute_evaluator()
+                result_state = _execute_evaluator()
+                evaluation = result_state.get("evaluation", {})
                 
                 # Update span with output
                 eval_span.update(
@@ -524,5 +525,5 @@ def evaluator_node(state: AgentState) -> AgentState:
             # Fall through to non-traced execution
     
     # Execute without tracing if Langfuse not available
-    result_state, _ = _execute_evaluator()
+    result_state = _execute_evaluator()
     return result_state

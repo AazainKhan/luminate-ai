@@ -32,6 +32,148 @@ from app.observability import get_langfuse_client, calculate_cost
 
 logger = logging.getLogger(__name__)
 
+# Source selection prompt for intelligent filtering
+SOURCE_SELECTION_PROMPT = """You are evaluating sources for relevance to a student question about AI/ML.
+
+STUDENT QUESTION: {question}
+
+RETRIEVED SOURCES:
+{sources}
+
+TASK: Evaluate each source and rank them by relevance to answering the student's question.
+
+For each source, respond with a JSON array where each object has:
+- "index": The source number (1-based)
+- "relevant": true/false - Is this source directly relevant to the question?
+- "reasoning": Brief (1 sentence) explanation of why/why not
+- "priority": "high", "medium", or "low"
+
+Only include sources that are ACTUALLY relevant. Prioritize:
+1. Sources that directly explain the concept asked about
+2. Sources with specific examples or definitions
+3. Visual aids (images/diagrams) that illustrate the concept
+4. Video lectures covering the topic
+
+Respond with ONLY the JSON array, no other text."""
+
+
+def _intelligent_source_selection(
+    query: str, 
+    docs: list, 
+    sources: list,
+    langfuse: Any = None
+) -> tuple[list, list, dict]:
+    """
+    Use LLM to intelligently select the most relevant sources for the query.
+    
+    Returns:
+        tuple: (filtered_docs, filtered_sources, selection_reasoning)
+    """
+    if not docs or len(docs) <= 3:
+        # Not enough sources to filter - return as-is
+        return docs, sources, {"method": "no-filter", "reason": "too_few_sources"}
+    
+    try:
+        from langchain_google_genai import ChatGoogleGenerativeAI
+        
+        # Build source descriptions for the prompt
+        source_descriptions = []
+        for i, (doc, source) in enumerate(zip(docs[:8], sources[:8]), 1):  # Max 8 sources to evaluate
+            source_type = doc.get("source_type", "course")
+            title = source.title if hasattr(source, 'title') else doc.get("title", "Unknown")
+            module = doc.get("module", "")
+            week = doc.get("week", "")
+            content_preview = doc.get("content", "")[:200]
+            
+            desc = f"""
+SOURCE {i}:
+- Title: {title}
+- Type: {source_type}
+- Module: {module}, Week: {week}
+- Content Preview: {content_preview}...
+"""
+            source_descriptions.append(desc)
+        
+        prompt = SOURCE_SELECTION_PROMPT.format(
+            question=query,
+            sources="\n".join(source_descriptions)
+        )
+        
+        llm = ChatGoogleGenerativeAI(
+            model="gemini-2.5-flash",
+            temperature=0.1,
+            google_api_key=settings.google_api_key,
+        )
+        
+        # Run with tracing if available (synchronous invoke)
+        if langfuse:
+            with langfuse.start_as_current_observation(
+                as_type="generation",
+                name="source_selection",
+                input={"query": query, "source_count": len(docs)},
+            ) as span:
+                response = llm.invoke([
+                    HumanMessage(content=prompt)
+                ])
+                span.update(output={"response": response.content[:500]})
+        else:
+            response = llm.invoke([
+                HumanMessage(content=prompt)
+            ])
+        
+        # Parse the JSON response
+        import json
+        import re
+        
+        response_text = response.content.strip()
+        # Extract JSON from response (handle potential markdown code blocks)
+        json_match = re.search(r'\[[\s\S]*\]', response_text)
+        if json_match:
+            selections = json.loads(json_match.group())
+        else:
+            logger.warning(f"[SourceSelection] Could not parse JSON response: {response_text[:200]}")
+            return docs, sources, {"method": "parse-failed", "reason": "invalid_json"}
+        
+        # Filter to relevant sources
+        filtered_docs = []
+        filtered_sources = []
+        selection_reasoning = {
+            "method": "llm-selection",
+            "evaluated": len(docs),
+            "selected": 0,
+            "reasons": []
+        }
+        
+        for selection in selections:
+            idx = selection.get("index", 0) - 1  # Convert to 0-based
+            if 0 <= idx < len(docs) and selection.get("relevant", False):
+                priority = selection.get("priority", "medium")
+                if priority in ["high", "medium"]:  # Only include high/medium priority
+                    filtered_docs.append(docs[idx])
+                    filtered_sources.append(sources[idx])
+                    selection_reasoning["reasons"].append({
+                        "source": idx + 1,
+                        "title": docs[idx].get("title", "Unknown")[:40],
+                        "priority": priority,
+                        "reasoning": selection.get("reasoning", "")[:100]
+                    })
+        
+        selection_reasoning["selected"] = len(filtered_docs)
+        
+        # Ensure we have at least some sources
+        if len(filtered_docs) < 2:
+            # Fall back to top sources by score
+            logger.info(f"[SourceSelection] Too few selected ({len(filtered_docs)}), using top by score")
+            return docs[:3], sources[:3], {"method": "fallback", "reason": "too_few_selected"}
+        
+        logger.info(f"[SourceSelection] Selected {len(filtered_docs)}/{len(docs)} sources via LLM")
+        return filtered_docs, filtered_sources, selection_reasoning
+        
+    except Exception as e:
+        logger.warning(f"[SourceSelection] LLM selection failed: {e}")
+        # Fall back to original sources
+        return docs, sources, {"method": "error", "reason": str(e)}
+
 
 def _format_history(conversation_history: list) -> str:
     """Format conversation history for prompt"""
@@ -139,13 +281,20 @@ def _execute_tutor_logic(state: AgentState, langfuse: Any) -> Dict[str, Any]:
             with langfuse.start_as_current_observation(
                 as_type="retriever",
                 name="rag_retrieval",
-                input={"query": query, "k": 5},
+                input={"query": query, "k": 8},  # Retrieve more for intelligent filtering
                 metadata={"retriever": "chromadb", "collections": "auto-detect"}
             ) as rag_span:
                 # Let RAG auto-detect if OER is needed based on query content
-                docs, rag_metadata = retriever.retrieve(query, k=5)
-                context_str = retriever.format_context(docs)
+                docs, rag_metadata = retriever.retrieve(query, k=8)  # Get more sources for filtering
                 sources = retriever.docs_to_sources(docs)
+                
+                # Intelligent source selection (filters down to most relevant)
+                docs, sources, selection_info = _intelligent_source_selection(
+                    query, docs, sources, langfuse
+                )
+                
+                # Now format context with filtered sources
+                context_str = retriever.format_context(docs)
                 
                 # Update span with output
                 rag_span.update(
@@ -154,14 +303,21 @@ def _execute_tutor_logic(state: AgentState, langfuse: Any) -> Dict[str, Any]:
                         "has_comp237": rag_metadata.has_comp237 if rag_metadata else False,
                         "sources": [s.title for s in sources[:3]] if sources else [],
                         "used_oer": any(s.source_type == "oer" for s in sources) if sources else False,
-                        "used_embedded": any(s.source_type == "embedded" for s in sources) if sources else False
+                        "used_embedded": any(s.source_type == "embedded" for s in sources) if sources else False,
+                        "source_selection": selection_info
                     }
                 )
         else:
             # No Langfuse - run without tracing (auto-detect OER usage)
-            docs, rag_metadata = retriever.retrieve(query, k=5)
-            context_str = retriever.format_context(docs)
+            docs, rag_metadata = retriever.retrieve(query, k=8)
             sources = retriever.docs_to_sources(docs)
+            
+            # Intelligent source selection
+            docs, sources, selection_info = _intelligent_source_selection(
+                query, docs, sources, None
+            )
+            
+            context_str = retriever.format_context(docs)
             
     except Exception as e:
         logger.error(f"[Tutor] RAG failed: {e}")
@@ -169,6 +325,7 @@ def _execute_tutor_logic(state: AgentState, langfuse: Any) -> Dict[str, Any]:
         rag_metadata = None
         context_str = "No course context available."
         sources = []
+        selection_info = {"method": "error", "reason": str(e)}
     
     # Format history
     history_str = _format_history(conversation_history)
@@ -333,6 +490,9 @@ def _execute_tutor_logic(state: AgentState, langfuse: Any) -> Dict[str, Any]:
         # Convert rag_metadata to dict if it's a Pydantic model
         rag_meta_dict = rag_metadata.model_dump() if rag_metadata else {"docs_retrieved": 0, "retrieval_success": False}
         
+        # Get source selection info (should always exist after RAG step)
+        source_selection = selection_info if selection_info else {"method": "default"}
+        
         return {
             **state,
             "response": response_text,
@@ -341,6 +501,7 @@ def _execute_tutor_logic(state: AgentState, langfuse: Any) -> Dict[str, Any]:
             "retrieved_docs": docs,
             "rag_metadata": rag_meta_dict,
             "context_str": context_str,
+            "source_selection": source_selection,  # Include selection reasoning
         }
         
     except Exception as e:

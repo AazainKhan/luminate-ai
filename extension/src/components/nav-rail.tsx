@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState, useRef } from "react"
+import React, { useState, useRef, useEffect } from "react"
 import { TrashDialog } from "./trash-popover"
 import { ConfirmDialog } from "./confirm-dialog"
 import { RenameDialog } from "./rename-dialog"
@@ -277,7 +277,6 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
     return (
       <div key={item.id}>
         <TreeItem
-          id={item.id}
           icon={item.icon}
           label={item.label}
           hasChildren={true}
@@ -497,7 +496,6 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                       return (
                         <TreeItem
                           key={item.id}
-                          id={item.id}
                           icon={item.icon}
                           label={item.label}
                           active={item.id === activeChatId}
@@ -526,7 +524,6 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                     {sortItems(filterItems(recentChats, true)).map((item) => (
                       <TreeItem
                         key={item.id}
-                        id={item.id}
                         icon={item.icon}
                         label={item.label}
                         itemId={item.id}
@@ -652,8 +649,11 @@ export function NavRail({ onSelectChat, activeChatId }: { onSelectChat?: (chatId
                 <DropdownMenuSeparator className="bg-border" />
 
                 <DropdownMenuItem
-                  className="text-foreground hover:text-destructive focus:bg-destructive/10 focus:text-destructive"
-                  onClick={() => signOut()}
+                  className="text-foreground hover:text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer"
+                  onSelect={async (e) => {
+                    e.preventDefault()
+                    await signOut()
+                  }}
                   data-testid="logout-item"
                 >
                   <LogOut className="w-4 h-4 mr-2" />
@@ -744,7 +744,7 @@ function TreeItem({
   onClick?: () => void,
   onRename?: () => void,
   onDelete?: () => void,
-  onMove?: (targetId: string) => void,
+  onMove?: (targetId: string | null) => void,
   folders?: { id: string; label: string; parentId?: string | null }[],
   isExpanded?: boolean,
   onMenuOpenChange?: (open: boolean) => void
@@ -757,7 +757,7 @@ function TreeItem({
     <div
       ref={itemRef}
       className={cn(
-        "flex items-center gap-2 px-2 py-2 cursor-pointer border-l-2 border-transparent hover:bg-accent rounded transition-colors group relative pr-8",
+        "flex items-center gap-2 px-2 py-2 cursor-pointer border-l-2 border-transparent hover:bg-accent rounded transition-colors group relative",
         active ? "bg-primary/10 border-l-2 border-primary text-primary" : "text-muted-foreground hover:text-foreground"
       )}
       data-testid={`tree-item-${itemId}`}
@@ -786,64 +786,64 @@ function TreeItem({
         <div className="w-3 shrink-0" />
       )}
       <Icon className={cn("w-3.5 h-3.5 shrink-0", active ? "text-primary" : "text-muted-foreground")} />
-      <span className="text-xs truncate leading-none flex-1">{label}</span>
+      <span className="text-xs truncate leading-none flex-1 min-w-0 max-w-[120px]">{label}</span>
 
-      <div className="flex items-center gap-1 absolute right-1 opacity-0 group-hover:opacity-100 transition-opacity">
-        <button
-          onClick={(e) => {
-            e.stopPropagation()
-            onToggleStar(itemId)
-          }}
-          className={cn(
-            "p-0.5 hover:bg-accent rounded shrink-0",
-            isStarred && "opacity-100 block"
-          )}
-          data-testid={`star-button-${itemId}`}
-        >
-          <Star className={cn(
-            "w-3 h-3",
-            isStarred ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"
-          )} />
-        </button>
+      {/* Star button - always visible when starred, otherwise show on hover */}
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          onToggleStar(itemId)
+        }}
+        className={cn(
+          "p-0.5 hover:bg-accent rounded shrink-0 transition-opacity",
+          isStarred ? "opacity-100" : "opacity-0 group-hover:opacity-100"
+        )}
+        data-testid={`star-button-${itemId}`}
+      >
+        <Star className={cn(
+          "w-3 h-3",
+          isStarred ? "fill-yellow-500 text-yellow-500" : "text-muted-foreground"
+        )} />
+      </button>
 
-        <DropdownMenu onOpenChange={onMenuOpenChange}>
-          <DropdownMenuTrigger asChild>
-            <Button
-              variant="ghost"
-              className="h-6 w-6 p-0 hover:bg-accent"
-              onClick={(e) => e.stopPropagation()}
-              data-testid={`menu-button-${itemId}`}
-            >
-              <MoreHorizontal className="h-4 w-4 text-muted-foreground hover:text-foreground" />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent
-            align="end"
-            className="bg-popover border-border z-[60]"
-            onCloseAutoFocus={(e) => {
-              if (isMovingRef.current) {
-                e.preventDefault()
-              }
-            }}
+      {/* Menu button - show on hover */}
+      <DropdownMenu onOpenChange={onMenuOpenChange}>
+        <DropdownMenuTrigger asChild>
+          <Button
+            variant="ghost"
+            className="h-5 w-5 p-0 hover:bg-accent shrink-0 opacity-0 group-hover:opacity-100 transition-opacity"
+            onClick={(e) => e.stopPropagation()}
+            data-testid={`menu-button-${itemId}`}
           >
-            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRename?.() }} className="text-popover-foreground focus:bg-accent cursor-pointer">
-              Rename
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={(e) => {
-                isMovingRef.current = true
-                setShowMove(true)
-              }}
-              className="text-popover-foreground focus:bg-accent cursor-pointer"
-            >
-              Move to...
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete?.() }} className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
-              Delete
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      </div>
+            <MoreHorizontal className="h-3.5 w-3.5 text-muted-foreground hover:text-foreground" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent
+          align="end"
+          className="bg-popover border-border z-[60]"
+          onCloseAutoFocus={(e) => {
+            if (isMovingRef.current) {
+              e.preventDefault()
+            }
+          }}
+        >
+          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onRename?.() }} className="text-popover-foreground focus:bg-accent cursor-pointer">
+            Rename
+          </DropdownMenuItem>
+          <DropdownMenuItem
+            onSelect={(e) => {
+              isMovingRef.current = true
+              setShowMove(true)
+            }}
+            className="text-popover-foreground focus:bg-accent cursor-pointer"
+          >
+            Move to...
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onDelete?.() }} className="text-destructive focus:bg-destructive/10 focus:text-destructive cursor-pointer">
+            Delete
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   )
 }

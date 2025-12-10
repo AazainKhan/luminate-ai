@@ -460,11 +460,21 @@ function MessageLegacyContent({ message, copied, handleCopy, isUser, isLoading, 
                 // Phase-based control: open during reasoning phase, closed otherwise
                 const currentPhase = message.metadata?.currentPhase || "thinking";
                 const isReasoningPhase = currentPhase === "reasoning";
+                const isStreamingActive = isLoading && !message.streamComplete;
+                const isStreamingReasoning = isStreamingActive && isReasoningPhase;
+                
+                // State for manual control after streaming
+                const [manuallyOpen, setManuallyOpen] = React.useState(false);
+                
+                // During streaming: controlled by phase
+                // After streaming: controlled by manual state (user can toggle)
+                const isOpen = isStreamingActive ? isReasoningPhase : manuallyOpen;
 
                 return (
                   <Reasoning 
-                    open={isReasoningPhase}
-                    isStreaming={isLoading && !message.streamComplete && isReasoningPhase}
+                    open={isOpen}
+                    onOpenChange={setManuallyOpen}
+                    isStreaming={isStreamingReasoning}
                   >
                     <ReasoningTrigger currentStep={currentStep} />
                     <ReasoningContent>

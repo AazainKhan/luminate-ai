@@ -44,6 +44,7 @@ class AgentState(TypedDict):
     retrieved_docs: List[dict]        # Raw docs from ChromaDB
     rag_metadata: Optional[dict]      # RAGMetadata as dict
     context_str: Optional[str]        # Formatted context for prompts
+    source_selection: Optional[dict]  # Intelligent source selection reasoning
     
     # ========== Scaffolding (LearnLM + Adarsh's escalation) ==========
     escalation_level: int             # 1-4 scaffolding level
@@ -52,6 +53,7 @@ class AgentState(TypedDict):
     
     # ========== Output ==========
     response: Optional[str]           # Final text response
+    reasoning: Optional[str]          # LLM thinking/reasoning (for frontend display)
     intervention: Optional[dict]      # Polymorphic UI component (as dict)
     sources: List[dict]               # RAG sources used
     

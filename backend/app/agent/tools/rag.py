@@ -28,10 +28,12 @@ class RAGRetriever:
     """
     Multi-collection ChromaDB retriever for COMP237.
     
-    Collections:
-    1. comp237_course_materials (403 docs) - Primary course content
-    2. oer_resources (73 docs) - MIT Math for ML supplementary materials
-    3. embedded_resources (247 docs) - Mediasite videos, URLs, external links
+    Collections (updated Dec 2024):
+    1. comp237_course_materials - Primary course content with Blackboard links
+    2. comp237_media - Mediasite and YouTube videos  
+    3. comp237_images - Analyzed course images with educational context
+    4. comp237_oer - OER supplementary materials (MIT Math for ML, Python for DS)
+    5. comp237_external - External validated resources
     
     All collections are always queried. The LLM decides which sources
     to cite based on relevance via citation confidence scoring.
@@ -42,8 +44,10 @@ class RAGRetriever:
         host: str = None,
         port: int = None,
         collection_name: str = "comp237_course_materials",  # Primary collection
-        oer_collection_name: str = "oer_resources",  # Supplementary OER collection
-        embedded_collection_name: str = "embedded_resources",  # Mediasite/URLs collection
+        oer_collection_name: str = "comp237_oer",  # OER supplementary collection
+        embedded_collection_name: str = "comp237_media",  # Mediasite/YouTube videos
+        images_collection_name: str = "comp237_images",  # Analyzed images
+        external_collection_name: str = "comp237_external",  # External resources
     ):
         """
         Initialize multi-collection RAG retriever.
@@ -53,13 +57,17 @@ class RAGRetriever:
             port: ChromaDB port (defaults to 8000 internal Docker port)
             collection_name: Primary course collection
             oer_collection_name: OER supplementary collection (MIT Math for ML)
-            embedded_collection_name: Embedded resources (mediasite, URLs)
+            embedded_collection_name: Media resources (Mediasite, YouTube)
+            images_collection_name: Analyzed course images
+            external_collection_name: External validated resources
         """
         self.host = host or app_settings.chromadb_host
         self.port = port or app_settings.chromadb_port
         self.collection_name = collection_name
         self.oer_collection_name = oer_collection_name
         self.embedded_collection_name = embedded_collection_name
+        self.images_collection_name = images_collection_name
+        self.external_collection_name = external_collection_name
         self.client = None
         self._embeddings = None
         self._connect()
@@ -126,17 +134,33 @@ class RAGRetriever:
             return None
     
     def _get_embedded_collection(self):
-        """Get embedded resources collection (returns None if not available)"""
+        """Get embedded resources (media) collection (returns None if not available)"""
         try:
             return self._get_collection(self.embedded_collection_name, quiet=True)
         except ValueError:
-            logger.info(f"Embedded resources collection '{self.embedded_collection_name}' not available - skipping embedded resources")
+            logger.info(f"Media collection '{self.embedded_collection_name}' not available - skipping media search")
+            return None
+    
+    def _get_images_collection(self):
+        """Get images collection (returns None if not available)"""
+        try:
+            return self._get_collection(self.images_collection_name, quiet=True)
+        except ValueError:
+            logger.debug(f"Images collection '{self.images_collection_name}' not available - skipping image search")
+            return None
+    
+    def _get_external_collection(self):
+        """Get external resources collection (returns None if not available)"""
+        try:
+            return self._get_collection(self.external_collection_name, quiet=True)
+        except ValueError:
+            logger.debug(f"External collection '{self.external_collection_name}' not available - skipping external search")
             return None
     
     def retrieve(
         self,
         query: str,
-        k: int = 5,  # Increased from 3 to accommodate 3 collections
+        k: int = 5,  # Increased from 3 to accommodate multiple collections
         threshold: float = 0.30,  # Lowered from 0.35 to 0.30 - scores typically ~0.34
     ) -> Tuple[List[Dict[str, Any]], RAGMetadata]:
         """
@@ -199,7 +223,7 @@ class RAGRetriever:
                     logger.warning(f"OER search failed: {e}")
             
             # --- EMBEDDED RESOURCES COLLECTION (Always query for mediasite/URLs) ---
-            logger.info("Querying embedded resources (mediasite links, URLs)...")
+            logger.info("Querying media collection (Mediasite, YouTube videos)...")
             embedded_collection = self._get_embedded_collection()
             embedded_results = None
             if embedded_collection:
@@ -209,9 +233,26 @@ class RAGRetriever:
                         n_results=k,
                         include=["documents", "metadatas", "distances"],
                     )
-                    logger.info(f"Embedded: Found {len(embedded_results.get('documents', [[]])[0])} media/URL resources")
+                    logger.info(f"Media: Found {len(embedded_results.get('documents', [[]])[0])} video resources")
                 except Exception as e:
-                    logger.warning(f"Embedded resources search failed: {e}")            # --- PROCESS COURSE RESULTS (Primary) ---
+                    logger.warning(f"Media search failed: {e}")
+            
+            # --- IMAGES COLLECTION (Query for educational diagrams) ---
+            logger.info("Querying images collection (course diagrams, figures)...")
+            images_collection = self._get_images_collection()
+            images_results = None
+            if images_collection:
+                try:
+                    images_results = images_collection.query(
+                        query_embeddings=[query_embedding],
+                        n_results=max(2, k // 2),  # Fetch fewer images
+                        include=["documents", "metadatas", "distances"],
+                    )
+                    logger.info(f"Images: Found {len(images_results.get('documents', [[]])[0])} educational images")
+                except Exception as e:
+                    logger.warning(f"Images search failed: {e}")
+            
+            # --- PROCESS COURSE RESULTS (Primary) ---
             course_docs = []
             docs_raw = course_results.get("documents", [[]])[0]
             metas_raw = course_results.get("metadatas", [[]])[0]
@@ -236,35 +277,29 @@ class RAGRetriever:
                     module = meta.get("module", "")
                     week = meta.get("week", "")
                     
-                    # Extract URLs from enriched metadata
-                    primary_url = meta.get("primary_url", "")
-                    primary_url_type = meta.get("primary_url_type", "")
-                    has_urls = meta.get("has_urls", False)
+                    # Extract URLs from actual metadata fields
+                    blackboard_url = meta.get("blackboard_url", "")
+                    external_url = meta.get("external_url", "")
+                    source_type = meta.get("type", "course_content")
                     
-                    # Parse additional URLs if available
-                    import json
-                    all_urls = []
-                    url_types = []
-                    try:
-                        if meta.get("urls"):
-                            all_urls = json.loads(meta["urls"])
-                        if meta.get("url_types"):
-                            url_types = json.loads(meta["url_types"])
-                    except:
-                        pass
+                    # Determine primary URL and type
+                    primary_url = ""
+                    link_type = None
+                    if blackboard_url:
+                        primary_url = blackboard_url
+                        link_type = "blackboard"
+                    elif external_url:
+                        primary_url = external_url
+                        # Infer type from URL
+                        if "mediasite" in external_url.lower():
+                            link_type = "mediasite"
+                        elif "youtube" in external_url.lower() or "youtu.be" in external_url.lower():
+                            link_type = "youtube"
+                        else:
+                            link_type = "external"
                     
                     # Citation confidence: High for course content if score > 0.4 (likely to be cited inline)
                     citation_confidence = "high" if score > 0.4 else "medium"
-                    
-                    # Map URL type to link_type (for consistency with embedded resources)
-                    link_type = None
-                    if primary_url_type:
-                        if primary_url_type == "blackboard":
-                            link_type = "blackboard"  # Blackboard course content (highest priority)
-                        elif primary_url_type == "mediasite_video":
-                            link_type = "mediasite"
-                        elif primary_url_type in ["wikipedia", "external", "youtube", "pdf", "code"]:
-                            link_type = "generic_url"
                     
                     course_docs.append({
                         "content": doc,
@@ -276,10 +311,10 @@ class RAGRetriever:
                         "week": week,
                         "source_type": "course",
                         "citation_confidence": citation_confidence,
-                        "url": primary_url if has_urls else None,
+                        "url": primary_url if primary_url else None,
                         "link_type": link_type,
-                        "all_urls": all_urls if all_urls else None,
-                        "url_types": url_types if url_types else None,
+                        "blackboard_url": blackboard_url if blackboard_url else None,
+                        "external_url": external_url if external_url else None,
                     })
             
             # --- PROCESS OER RESULTS (Supplementary) ---
@@ -339,10 +374,20 @@ class RAGRetriever:
                     if score >= threshold * 0.8 and len(doc) >= 50:
                         meta = meta or {}
                         
-                        link_type = meta.get("link_type", "url")
-                        url = meta.get("url", "")
-                        title = meta.get("title", "Resource")
-                        parent_module = meta.get("parent_module", "")
+                        # Map type field to link_type for consistency
+                        source_type_raw = meta.get("type", "")
+                        link_type = meta.get("link_type", "")
+                        if not link_type:
+                            if "mediasite" in source_type_raw.lower():
+                                link_type = "mediasite"
+                            elif "youtube" in source_type_raw.lower():
+                                link_type = "youtube"
+                            else:
+                                link_type = "video"
+                        
+                        url = meta.get("external_url", "") or meta.get("url", "")
+                        title = meta.get("title", "Video Resource")
+                        parent_module = meta.get("module", "") or meta.get("parent_module", "")
                         
                         # Citation confidence: High for mediasite (course videos), medium for URLs
                         if link_type == "mediasite":
@@ -357,17 +402,53 @@ class RAGRetriever:
                             "source_file": f"{parent_module}: {title}" if parent_module else title,
                             "title": title,
                             "module": parent_module,
-                            "week": "",
-                            "source_type": "embedded",
+                            "week": meta.get("week", ""),
+                            "source_type": "media",
                             "citation_confidence": citation_confidence,
                             "link_type": link_type,
                             "url": url,
                         })
             
-            # --- MERGE RESULTS: Prioritize course > embedded > OER ---
+            # --- PROCESS IMAGES (Educational diagrams/figures) ---
+            image_docs = []
+            if images_results:
+                images_docs_raw = images_results.get("documents", [[]])[0]
+                images_metas_raw = images_results.get("metadatas", [[]])[0]
+                images_dists_raw = images_results.get("distances", [[]])[0]
+                
+                for doc, meta, dist in zip(images_docs_raw, images_metas_raw, images_dists_raw):
+                    score = 1.0 / (1.0 + float(dist)) if dist is not None else 0.0
+                    
+                    if score >= threshold * 0.8 and len(doc) >= 20:  # Images have shorter descriptions
+                        meta = meta or {}
+                        
+                        title = meta.get("title", "Course Image")
+                        module = meta.get("module", "")
+                        concepts = meta.get("concepts", "").split(",") if meta.get("concepts") else []
+                        source_file = meta.get("source_file", "")
+                        
+                        # Images are supplementary visual aids - lower citation priority
+                        citation_confidence = "low"
+                        
+                        image_docs.append({
+                            "content": doc,
+                            "metadata": meta,
+                            "score": score * 0.7,  # Lower priority than text/videos
+                            "source_file": f"Image: {source_file}" if source_file else title,
+                            "title": title,
+                            "module": module,
+                            "week": meta.get("week", ""),
+                            "source_type": "image",
+                            "citation_confidence": citation_confidence,
+                            "concepts": concepts,
+                            "image_path": source_file,
+                        })
+            
+            # --- MERGE RESULTS: Prioritize course > media > images > OER ---
             # STRATEGY: Ensure diverse source types (not all videos, not all text)
             # - Course materials (Blackboard text/PDFs): High priority for conceptual content
-            # - Embedded resources (Mediasite videos): High priority for demonstrations
+            # - Media resources (Mediasite/YouTube videos): High priority for demonstrations
+            # - Images: Visual aids for concepts (lower priority, supplementary)
             # - OER (MIT Math for ML): Lower priority for supplementary theory
             
             # Sort by adjusted score with diversity weighting
@@ -376,43 +457,53 @@ class RAGRetriever:
                 source_type = d.get("source_type")
                 link_type = d.get("link_type")
                 
-                # Boost by source type - calibrated to ensure top-5 includes both course text & videos
+                # Boost by source type - calibrated to ensure top-k includes diverse sources
                 if source_type == "course":
                     # Prioritize Blackboard course materials (text content with URLs)
                     if link_type == "blackboard":
                         boost = 0.40  # Highest priority: Course text with Blackboard URLs
                     else:
                         boost = 0.35  # Course text without URLs
-                elif source_type == "embedded":
-                    # Embedded resources (videos/external links)
+                elif source_type == "media":
+                    # Media resources (videos)
                     if link_type == "mediasite":
                         boost = 0.25  # Videos rank well when relevant, but not above course text
+                    elif link_type == "youtube":
+                        boost = 0.20  # YouTube videos
                     else:
-                        boost = 0.15  # Generic URLs (Wikipedia, etc.)
+                        boost = 0.15  # Other video types
+                elif source_type == "image":
+                    # Images are visual aids (moderate priority for visual learners)
+                    boost = 0.15
                 else:  # OER
                     boost = 0.0
                     
                 return score + boost
             
-            # Sort all docs by adjusted score
-            all_docs = course_docs + embedded_docs + oer_docs
+            # Sort all docs by adjusted score (now includes images)
+            all_docs = course_docs + embedded_docs + image_docs + oer_docs
             all_docs.sort(key=sort_key, reverse=True)
             
-            # DIVERSITY FILTER: Ensure top-k includes BOTH course text AND videos (if available)
-            # Strategy: Take top results, but reserve at least 1-2 slots for videos if they exist
+            # DIVERSITY FILTER: Ensure top-k includes diverse source types
+            # Strategy: Reserve slots for videos and images if they exist
             top_docs = []
-            video_docs = [d for d in all_docs if d.get("link_type") == "mediasite"]
-            non_video_docs = [d for d in all_docs if d.get("link_type") != "mediasite"]
+            video_docs = [d for d in all_docs if d.get("link_type") in ("mediasite", "youtube")]
+            image_docs_filtered = [d for d in all_docs if d.get("source_type") == "image"]
+            text_docs = [d for d in all_docs if d.get("source_type") in ("course", "oer") and d.get("link_type") not in ("mediasite", "youtube")]
             
-            # If we have videos, ensure at least 1-2 make it into top-k
-            if video_docs and len(video_docs) >= 2:
-                # Take top 3 non-videos + top 2 videos
-                top_docs = non_video_docs[:3] + video_docs[:2]
-            elif video_docs and len(video_docs) == 1:
-                # Take top 4 non-videos + 1 video
-                top_docs = non_video_docs[:4] + video_docs[:1]
+            # Build diverse result set
+            # Reserve: top 3-4 text, 1-2 videos, 1-2 images (if available)
+            if video_docs and image_docs_filtered:
+                # Have both videos and images - include 1 of each minimum
+                top_docs = text_docs[:3] + video_docs[:1] + image_docs_filtered[:1]
+            elif video_docs:
+                # Only videos
+                top_docs = text_docs[:4] + video_docs[:1]
+            elif image_docs_filtered:
+                # Only images  
+                top_docs = text_docs[:4] + image_docs_filtered[:1]
             else:
-                # No videos - take all top docs
+                # No media - take all text docs
                 top_docs = all_docs[:k]
             
             # Re-sort by original adjusted score to maintain relevance order
@@ -466,6 +557,7 @@ class RAGRetriever:
         """
         Format retrieved documents into a context string for prompts.
         Uses numbered references [1], [2], etc. that match the sources array.
+        Includes special formatting for images with path and concepts.
         
         Args:
             docs: List of document dicts
@@ -478,27 +570,59 @@ class RAGRetriever:
             return "No course context available."
         
         pieces = []
+        image_pieces = []  # Separate list for images
         total_len = 0
+        
+        # API base URL for serving images (will be proxied through frontend or used directly)
+        # Using relative API path that works with the backend
+        IMAGE_API_BASE = "/api/media/image"
         
         for idx, doc in enumerate(docs, start=1):
             source = doc.get("source_file", "Unknown")
             title = doc.get("title", "Document")
             content = doc.get("content", "").strip()
             score = doc.get("score", 0.0)
+            source_type = doc.get("source_type", "course")
             
-            # Use numbered reference [1], [2] that matches citation format
-            header = f"[Source {idx}] {title}"
-            source_info = f"File: {source} | Relevance: {score:.2f}"
-            block = f"{header}\n{source_info}\nContent: {content}\n"
+            if source_type == "image":
+                # Special formatting for images with API URL
+                image_path = doc.get("image_path", "")
+                concepts = doc.get("concepts", [])
+                concepts_str = ", ".join(concepts[:5]) if concepts else "General"
+                
+                # Create API URL for the image
+                image_url = f"{IMAGE_API_BASE}/{image_path}"
+                
+                block = f"""[Source {idx}] 📷 Educational Image
+Type: Image/Diagram  
+Image URL: {image_url}
+Concepts: {concepts_str}
+Description: {content}
+Relevance: {score:.2f}
+"""
+                image_pieces.append(block)
+            else:
+                # Standard text/media formatting
+                header = f"[Source {idx}] {title}"
+                source_info = f"File: {source} | Relevance: {score:.2f}"
+                block = f"{header}\n{source_info}\nContent: {content}\n"
+            
             block_len = len(block)
             
             if total_len + block_len > max_chars:
                 break
             
-            pieces.append(block)
+            if source_type != "image":
+                pieces.append(block)
             total_len += block_len
         
-        return "\n\n---\n\n".join(pieces)
+        # Combine: text sources first, then images section
+        result = "\n\n---\n\n".join(pieces)
+        
+        if image_pieces:
+            result += "\n\n---\n\n📷 AVAILABLE IMAGES FOR THIS TOPIC:\n" + "\n".join(image_pieces)
+        
+        return result
     
     def docs_to_sources(self, docs: List[Dict[str, Any]]) -> List[Source]:
         """Convert document dicts to Source schema objects with full metadata"""
@@ -558,6 +682,10 @@ class RAGRetriever:
                 if cap_match and cap_match.start() < 50:
                     description = description[cap_match.start():]
             
+            # Image-specific fields
+            image_path = doc.get("image_path") if doc.get("source_type") == "image" else None
+            image_url = f"/api/media/image/{image_path}" if image_path else None
+            
             sources.append(Source(
                 title=title,
                 source_file=doc.get("source_file", "Unknown"),
@@ -568,11 +696,15 @@ class RAGRetriever:
                 week=int(week) if week else None,
                 module=module if module else None,
                 description=description,
-                # New multi-collection fields
+                # Multi-collection fields
                 source_type=doc.get("source_type"),
                 citation_confidence=doc.get("citation_confidence"),
                 url=doc.get("url"),
                 link_type=doc.get("link_type"),
+                # Image-specific fields
+                image_path=image_path,
+                image_url=image_url,
+                concepts=doc.get("concepts") if doc.get("source_type") == "image" else None,
             ))
         return sources
 

@@ -204,6 +204,7 @@ def run_agent(
         
         return {
             "response": result.get("response", ""),
+            "reasoning": result.get("reasoning", ""),  # Add reasoning for frontend display
             "sources": result.get("sources", []),
             "intent": intent,
             "escalation_level": result.get("escalation_level", 1),
@@ -215,6 +216,7 @@ def run_agent(
             "rejection_reason": result.get("rejection_reason"),
             "trace_id": trace_id,
             "error": result.get("error"),
+            "source_selection": result.get("source_selection", {}),  # Intelligent source selection info
         }
         
     except Exception as e:
@@ -459,6 +461,7 @@ async def astream_agent(
                     output = event.get("data", {}).get("output", {})
                     sources = output.get("sources", [])
                     reasoning = output.get("reasoning", "")
+                    source_selection = output.get("source_selection", {})
                     
                     # RAG results (step 4 completion)
                     if sources:
@@ -469,6 +472,24 @@ async def astream_agent(
                             "result": {"docs_found": len(sources)},
                             "message": f"Found {len(sources)} relevant course materials"
                         }
+                        
+                        # Source selection step (step 4b - intelligent filtering)
+                        if source_selection and source_selection.get("method") == "llm-selection":
+                            selection_reasons = source_selection.get("reasons", [])
+                            selected_count = source_selection.get("selected", len(sources))
+                            evaluated_count = source_selection.get("evaluated", selected_count)
+                            yield {
+                                "type": "thinking",
+                                "step": "source_selection",
+                                "status": "completed",
+                                "result": {
+                                    "evaluated": evaluated_count,
+                                    "selected": selected_count,
+                                    "reasons": selection_reasons[:3]  # Top 3 reasons
+                                },
+                                "message": f"Selected {selected_count} most relevant sources from {evaluated_count} candidates"
+                            }
+                        
                         yield {"type": "sources", "sources": sources}
                     else:
                         yield {
@@ -533,10 +554,13 @@ async def astream_agent(
                             await asyncio.sleep(0.12)  # Small delay for natural reading pace
                 
                 elif name == "evaluator":
+                    # The output is the entire state dict returned by evaluator_node
                     output = event.get("data", {}).get("output", {})
-                    evaluation_result = output.get("evaluation", {})
+                    # Extract evaluation from state (not from output.evaluation)
+                    evaluation_result = output.get("evaluation") if isinstance(output, dict) else None
+                    
                     if evaluation_result:
-                        detected_concept = evaluation_result.get("detected_concept")
+                        detected_concept = evaluation_result.get("concept_detected")  # Note: correct key
                         if detected_concept:
                             yield {
                                 "type": "thinking",
@@ -578,6 +602,23 @@ async def astream_agent(
             logger.info(f"[Stream] Closed trace {trace_id} successfully")
         
         yield {"type": "finish", "chatId": chat_id, "traceId": trace_id, "finalPhase": "response"}
+    
+    except asyncio.CancelledError:
+        # Stream was cancelled by client - clean up gracefully
+        logger.info(f"[Stream] Cancelled by client for trace {trace_id}")
+        if root_span:
+            root_span.update(
+                output=json.dumps({"cancelled": True}),
+                metadata={"cancelled": True, "streaming_complete": False}
+            )
+            try:
+                if root_span_ctx:
+                    root_span_ctx.__exit__(None, None, None)
+                else:
+                    root_span.end()
+            except Exception:
+                pass  # Ignore cleanup errors on cancellation
+        # Don't re-raise - let the generator close cleanly
         
     except Exception as e:
         logger.error(f"Stream error: {e}")

@@ -99,8 +99,20 @@ export function LoginForm() {
       }
 
       if (data.session) {
-        console.log("✅ Code verified! User logged in:", data.session.user.email)
+        // Check if full_name is missing in user metadata and update it
+        if (!data.session.user.user_metadata?.full_name && fullName) {
+          const { error: updateError } = await supabase.auth.updateUser({
+            data: { full_name: fullName }
+          })
+          
+          if (updateError) {
+            console.error("❌ Failed to update user metadata:", updateError)
+          }
+        }
+        
         // Auth state will update automatically via useAuth hook
+        // Force refresh in case auth listener misses the change (extension env)
+        window.dispatchEvent(new Event("auth-refresh"))
       }
     } catch (err: any) {
       setError(err.message || "Invalid code. Please try again.")

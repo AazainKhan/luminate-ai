@@ -186,6 +186,15 @@ async def stream_chat(
             # Signal completion with chat_id and trace_id for client reference
             yield f'data: {json.dumps({"type": "finish", "chatId": chat_id, "traceId": trace_id})}\n\n'
 
+        except asyncio.CancelledError:
+            # Stream was cancelled by client - clean up gracefully
+            logger.info(f"Stream cancelled by client for chat {chat_id}")
+            # Flush Langfuse to close any open spans
+            from app.observability import flush_langfuse
+            flush_langfuse()
+            # Re-raise to let FastAPI handle the cancellation
+            raise
+
         except Exception as e:
             logger.error(f"Error during agent execution: {e}", exc_info=True)
             error_msg = "An unexpected error occurred while processing your request."

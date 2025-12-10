@@ -1,5 +1,5 @@
 "use client"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useEffect } from "react"
 import { useAuth } from "~/hooks/useAuth"
 import { LoginForm } from "~/components/auth/LoginForm"
 import { Conversation } from "~/components/chat/Conversation"
@@ -107,7 +107,7 @@ function AuthenticatedChatView({ user, session }: { user: User; session: Session
         </div>
 
         {/* Input Area - Sticky Bottom */}
-        <div className="shrink-0 w-full bg-gradient-to-t from-background via-background to-transparent pt-8 pb-10 px-6">
+        <div className="shrink-0 w-full bg-gradient-to-t from-background via-background to-transparent pt-2 pb-10 px-6">
           {/* Smart Suggestions - Above Input */}
           <div className="max-w-3xl mx-auto mb-3">
             <SmartSuggestions 

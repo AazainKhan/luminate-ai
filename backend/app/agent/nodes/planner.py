@@ -113,6 +113,40 @@ FAST_PATH_PATTERNS = {
     ],
 }
 
+# Math follow-up patterns - signals that the user is continuing a math conversation
+# These should keep the task type as SOLVE rather than switching to EXPLAIN
+MATH_FOLLOW_UP_PATTERNS = [
+    r"^(?:yes|no|okay|ok|sure|yeah|yep|nope|correct|right|wrong)\b",  # Simple affirmation/negation
+    r"^\s*\d",  # Starts with a number (answer attempt)
+    r"^(?:it'?s|that'?s|i think it'?s|the answer is)\s*[-\d]",  # Answer format
+    r"^(?:so|then)\s+(?:the|it|we|i)\b",  # Continuation pattern
+    r"^(?:what|how)\s+(?:about|if)\b",  # Follow-up question about the same problem
+    r"^(?:for|with|when|if)\s+(?:x|y|z|n|a|b|c)\s*=",  # Variable substitution
+    r"^\s*[-+*/()\d\s.=xy]+\s*$",  # Pure mathematical expression
+    r"^(?:using|applying|with|given)\b",  # Method continuation
+    r"^(?:can you|could you)\s+(?:show|help|explain)\s+(?:the|how)\s+(?:step|next|calculation)",  # Help with steps
+    r"^(?:next|continue|go on|keep going|and then)\b",  # Explicit continuation
+    r"^(?:wait|hold on|actually|but)\b",  # Correction/clarification
+    r"^(?:i got|i have|my answer|my result)\b",  # Showing work
+]
+MATH_FOLLOW_UP_RE = re.compile("|".join(MATH_FOLLOW_UP_PATTERNS), re.IGNORECASE)
+
+# Math topic indicators in messages
+# Note: Use \w* instead of \b at end to match word stems like "integrat" -> "integrate"
+MATH_TOPIC_INDICATORS = [
+    r"\b(?:equation|formula|expression|variable|coefficient)\b",
+    r"\b(?:derivative|integral|differentiat\w*|integrat\w*)\b",  # Match integrate, integration, etc.
+    r"\b(?:solve|calculate|compute|evaluate|simplify)\b",
+    r"\b(?:x|y|z)\s*[=+\-*/^]",  # Variable with operator
+    r"\b(?:gradient|loss|cost|function|MSE|RSS)\b",
+    r"\b(?:matrix|vector|eigenvalue|determinant)\b",
+    r"\b(?:probability|P\(|expected|variance)\b",
+    r"\blimit\s*\[",  # Definite integral limits like "limit [0,1]"
+    r"\bfrom\s+\d+\s+to\s+\d+",  # "from 0 to 1"
+    r"\bdx\b|\bdy\b",  # Integration variable
+]
+MATH_TOPIC_RE = re.compile("|".join(MATH_TOPIC_INDICATORS), re.IGNORECASE)
+
 # Confusion signals → always route to EXPLAIN with scaffolding
 CONFUSION_PATTERNS = [
     r"\bdon'?t\s*(?:get|understand)\b",
@@ -125,21 +159,174 @@ CONFUSION_PATTERNS = [
 ]
 
 # Stuck patterns for escalation detection
+# These patterns detect when a student is confused and needs more scaffolding
 STUCK_PATTERNS = [
-    r"\bi\s+don'?t\s+(?:know|understand|get\s+it)\b",
+    # "I don't understand/know" with optional words in between
+    r"\bi\s+don'?t\s+(?:\w+\s+)?(?:know|understand|get\s+it)\b",
+    r"\bi\s+don'?t\s+(?:\w+\s+)?(?:\w+\s+)?understand\b",  # "I dont even understand"
     r"\bidk\b",
     r"\bstill\s+(?:don'?t|confused|unclear|not\s+sure)\b",
     r"\bdidn'?t\s+(?:make\s+)?sense\b",
-    r"\bexplain\s+(?:again|it\s+again)\b",
+    r"\bdoesn'?t\s+(?:make\s+)?sense\b",
+    r"\bexplain\s+(?:again|it\s+again|more)\b",
     r"\bjust\s+(?:tell|explain|show)\s+me\b",
-    r"\bi'?m\s+(?:really\s+)?confused\b",
-    r"\bcan\s+you\s+just\s+explain\b",
-    r"\bi\s+(?:really\s+)?(?:don'?t\s+)?(?:understand|get)\s+(?:this|it)\b",
-    r"\bwhat\s+(?:do\s+you\s+mean|does\s+that\s+mean)\b",
+    r"\bi'?m\s+(?:really\s+|so\s+|very\s+)?confused\b",
+    r"\bcan\s+you\s+(?:just\s+)?explain\b",
+    r"\bi\s+(?:really\s+)?(?:don'?t\s+)?(?:understand|get)\s+(?:this|it|that)\b",
+    r"\bwhat\s+(?:do\s+you\s+mean|does\s+(?:this|that|it)\s+mean)\b",
     r"\bi'?m\s+(?:so\s+)?lost\b",
     r"\bthis\s+is\s+(?:too\s+)?confusing\b",
     r"\bhelp\s+me\s+understand\b",
+    r"\bnot\s+(?:getting|understanding)\s+(?:it|this)\b",
+    r"\bconfused\s+(?:about|by)\b",
+    r"\bwhat\s+do\s+(?:i|you)\s+mean\b",
+    r"\bcan'?t\s+(?:understand|figure|get)\b",
 ]
+
+
+def _detect_math_context(query: str, conversation_history: List[dict]) -> Tuple[bool, Optional[str]]:
+    """
+    Detect if the current conversation is in a math/solve context.
+    
+    This prevents the planner from switching task type from SOLVE to EXPLAIN
+    when the student is still working through a math problem.
+    
+    Returns:
+        (is_math_context, reason)
+    """
+    if not conversation_history:
+        return False, None
+    
+    query_lower = query.lower()
+    
+    # NEW: Check if query is clearly a new conceptual topic (breaks math context)
+    new_topic_patterns = [
+        r"\bwhat\s+is\s+(?:a\s+)?(?!the\s+(?:answer|result|solution))(\w+)",  # "what is X" (but not "what is the answer")
+        r"\bexplain\s+(?!this|that|the\s+(?:step|solution))(\w+)",  # "explain X" (but not "explain this")
+        r"\btell\s+me\s+about\b",  # "tell me about"
+        r"\bdefine\b",  # "define"
+        r"\bhow\s+does\s+(?!this|that|it)(\w+)",  # "how does X" (but not "how does this")
+        r"\bwhy\s+is\s+(?!this|that|it)(\w+)",  # "why is X" (but not "why is this")
+    ]
+    
+    # Check if it looks like a new topic question
+    is_new_topic = any(re.search(p, query_lower, re.IGNORECASE) for p in new_topic_patterns)
+    
+    # Check if current query looks like a math follow-up
+    is_follow_up = bool(MATH_FOLLOW_UP_RE.search(query))
+    
+    # Check if current query has explicit math content (keeps math context)
+    has_math_content = bool(MATH_TOPIC_RE.search(query))
+    
+    # If query is clearly a new topic AND doesn't contain math, break context
+    if is_new_topic and not has_math_content and not is_follow_up:
+        logger.info(f"[Planner] Math context BREAK: New topic query detected")
+        return False, None
+    
+    # Look at recent conversation for math context
+    recent_messages = conversation_history[-6:]  # Last 3 exchanges
+    
+    # Check if previous assistant message contained math scaffolding indicators
+    # These match phrases the math node uses when scaffolding
+    math_scaffolding_indicators = [
+        # Clarifying questions
+        "what variable",
+        "which bounds",
+        "definite or indefinite",
+        "what value",
+        "let me clarify",
+        "before we solve",
+        "can you tell me",
+        "what's your approach",
+        "what methods",          # NEW: "What methods do you know"
+        "what have you tried",   # NEW: asking about attempts
+        "have you heard of",     # NEW: checking knowledge
+        "have you tried",        # NEW: checking approaches
+        # Step-by-step guidance
+        "step by step",
+        "let's work through",
+        "first, let's",
+        "to solve this",
+        "let me give you a hint",  # NEW: explicit hint
+        "hint:",                   # NEW: hint prefix
+        "think about",             # NEW: prompting thought
+        # Math content
+        "the derivative",
+        "the integral",
+        "quadratic",               # NEW: quadratic equations
+        "equation",                # NEW: equation discussion
+        "factor",                  # NEW: factoring
+        "formula",                 # NEW: formula usage
+        # ML-specific
+        "gradient descent",
+        "cost function",
+        "loss function",
+    ]
+    
+    # Task type tracking from routing_info
+    previous_task = None
+    for msg in reversed(recent_messages):
+        if msg.get("role") == "assistant":
+            content = msg.get("content", "").lower()
+            metadata = msg.get("metadata", {})
+            
+            # Check if previous response was from math node
+            routing = metadata.get("routing_info", {})
+            if routing.get("task") == "solve":
+                previous_task = "solve"
+            
+            # Check content for math scaffolding
+            for indicator in math_scaffolding_indicators:
+                if indicator in content:
+                    logger.info(f"[Planner] Math context: Found scaffolding indicator '{indicator}'")
+                    return True, f"scaffolding_indicator:{indicator}"
+            
+            # Check for mathematical content
+            if MATH_TOPIC_RE.search(content):
+                return True, "math_topic_in_history"
+            
+            break  # Only check most recent assistant message
+    
+    # Check if previous user message was a math problem
+    for msg in reversed(recent_messages):
+        if msg.get("role") == "user":
+            user_content = msg.get("content", "")
+            # Check for math patterns in previous user message
+            if MATH_TOPIC_RE.search(user_content):
+                if is_follow_up:
+                    logger.info("[Planner] Math context: Follow-up to math problem")
+                    return True, "math_follow_up"
+            break
+    
+    # If current query is a simple follow-up and previous task was solve, maintain it
+    if is_follow_up and previous_task == "solve":
+        logger.info("[Planner] Math context: Simple follow-up maintaining solve task")
+        return True, "follow_up_maintain_solve"
+    
+    return False, None
+
+
+def _find_original_math_problem(conversation_history: List[dict]) -> Optional[str]:
+    """
+    Find the original math problem from conversation history.
+    
+    Looks for the most recent user message that contains a math pattern.
+    This is used when maintaining math context to pass the original problem
+    to the math node instead of the follow-up query.
+    """
+    if not conversation_history:
+        return None
+    
+    # Look through history in reverse to find the original math problem
+    for msg in reversed(conversation_history):
+        if msg.get("role") == "user":
+            content = msg.get("content", "")
+            # Check if this message looks like a math problem
+            if MATH_TOPIC_RE.search(content):
+                logger.info(f"[Planner] Found original math problem: {content[:50]}...")
+                return content
+    
+    return None
 
 
 def _check_policy(query: str) -> Tuple[bool, Optional[str], Optional[str]]:
@@ -397,6 +584,44 @@ def planner_node(state: AgentState) -> Dict[str, Any]:
         escalation_level = _calculate_escalation_level(is_stuck, stuck_count)
         
         logger.info(f"[Planner] Stuck: {is_stuck}, Count: {stuck_count}, Escalation: {escalation_level}")
+        
+        # =====================================================================
+        # Step 2b: Math Context Persistence Check
+        # =====================================================================
+        # Check if we're in an ongoing math conversation - prevents switching from SOLVE to EXPLAIN
+        is_math_context, math_context_reason = _detect_math_context(query, conversation_history)
+        
+        if is_math_context:
+            logger.info(f"[Planner] Math context detected: {math_context_reason}")
+            
+            # Find the original math problem from history to pass to math node
+            # This ensures the math node knows what problem we're working on
+            original_problem = _find_original_math_problem(conversation_history)
+            
+            # Use original problem if found, otherwise include current query
+            # The math node will see both in the conversation context
+            problem_for_node = original_problem if original_problem else query
+            
+            # Create payload with original problem and current follow-up
+            payload = SolvePayload(problem=problem_for_node)
+            
+            plan = {
+                "subtasks": [{"task": "solve", "payload": payload.model_dump()}],
+                "confidence": 0.9,
+                "reasoning": f"Math context maintained: {math_context_reason}. Original problem: {problem_for_node[:50]}...",
+            }
+            
+            return {
+                **state,
+                "plan": plan,
+                "approved": True,
+                "rejection_reason": None,
+                "escalation_level": escalation_level,
+                "stuck_count": stuck_count,
+                "is_stuck": is_stuck,
+                "original_math_problem": original_problem,  # Pass to state for reference
+                "routing_info": {"method": "math-context", "task": "solve", "reason": math_context_reason},
+            }
         
         # Try fast-path first
         fast_task = _check_fast_path(query)

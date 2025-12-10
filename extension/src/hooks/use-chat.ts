@@ -463,11 +463,8 @@ export default function useChat(options?: UseChatOptions): UseChatReturn {
       // Evaluation scores (agent badge, concept, quality metrics) - store in buffer
       } else if (parsed.type === "evaluation") {
         if (isDevelopment) {
-          console.log("📊 Received evaluation event:", {
-            agent: parsed.evaluation?.agent_used,
-            concept: parsed.evaluation?.detected_concept,
-            confidence: parsed.evaluation?.confidence
-          })
+          console.log("📊 Received evaluation event:", parsed.evaluation)
+          console.log("📊 Evaluation keys:", parsed.evaluation ? Object.keys(parsed.evaluation) : "no evaluation")
         }
         // Store in buffer for finish handler
         buffer.evaluation = parsed.evaluation

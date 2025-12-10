@@ -121,20 +121,22 @@ interface ThinkingTraceProps {
   steps: ThinkingStep[]
   /** Whether the agent is still processing */
   isStreaming?: boolean
-  /** Current phase for collapse control */
+  /** Current phase for collapse control. If undefined, component is uncontrolled */
   currentPhase?: "thinking" | "reasoning" | "response"
   className?: string
 }
 
 /**
- * ThinkingTrace - Displays structured thinking steps from the agent
+ * ThinkingTrace - Displays structured planning steps from the planner node
  * 
- * A sleek, Gemini-like accordion that shows the agent's decision-making process:
+ * A sleek, Gemini-like accordion that shows the agent's planning process:
  * - Scope check (is question within COMP237?)
  * - Classification (explain/solve/code)
  * - Escalation (scaffolding level 1-4)
  * - RAG retrieval (finding course materials)
  * - Strategy selection (teaching approach)
+ * 
+ * This represents the "Planning" phase before the agent begins reasoning.
  * 
  * @example
  * ```tsx
@@ -159,13 +161,19 @@ export function ThinkingTrace({
   const completedCount = steps.filter(s => s.status === "completed").length
   const processingStep = steps.find(s => s.status === "processing")
   
-  // Manual control: open during thinking phase, closed otherwise
-  const isOpen = currentPhase === "thinking"
+  // State for manual control after streaming
+  const [manuallyOpen, setManuallyOpen] = React.useState(false)
+  
+  // During streaming: controlled by currentPhase (auto-open during thinking)
+  // After streaming: controlled by manual state (user can toggle)
+  const isThinkingPhase = currentPhase === "thinking"
+  const isOpen = isStreaming ? isThinkingPhase : manuallyOpen
   
   return (
     <Reasoning 
       open={isOpen}
-      isStreaming={isStreaming && currentPhase === "thinking"}
+      onOpenChange={setManuallyOpen}
+      isStreaming={isStreaming}
       className={className}
     >
       <ReasoningTrigger>
@@ -174,8 +182,8 @@ export function ThinkingTrace({
             <Loader2 className="h-4 w-4 animate-spin text-violet-400" />
             <span className="animate-pulse text-violet-400 text-xs font-medium">
               {processingStep 
-                ? STEP_LABELS[processingStep.step] || "Thinking..."
-                : "Thinking..."}
+                ? STEP_LABELS[processingStep.step] || "Planning..."
+                : "Planning..."}
             </span>
             <ChevronDown className="h-4 w-4 ml-auto transition-transform duration-200 group-data-[state=open]:rotate-180 text-muted-foreground" />
           </>

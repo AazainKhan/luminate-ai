@@ -58,15 +58,16 @@ backend/app/
 │   ├── state.py             # AgentState TypedDict (~25 fields)
 │   ├── schemas.py           # Pydantic schemas (TaskType, Source, etc.)
 │   ├── nodes/
-│   │   ├── planner.py       # Policy enforcement + Query classification
+│   │   ├── planner.py       # Policy enforcement + Query classification + Math context persistence
 │   │   ├── tutor.py         # Scaffolded teaching (4 levels)
-│   │   ├── math.py          # Step-by-step math solutions
+│   │   ├── math.py          # Step-by-step math solutions + MathTool integration
 │   │   ├── reject.py        # Off-topic/policy violation handling
 │   │   └── evaluator.py     # Interaction logging + mastery tracking
 │   ├── prompts/
 │   │   └── tutor.py         # LearnLM-aligned prompts
 │   └── tools/
-│       └── rag.py           # Direct ChromaDB retriever
+│       ├── rag.py           # Direct ChromaDB retriever
+│       └── math_tool.py     # SymPy-based symbolic computation
 ├── api/routes/
 │   ├── chat.py              # SSE streaming endpoint
 │   ├── history.py           # Chat persistence (Supabase)

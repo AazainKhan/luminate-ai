@@ -73,12 +73,9 @@ export const Reasoning = memo(
       }
     }, [isStreaming, startTime, setDuration]);
 
-    // Controlled open state - no auto-open/close logic
-    // Parent component controls via open prop and phase state
-
-    const handleOpenChange = (newOpen: boolean) => {
+    const handleOpenChange = useCallback((newOpen: boolean) => {
       setIsOpen(newOpen);
-    };
+    }, [setIsOpen]);
 
     return (
       <ReasoningContext.Provider
@@ -126,11 +123,11 @@ export const ReasoningTrigger = memo(
             <Brain className="size-4" />
             {isStreaming ? (
               <p className="text-xs font-medium animate-pulse">
-                {currentStep ? `Reasoning: ${currentStep}` : "Thinking..."}
+                {currentStep ? `Reasoning: ${currentStep}` : "Reasoning..."}
               </p>
             ) : (
               <p className="text-xs font-medium">
-                {duration > 0 ? `Thought for ${duration} seconds` : "Reasoning"}
+                {duration > 0 ? `Reasoned for ${duration} seconds` : "Reasoning"}
               </p>
             )}
             <ChevronDown

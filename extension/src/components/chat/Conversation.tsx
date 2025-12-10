@@ -207,7 +207,7 @@ const ConversationScrollButton = React.forwardRef<HTMLButtonElement, Conversatio
         variant="outline"
         size="icon"
         className={cn(
-          "absolute bottom-20 right-8 z-10 rounded-full shadow-lg",
+          "absolute bottom-8 left-1/2 -translate-x-1/2 z-10 rounded-full shadow-lg",
           "bg-background/80 backdrop-blur-sm border-border",
           "animate-fade-slide-in",
           className
@@ -320,8 +320,8 @@ function LegacyConversationInternal({ messages, isLoading, onRegenerate }: Legac
               </div>
             </div>
           </ScrollArea>
-          <ConversationScrollButton />
         </Card>
+        <ConversationScrollButton />
       </div>
     </ConversationContext.Provider>
   )

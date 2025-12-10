@@ -193,10 +193,15 @@ class Source(BaseModel):
     description: Optional[str] = Field(None, description="Brief description of what this source covers")
     
     # Multi-collection fields
-    source_type: Optional[str] = Field(None, description="Source type: course, oer, or embedded")
+    source_type: Optional[str] = Field(None, description="Source type: course, oer, media, or image")
     citation_confidence: Optional[str] = Field(None, description="Citation confidence: high, medium, or low")
     url: Optional[str] = Field(None, description="URL for embedded resources (mediasite, external links)")
     link_type: Optional[str] = Field(None, description="Link type: mediasite, generic_url, etc.")
+    
+    # Image-specific fields
+    image_path: Optional[str] = Field(None, description="Path to image file (for source_type=image)")
+    image_url: Optional[str] = Field(None, description="API URL to serve the image (for source_type=image)")
+    concepts: Optional[List[str]] = Field(None, description="AI/ML concepts shown in image")
 
 
 class RAGMetadata(BaseModel):
