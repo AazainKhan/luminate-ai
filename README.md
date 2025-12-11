@@ -162,6 +162,48 @@ pnpm dev
 | **Database** | Supabase (PostgreSQL + Auth + RLS) |
 | **Infra** | Docker, GitHub Actions, E2B (code sandbox) |
 
+### 🧭 Frontend → Backend Request Flow
+
+1) **Student sends a prompt in the Chrome side panel**  
+   - UI: `extension/src/sidepanel.tsx` uses the `use-chat` hook.  
+   - Auth: Supabase session token is attached to the request headers.
+
+2) **Side panel streams to the backend**  
+   - Endpoint: `POST /api/chat/stream` (FastAPI).  
+   - Payload: prior messages + new user message, optional `chat_id` and `session_id`.  
+   - Transport: Server-Sent Events (AI SDK v5 format).  
+     - Format: each chunk is `data: {JSON}\n\n` and ends with a blank line.  
+     - Example: `data: {"type":"text-delta","textDelta":"Hi there"}\n\n`.
+
+3) **Backend initializes chat + history**  
+   - Creates or reuses a `chat_id` and saves the user message.  
+   - Fetches recent history for conversational context.
+
+4) **LangGraph agent pipeline runs**  
+   - Planner node: scope/integrity checks → intent classification + scaffolding level.  
+   - Router: sends to Tutor (default) or Math; Reject if policy fails.  
+   - Tutor/Math nodes: RAG via ChromaDB → scaffolded response generation.  
+   - Evaluator node: concept detection + mastery logging; emits evaluation events.
+
+5) **Streaming events flow back to the browser**  
+   - Events:  
+     - `trace-id`  
+     - `thinking` (decision trace)  
+     - `sources`  
+     - `citations`  
+     - `reasoning-delta`  
+     - `text-delta`  
+     - `evaluation`  
+     - `phase-transition`  
+     - optional `error`  
+     - final `finish` with `chatId`/`traceId`  
+   - Note: legacy `queue-init` / `queue-update` events were deprecated in favor of the structured `thinking` steps and are not emitted by this stream.  
+   - The `use-chat` hook assembles these chunks into the visible answer, inline citations, and thinking trace UI.
+
+6) **Persistence & observability**  
+   - Messages + metadata (sources, thinking steps, evaluation) are stored for history retrieval.  
+   - Langfuse traces capture spans for each node; Supabase stores chat content; ChromaDB backs RAG retrieval.
+
 ### Project Structure
 
 ```
