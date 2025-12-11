@@ -171,7 +171,9 @@ pnpm dev
 2) **Side panel streams to the backend**  
    - Endpoint: `POST /api/chat/stream` (FastAPI).  
    - Payload: prior messages + new user message, optional `chat_id` and `session_id`.  
-   - Transport: Server-Sent Events (AI SDK v5 format) using `data: {JSON}\n\n` chunks; each chunk ends with a blank line, e.g. `data: {"type":"text-delta","textDelta":"Hi there"}\n\n`.
+   - Transport: Server-Sent Events (AI SDK v5 format).  
+     - Format: each chunk is `data: {JSON}\n\n` and ends with a blank line.  
+     - Example: `data: {"type":"text-delta","textDelta":"Hi there"}\n\n`.
 
 3) **Backend initializes chat + history**  
    - Creates or reuses a `chat_id` and saves the user message.  
@@ -195,7 +197,7 @@ pnpm dev
      - `phase-transition`  
      - optional `error`  
      - final `finish` with `chatId`/`traceId`  
-   - Note: the legacy `queue-init` / `queue-update` events are not emitted by this stream.  
+   - Note: legacy `queue-init` / `queue-update` events were deprecated in favor of the structured `thinking` steps and are not emitted by this stream.  
    - The `use-chat` hook assembles these chunks into the visible answer, inline citations, and thinking trace UI.
 
 6) **Persistence & observability**  
