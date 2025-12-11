@@ -201,6 +201,9 @@ def calculate_mastery_score(
     
     Implements forgetting curve - scores decay towards 0.5 over time.
     Good performance increases score, poor performance decreases it.
+    
+    Formula (clamped to [0.1, 0.95]):
+        new = 0.7 * (0.5 + (old_score - 0.5) * decay_factor) + 0.3 * evaluation_confidence
     """
     # Apply decay to old score (moves toward 0.5 neutral)
     decayed_old = 0.5 + (old_score - 0.5) * decay_factor
