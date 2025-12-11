@@ -302,6 +302,7 @@ pnpm test:e2e
 
 | Document | Description |
 |----------|-------------|
+| [PROJECT_OVERVIEW_DETAILED.md](./docs/PROJECT_OVERVIEW_DETAILED.md) | Deep dive across backend, extension, infra, and pedagogy |
 | [SETUP.md](./SETUP.md) | Detailed setup & troubleshooting |
 | [PROJECT_STATUS.md](./PROJECT_STATUS.md) | Implementation status |
 | [PRD.md](./docs/PRD.md) | Product Requirements |
